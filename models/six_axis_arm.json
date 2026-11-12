@@ -1,0 +1,161 @@
+{
+  "name": "six_axis_arm_v1",
+  "description": "Design-study 6R arm: 0.96 m reach, harmonic-drive joints, BLDC drives. Parameters are representative, not measured.",
+  "gravity": [0.0, 0.0, -9.81],
+  "payload": {
+    "mass": 0.0,
+    "com": [0.0, 0.0, 0.05]
+  },
+  "links": [
+    {
+      "name": "link1_base_yaw",
+      "a": 0.0,
+      "alpha_deg": 90.0,
+      "d": 0.30,
+      "theta_offset_deg": 0.0,
+      "mass": 5.0,
+      "com": [0.0, 0.0, 0.15],
+      "inertia": [0.050, 0.050, 0.020],
+      "limits_deg": [-170.0, 170.0],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 100.0,
+        "efficiency": 0.80,
+        "kt": 0.09,
+        "resistance": 0.50,
+        "voltage": 48.0,
+        "stall_torque": 2.5,
+        "no_load_speed": 420.0,
+        "continuous_torque": 1.4,
+        "rotor_inertia": 0.0002,
+        "viscous_friction": 0.05,
+        "coulomb_friction": 0.15
+      }
+    },
+    {
+      "name": "link2_shoulder",
+      "a": 0.42,
+      "alpha_deg": 0.0,
+      "d": 0.0,
+      "theta_offset_deg": 0.0,
+      "mass": 4.0,
+      "com": [0.21, 0.0, 0.0],
+      "inertia": [0.080, 0.080, 0.010],
+      "limits_deg": [-120.0, 120.0],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 120.0,
+        "efficiency": 0.80,
+        "kt": 0.09,
+        "resistance": 0.50,
+        "voltage": 48.0,
+        "stall_torque": 2.8,
+        "no_load_speed": 400.0,
+        "continuous_torque": 1.6,
+        "rotor_inertia": 0.0002,
+        "viscous_friction": 0.06,
+        "coulomb_friction": 0.18
+      }
+    },
+    {
+      "name": "link3_elbow",
+      "a": 0.36,
+      "alpha_deg": 0.0,
+      "d": 0.0,
+      "theta_offset_deg": 0.0,
+      "mass": 3.0,
+      "com": [0.18, 0.0, 0.0],
+      "inertia": [0.050, 0.050, 0.008],
+      "limits_deg": [-150.0, 150.0],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 100.0,
+        "efficiency": 0.78,
+        "kt": 0.09,
+        "resistance": 0.55,
+        "voltage": 48.0,
+        "stall_torque": 2.2,
+        "no_load_speed": 420.0,
+        "continuous_torque": 1.2,
+        "rotor_inertia": 0.0002,
+        "viscous_friction": 0.05,
+        "coulomb_friction": 0.15
+      }
+    },
+    {
+      "name": "link4_wrist_roll",
+      "a": 0.0,
+      "alpha_deg": 90.0,
+      "d": 0.10,
+      "theta_offset_deg": 0.0,
+      "mass": 1.5,
+      "com": [0.0, 0.0, 0.05],
+      "inertia": [0.005, 0.005, 0.003],
+      "limits_deg": [-180.0, 180.0],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 60.0,
+        "efficiency": 0.75,
+        "kt": 0.05,
+        "resistance": 0.80,
+        "voltage": 48.0,
+        "stall_torque": 0.9,
+        "no_load_speed": 500.0,
+        "continuous_torque": 0.5,
+        "rotor_inertia": 0.00005,
+        "viscous_friction": 0.02,
+        "coulomb_friction": 0.05
+      }
+    },
+    {
+      "name": "link5_wrist_pitch",
+      "a": 0.0,
+      "alpha_deg": -90.0,
+      "d": 0.10,
+      "theta_offset_deg": 0.0,
+      "mass": 1.0,
+      "com": [0.0, 0.0, 0.05],
+      "inertia": [0.003, 0.003, 0.002],
+      "limits_deg": [-120.0, 120.0],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 60.0,
+        "efficiency": 0.75,
+        "kt": 0.05,
+        "resistance": 0.85,
+        "voltage": 48.0,
+        "stall_torque": 0.9,
+        "no_load_speed": 500.0,
+        "continuous_torque": 0.5,
+        "rotor_inertia": 0.00005,
+        "viscous_friction": 0.02,
+        "coulomb_friction": 0.05
+      }
+    },
+    {
+      "name": "link6_tool",
+      "a": 0.0,
+      "alpha_deg": 0.0,
+      "d": 0.08,
+      "theta_offset_deg": 0.0,
+      "mass": 0.6,
+      "com": [0.0, 0.0, 0.04],
+      "inertia": [0.001, 0.001, 0.001],
+      "limits_deg": [-180.0, 180.0],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 40.0,
+        "efficiency": 0.72,
+        "kt": 0.04,
+        "resistance": 1.00,
+        "voltage": 48.0,
+        "stall_torque": 0.5,
+        "no_load_speed": 600.0,
+        "continuous_torque": 0.25,
+        "rotor_inertia": 0.00002,
+        "viscous_friction": 0.01,
+        "coulomb_friction": 0.03
+      }
+    }
+  ]
+}

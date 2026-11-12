@@ -1,0 +1,116 @@
+{
+  "delay_30": {
+    "fixed": {
+      "overshoot_pct_mean": 0.0,
+      "settling_s_mean": 0.9550000000000001,
+      "final_error_mm_mean": 2.1522262571839894,
+      "energy_j_mean": 162.02053457004476,
+      "peak_torque_nm": 107.00195223382474,
+      "saturation_frac": 0.0
+    },
+    "governor": {
+      "overshoot_pct_mean": 0.05773993599533788,
+      "settling_s_mean": 0.965,
+      "final_error_mm_mean": 0.9080436264491412,
+      "energy_j_mean": 163.45567739591345,
+      "peak_torque_nm": 117.06846647518016,
+      "saturation_frac": 0.0
+    }
+  },
+  "delay_60": {
+    "fixed": {
+      "overshoot_pct_mean": 0.30166641848483605,
+      "settling_s_mean": 1.165,
+      "final_error_mm_mean": 1.0108804519176144,
+      "energy_j_mean": 162.1510192203002,
+      "peak_torque_nm": 107.00195223382474,
+      "saturation_frac": 0.0
+    },
+    "governor": {
+      "overshoot_pct_mean": 0.0,
+      "settling_s_mean": 0.895,
+      "final_error_mm_mean": 1.8432226262199245,
+      "energy_j_mean": 161.81776221471947,
+      "peak_torque_nm": 107.0019522338247,
+      "saturation_frac": 0.0
+    }
+  },
+  "delay_120": {
+    "fixed": {
+      "overshoot_pct_mean": 4.064702280017022,
+      "settling_s_mean": 2.895,
+      "final_error_mm_mean": 3.1708160396625336,
+      "energy_j_mean": 170.33096583414994,
+      "peak_torque_nm": 116.47583700924642,
+      "saturation_frac": 0.0
+    },
+    "governor": {
+      "overshoot_pct_mean": 0.0,
+      "settling_s_mean": 1.03,
+      "final_error_mm_mean": 1.9467106380288766,
+      "energy_j_mean": 159.70695660088467,
+      "peak_torque_nm": 105.22160437509771,
+      "saturation_frac": 0.0
+    }
+  },
+  "delay_180": {
+    "fixed": {
+      "overshoot_pct_mean": 13.083587358307426,
+      "settling_s_mean": NaN,
+      "final_error_mm_mean": 29.64945976867579,
+      "energy_j_mean": 178.5611800543313,
+      "peak_torque_nm": 129.7139695936107,
+      "saturation_frac": 0.0
+    },
+    "governor": {
+      "overshoot_pct_mean": 0.0,
+      "settling_s_mean": 1.11,
+      "final_error_mm_mean": 2.161968131180726,
+      "energy_j_mean": 157.53319093256135,
+      "peak_torque_nm": 99.61807397789057,
+      "saturation_frac": 0.0
+    }
+  },
+  "payload_0": {
+    "fixed": {
+      "overshoot_pct_mean": 4.064702280017022,
+      "settling_s_mean": 2.895,
+      "energy_j_mean": 170.33096583414994,
+      "peak_torque_nm": 116.47583700924642
+    },
+    "governor": {
+      "overshoot_pct_mean": 0.0,
+      "settling_s_mean": 1.03,
+      "energy_j_mean": 159.70695660088467,
+      "peak_torque_nm": 105.22160437509771
+    }
+  },
+  "payload_2": {
+    "fixed": {
+      "overshoot_pct_mean": 4.119380495255619,
+      "settling_s_mean": 2.8899999999999997,
+      "energy_j_mean": 266.39439656327767,
+      "peak_torque_nm": 142.27987531087825
+    },
+    "governor": {
+      "overshoot_pct_mean": 0.0,
+      "settling_s_mean": 1.025,
+      "energy_j_mean": 250.13961270978825,
+      "peak_torque_nm": 121.40549759938948
+    }
+  },
+  "payload_4": {
+    "fixed": {
+      "overshoot_pct_mean": 4.163832854172285,
+      "settling_s_mean": 2.88,
+      "energy_j_mean": 387.4767527985042,
+      "peak_torque_nm": 167.30003088947092
+    },
+    "governor": {
+      "overshoot_pct_mean": 0.0,
+      "settling_s_mean": 1.025,
+      "energy_j_mean": 364.57976332786427,
+      "peak_torque_nm": 138.13911724833847
+    }
+  }
+}

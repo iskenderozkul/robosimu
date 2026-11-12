@@ -1,0 +1,16 @@
+{
+  "title": "robosimu: a dependency-light 6-axis arm reaching simulator",
+  "description": "Rigid-body simulator for a six-axis serial arm with per-joint motor and drive models, delay/noise scenarios, and a delay-derived reaching controller benchmark.",
+  "upload_type": "software",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Ozkul, Iskender",
+      "orcid": "0000-0000-0000-0000"
+    }
+  ],
+  "keywords": ["robotics", "simulation", "visual servoing", "reaching", "delay", "dynamics"],
+  "version": "0.1.0",
+  "language": "eng",
+  "notes": "Simulation software; no hardware validation is claimed."
+}

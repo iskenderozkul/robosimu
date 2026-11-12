@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robosimu"
+version = "0.1.0"
+description = "Dependency-light 6-axis arm simulator: kinematics, dynamics, motors, energy"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["numpy>=1.24", "Pillow>=9.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+robosimu = "robosimu.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["robosimu*"]

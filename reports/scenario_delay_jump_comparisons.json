@@ -1,0 +1,110 @@
+[
+  {
+    "condition": "constant 60 ms",
+    "baseline": "fixed",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.635,
+    "mt_baseline_s": 1.02,
+    "delta_mt_pct": -37.745098039215684,
+    "cohens_d": -1.3203084223498016,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0017996400719856027
+  },
+  {
+    "condition": "constant 60 ms",
+    "baseline": "lqr",
+    "n_governor": 30,
+    "n_baseline": 3,
+    "mt_governor_s": 0.635,
+    "mt_baseline_s": 2.54,
+    "delta_mt_pct": -75.0,
+    "cohens_d": -4.2053491737661535,
+    "p_raw": 0.0003999200159968006,
+    "p_holm": 0.0017996400719856027
+  },
+  {
+    "condition": "constant 60 ms",
+    "baseline": "smith",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.635,
+    "mt_baseline_s": 0.9500000000000001,
+    "delta_mt_pct": -33.15789473684211,
+    "cohens_d": -0.3492971162669787,
+    "p_raw": 0.18316336732653468,
+    "p_holm": 0.36632673465306936
+  },
+  {
+    "condition": "60 -> 180 ms at 0.8 s",
+    "baseline": "smith",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.635,
+    "mt_baseline_s": 1.185,
+    "delta_mt_pct": -46.41350210970464,
+    "cohens_d": -1.5849014656563805,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0017996400719856027
+  },
+  {
+    "condition": "60 -> 0 ms at 0.8 s",
+    "baseline": "fixed",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.635,
+    "mt_baseline_s": 0.84,
+    "delta_mt_pct": -24.404761904761894,
+    "cohens_d": -1.4661869133725245,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0017996400719856027
+  },
+  {
+    "condition": "60 -> 0 ms at 0.8 s",
+    "baseline": "lqr",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.635,
+    "mt_baseline_s": 1.3900000000000001,
+    "delta_mt_pct": -54.31654676258992,
+    "cohens_d": -3.6433273966079627,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0017996400719856027
+  },
+  {
+    "condition": "60 -> 0 ms at 0.8 s",
+    "baseline": "smith",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.635,
+    "mt_baseline_s": 0.6900000000000001,
+    "delta_mt_pct": -7.971014492753625,
+    "cohens_d": -0.1721303134105151,
+    "p_raw": 0.5112977404519096,
+    "p_holm": 0.5112977404519096
+  },
+  {
+    "condition": "60 -> 180 -> 60 ms",
+    "baseline": "fixed",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.87,
+    "mt_baseline_s": 2.09,
+    "delta_mt_pct": -58.37320574162679,
+    "cohens_d": -4.384408802195015,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0017996400719856027
+  },
+  {
+    "condition": "60 -> 180 -> 60 ms",
+    "baseline": "smith",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.87,
+    "mt_baseline_s": 1.22,
+    "delta_mt_pct": -28.688524590163933,
+    "cohens_d": -1.6689070620493187,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0017996400719856027
+  }
+]

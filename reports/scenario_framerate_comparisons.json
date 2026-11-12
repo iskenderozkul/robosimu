@@ -1,0 +1,98 @@
+[
+  {
+    "condition": "15 Hz",
+    "baseline": "smith",
+    "n_governor": 30,
+    "n_baseline": 17,
+    "mt_governor_s": 0.8,
+    "mt_baseline_s": 2.0666666666666664,
+    "delta_mt_pct": -61.29032258064515,
+    "cohens_d": -3.1941008679136864,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0015996800639872025
+  },
+  {
+    "condition": "30 Hz",
+    "baseline": "fixed",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.6666666666666666,
+    "mt_baseline_s": 1.15,
+    "delta_mt_pct": -42.028985507246375,
+    "cohens_d": -3.3073889193653225,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0015996800639872025
+  },
+  {
+    "condition": "30 Hz",
+    "baseline": "smith",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.6666666666666666,
+    "mt_baseline_s": 1.0333333333333332,
+    "delta_mt_pct": -35.48387096774193,
+    "cohens_d": -2.034521694032754,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0015996800639872025
+  },
+  {
+    "condition": "60 Hz",
+    "baseline": "fixed",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.6416666666666666,
+    "mt_baseline_s": 1.0333333333333332,
+    "delta_mt_pct": -37.903225806451616,
+    "cohens_d": -1.192769228430576,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0015996800639872025
+  },
+  {
+    "condition": "60 Hz",
+    "baseline": "smith",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.6416666666666666,
+    "mt_baseline_s": 0.9666666666666667,
+    "delta_mt_pct": -33.62068965517242,
+    "cohens_d": -0.5679271086693692,
+    "p_raw": 0.027994401119776045,
+    "p_holm": 0.05598880223955209
+  },
+  {
+    "condition": "100 Hz",
+    "baseline": "fixed",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.635,
+    "mt_baseline_s": 1.02,
+    "delta_mt_pct": -37.745098039215684,
+    "cohens_d": -1.3203084223498016,
+    "p_raw": 0.0001999600079984003,
+    "p_holm": 0.0015996800639872025
+  },
+  {
+    "condition": "100 Hz",
+    "baseline": "lqr",
+    "n_governor": 30,
+    "n_baseline": 3,
+    "mt_governor_s": 0.635,
+    "mt_baseline_s": 2.54,
+    "delta_mt_pct": -75.0,
+    "cohens_d": -4.2053491737661535,
+    "p_raw": 0.0003999200159968006,
+    "p_holm": 0.0015996800639872025
+  },
+  {
+    "condition": "100 Hz",
+    "baseline": "smith",
+    "n_governor": 30,
+    "n_baseline": 30,
+    "mt_governor_s": 0.635,
+    "mt_baseline_s": 0.9500000000000001,
+    "delta_mt_pct": -33.15789473684211,
+    "cohens_d": -0.3492971162669787,
+    "p_raw": 0.18316336732653468,
+    "p_holm": 0.18316336732653468
+  }
+]

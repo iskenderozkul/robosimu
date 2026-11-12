@@ -1,0 +1,482 @@
+{
+  "(0.1, 0.008, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.58,
+    "mt_ci95_s": [
+      0.58,
+      0.59
+    ],
+    "failures": 0,
+    "overshoot_rate": 1.0,
+    "overshoot_ci95": [
+      0.8864866068260312,
+      0.9999999999999999
+    ],
+    "max_penetration_mm": 19.807471212625604,
+    "energy_mean_j": 142.00629958609426,
+    "final_error_mm": 1.1418840978061433,
+    "peak_torque_nm": 103.08201018021228,
+    "id_bits": 3.7548875021634687,
+    "throughput_bps": 6.47394396924736
+  },
+  "(0.1, 0.008, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.43,
+    "mt_ci95_s": [
+      0.43,
+      0.43
+    ],
+    "failures": 0,
+    "overshoot_rate": 1.0,
+    "overshoot_ci95": [
+      0.8864866068260312,
+      0.9999999999999999
+    ],
+    "max_penetration_mm": 6.880685037124412,
+    "energy_mean_j": 140.21268574867426,
+    "final_error_mm": 1.5730774051074963,
+    "peak_torque_nm": 103.08201018021228,
+    "id_bits": 3.7548875021634687,
+    "throughput_bps": 8.732296516659229
+  },
+  "(0.1, 0.016, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.39,
+    "mt_ci95_s": [
+      0.39,
+      0.4
+    ],
+    "failures": 0,
+    "overshoot_rate": 1.0,
+    "overshoot_ci95": [
+      0.8864866068260312,
+      0.9999999999999999
+    ],
+    "max_penetration_mm": 20.47732869310903,
+    "energy_mean_j": 141.76283811476134,
+    "final_error_mm": 5.347418502173737,
+    "peak_torque_nm": 103.08201018021228,
+    "id_bits": 2.857980995127572,
+    "throughput_bps": 7.328156397763005
+  },
+  "(0.1, 0.016, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.42,
+    "mt_ci95_s": [
+      0.42,
+      0.425
+    ],
+    "failures": 0,
+    "overshoot_rate": 1.0,
+    "overshoot_ci95": [
+      0.8864866068260312,
+      0.9999999999999999
+    ],
+    "max_penetration_mm": 10.61881306673483,
+    "energy_mean_j": 140.65943611586104,
+    "final_error_mm": 1.3631091203782817,
+    "peak_torque_nm": 103.08201018021228,
+    "id_bits": 2.857980995127572,
+    "throughput_bps": 6.804716655065648
+  },
+  "(0.1, 0.032, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.38,
+    "mt_ci95_s": [
+      0.38,
+      0.38
+    ],
+    "failures": 0,
+    "overshoot_rate": 1.0,
+    "overshoot_ci95": [
+      0.8864866068260312,
+      0.9999999999999999
+    ],
+    "max_penetration_mm": 22.177646307339177,
+    "energy_mean_j": 141.46257164233685,
+    "final_error_mm": 6.3276347349146524,
+    "peak_torque_nm": 103.08201018021228,
+    "id_bits": 2.0443941193584534,
+    "throughput_bps": 5.379984524627509
+  },
+  "(0.1, 0.032, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.19,
+    "mt_ci95_s": [
+      0.19,
+      0.2
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 15.652051097122948,
+    "energy_mean_j": 140.83839591104075,
+    "final_error_mm": 9.807714125215247,
+    "peak_torque_nm": 103.08201018021228,
+    "id_bits": 2.0443941193584534,
+    "throughput_bps": 10.759969049255018
+  },
+  "(0.15, 0.008, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.68,
+    "mt_ci95_s": [
+      0.67,
+      0.6900000000000001
+    ],
+    "failures": 0,
+    "overshoot_rate": 1.0,
+    "overshoot_ci95": [
+      0.8864866068260312,
+      0.9999999999999999
+    ],
+    "max_penetration_mm": 16.123482274353258,
+    "energy_mean_j": 145.10365639457206,
+    "final_error_mm": 0.8835829178956501,
+    "peak_torque_nm": 103.07829012756181,
+    "id_bits": 4.303780748177103,
+    "throughput_bps": 6.3290893355545625
+  },
+  "(0.15, 0.008, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.35000000000000003,
+    "mt_ci95_s": [
+      0.35000000000000003,
+      0.35000000000000003
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.06666666666666667,
+    "overshoot_ci95": [
+      0.018477023791270378,
+      0.2132345836261692
+    ],
+    "max_penetration_mm": 4.477660192795358,
+    "energy_mean_j": 143.45855325419163,
+    "final_error_mm": 1.9543042866138438,
+    "peak_torque_nm": 103.07829012756184,
+    "id_bits": 4.303780748177103,
+    "throughput_bps": 12.296516423363151
+  },
+  "(0.15, 0.016, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.47000000000000003,
+    "mt_ci95_s": [
+      0.47000000000000003,
+      0.48
+    ],
+    "failures": 0,
+    "overshoot_rate": 1.0,
+    "overshoot_ci95": [
+      0.8864866068260312,
+      0.9999999999999999
+    ],
+    "max_penetration_mm": 16.844638043344297,
+    "energy_mean_j": 144.91812299486293,
+    "final_error_mm": 5.366649218436239,
+    "peak_torque_nm": 103.07829012756181,
+    "id_bits": 3.3750394313469245,
+    "throughput_bps": 7.180934960312605
+  },
+  "(0.15, 0.016, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.32,
+    "mt_ci95_s": [
+      0.31,
+      0.32
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 6.9487319600512745,
+    "energy_mean_j": 143.54699153960897,
+    "final_error_mm": 3.4299003321631307,
+    "peak_torque_nm": 103.07829012756184,
+    "id_bits": 3.3750394313469245,
+    "throughput_bps": 10.54699822295914
+  },
+  "(0.15, 0.032, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.46,
+    "mt_ci95_s": [
+      0.45,
+      0.46
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.8333333333333334,
+    "overshoot_ci95": [
+      0.6643564949358398,
+      0.9266345762815145
+    ],
+    "max_penetration_mm": 17.5368417277178,
+    "energy_mean_j": 144.72663730568613,
+    "final_error_mm": 3.2922198379371364,
+    "peak_torque_nm": 103.07829012756181,
+    "id_bits": 2.5077946401986964,
+    "throughput_bps": 5.451727478692818
+  },
+  "(0.15, 0.032, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.28,
+    "mt_ci95_s": [
+      0.28,
+      0.28
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 11.339746763855574,
+    "energy_mean_j": 143.84021692639547,
+    "final_error_mm": 4.770489831953985,
+    "peak_torque_nm": 103.07829012756184,
+    "id_bits": 2.5077946401986964,
+    "throughput_bps": 8.956409429281058
+  },
+  "(0.2, 0.008, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.78,
+    "mt_ci95_s": [
+      0.77,
+      0.79
+    ],
+    "failures": 0,
+    "overshoot_rate": 1.0,
+    "overshoot_ci95": [
+      0.8864866068260312,
+      0.9999999999999999
+    ],
+    "max_penetration_mm": 13.019710212743702,
+    "energy_mean_j": 148.62827462162093,
+    "final_error_mm": 0.8859899660437143,
+    "peak_torque_nm": 103.18858670195816,
+    "id_bits": 4.700439718141093,
+    "throughput_bps": 6.026204766847554
+  },
+  "(0.2, 0.008, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.46,
+    "mt_ci95_s": [
+      0.46,
+      0.46
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 1.8088333203862272,
+    "energy_mean_j": 146.74406600364836,
+    "final_error_mm": 1.0361096790129753,
+    "peak_torque_nm": 103.1823715075548,
+    "id_bits": 4.700439718141093,
+    "throughput_bps": 10.218347213350201
+  },
+  "(0.2, 0.016, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.55,
+    "mt_ci95_s": [
+      0.55,
+      0.56
+    ],
+    "failures": 0,
+    "overshoot_rate": 1.0,
+    "overshoot_ci95": [
+      0.8864866068260312,
+      0.9999999999999999
+    ],
+    "max_penetration_mm": 13.41467932111104,
+    "energy_mean_j": 148.07147706709318,
+    "final_error_mm": 5.334591920097953,
+    "peak_torque_nm": 103.16760806894689,
+    "id_bits": 3.7548875021634687,
+    "throughput_bps": 6.82706818575176
+  },
+  "(0.2, 0.016, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.42,
+    "mt_ci95_s": [
+      0.42,
+      0.42
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 4.028434433734934,
+    "energy_mean_j": 146.94326770210094,
+    "final_error_mm": 1.0631776380007687,
+    "peak_torque_nm": 103.07636036813493,
+    "id_bits": 3.7548875021634687,
+    "throughput_bps": 8.94020833848445
+  },
+  "(0.2, 0.032, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.37,
+    "mt_ci95_s": [
+      0.37,
+      0.37
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 13.676983327100462,
+    "energy_mean_j": 147.81893340467033,
+    "final_error_mm": 5.4073455651465245,
+    "peak_torque_nm": 103.07636036813493,
+    "id_bits": 2.857980995127572,
+    "throughput_bps": 7.7242729598042486
+  },
+  "(0.2, 0.032, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.38,
+    "mt_ci95_s": [
+      0.38,
+      0.38
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 7.235850689476825,
+    "energy_mean_j": 147.2724219479721,
+    "final_error_mm": 1.6730660743851542,
+    "peak_torque_nm": 103.07636036813493,
+    "id_bits": 2.857980995127572,
+    "throughput_bps": 7.521002618756768
+  },
+  "(0.25, 0.008, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.86,
+    "mt_ci95_s": [
+      0.845,
+      0.87
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.9,
+    "overshoot_ci95": [
+      0.7437891742081593,
+      0.9654001112526658
+    ],
+    "max_penetration_mm": 11.345674814140061,
+    "energy_mean_j": 152.95691432638387,
+    "final_error_mm": 1.5186803295780065,
+    "peak_torque_nm": 103.5122018371466,
+    "id_bits": 5.011227255423254,
+    "throughput_bps": 5.827008436538668
+  },
+  "(0.25, 0.008, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.58,
+    "mt_ci95_s": [
+      0.58,
+      0.58
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 0.4884883368541093,
+    "energy_mean_j": 150.8444610720173,
+    "final_error_mm": 1.8277829755693429,
+    "peak_torque_nm": 103.07517046232958,
+    "id_bits": 5.011227255423254,
+    "throughput_bps": 8.64004699210906
+  },
+  "(0.25, 0.016, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.64,
+    "mt_ci95_s": [
+      0.62,
+      0.64
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.7333333333333333,
+    "overshoot_ci95": [
+      0.555520383048111,
+      0.8581733668040368
+    ],
+    "max_penetration_mm": 11.379996334732578,
+    "energy_mean_j": 152.56750957845182,
+    "final_error_mm": 3.8835970935354034,
+    "peak_torque_nm": 103.70564897664434,
+    "id_bits": 4.05528243550119,
+    "throughput_bps": 6.336378805470609
+  },
+  "(0.25, 0.016, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.52,
+    "mt_ci95_s": [
+      0.52,
+      0.53
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 1.7826618976029274,
+    "energy_mean_j": 151.12095976455865,
+    "final_error_mm": 1.7112368892927923,
+    "peak_torque_nm": 103.07517046232958,
+    "id_bits": 4.05528243550119,
+    "throughput_bps": 7.798620068271519
+  },
+  "(0.25, 0.032, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.47000000000000003,
+    "mt_ci95_s": [
+      0.47000000000000003,
+      0.48
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 11.624247911938667,
+    "energy_mean_j": 152.02108341262053,
+    "final_error_mm": 4.295663468886201,
+    "peak_torque_nm": 103.37585762400387,
+    "id_bits": 3.1395513523987937,
+    "throughput_bps": 6.679896494465518
+  },
+  "(0.25, 0.032, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.48,
+    "mt_ci95_s": [
+      0.48,
+      0.48
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 4.9619830748984795,
+    "energy_mean_j": 151.41538070631856,
+    "final_error_mm": 2.522127271513455,
+    "peak_torque_nm": 103.07517046232958,
+    "id_bits": 3.1395513523987937,
+    "throughput_bps": 6.540731984164154
+  }
+}

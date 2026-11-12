@@ -1,0 +1,154 @@
+{
+  "(0.0005, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 1.02,
+    "mt_ci95_s": [
+      1.005,
+      1.0350000000000001
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.36666666666666664,
+    "overshoot_ci95": [
+      0.21873920806100708,
+      0.5448643634520511
+    ],
+    "max_penetration_mm": 6.784934769164863,
+    "energy_mean_j": 160.883070746844,
+    "final_error_mm": 1.3679294294538233,
+    "peak_torque_nm": 108.27236815208306,
+    "noise_label": "sigma xyz = 0.5, 0.5, 0.5 mm"
+  },
+  "(0.0005, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.635,
+    "mt_ci95_s": [
+      0.605,
+      0.86
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 2.1626880520597966,
+    "energy_mean_j": 159.72973973084908,
+    "final_error_mm": 1.869732708747023,
+    "peak_torque_nm": 107.80216398590527,
+    "noise_label": "sigma xyz = 0.5, 0.5, 0.5 mm"
+  },
+  "(0.002, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 0.93,
+    "mt_ci95_s": [
+      0.8150000000000001,
+      1.0350000000000001
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.26666666666666666,
+    "overshoot_ci95": [
+      0.14182663319596317,
+      0.4444796169518888
+    ],
+    "max_penetration_mm": 6.329942424106116,
+    "energy_mean_j": 168.49787646648687,
+    "final_error_mm": 0.5216901309839709,
+    "peak_torque_nm": 124.79528869097531,
+    "noise_label": "sigma xyz = 1, 1, 2 mm"
+  },
+  "(0.002, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.985,
+    "mt_ci95_s": [
+      0.905,
+      1.03
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 2.731738719254362,
+    "energy_mean_j": 166.42751567713756,
+    "final_error_mm": 0.5129865500191056,
+    "peak_torque_nm": 120.73614515808232,
+    "noise_label": "sigma xyz = 1, 1, 2 mm"
+  },
+  "(0.003, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 2.56,
+    "mt_ci95_s": [
+      2.34,
+      2.62
+    ],
+    "failures": 1,
+    "overshoot_rate": 0.3333333333333333,
+    "overshoot_ci95": [
+      0.19230498083676134,
+      0.5121994835545616
+    ],
+    "max_penetration_mm": 5.366335558307317,
+    "energy_mean_j": 185.03349305253565,
+    "final_error_mm": 1.464306263723574,
+    "peak_torque_nm": 129.84959989534454,
+    "noise_label": "sigma xyz = 1.5, 1.5, 3 mm"
+  },
+  "(0.003, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.665,
+    "mt_ci95_s": [
+      0.62,
+      0.755
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 1.3497954572446735,
+    "energy_mean_j": 161.0226765117882,
+    "final_error_mm": 0.6209214740389983,
+    "peak_torque_nm": 111.57039399538856,
+    "noise_label": "sigma xyz = 1.5, 1.5, 3 mm"
+  },
+  "(0.004, 'fixed')": {
+    "n": 30,
+    "mt_median_s": 2.915,
+    "mt_ci95_s": [
+      2.755,
+      2.965
+    ],
+    "failures": 10,
+    "overshoot_rate": 0.36666666666666664,
+    "overshoot_ci95": [
+      0.21873920806100708,
+      0.5448643634520511
+    ],
+    "max_penetration_mm": 6.063593245566379,
+    "energy_mean_j": 198.77029865403483,
+    "final_error_mm": 3.5270227147505135,
+    "peak_torque_nm": 133.30677641480398,
+    "noise_label": "sigma xyz = 2, 2, 4 mm"
+  },
+  "(0.004, 'governor')": {
+    "n": 30,
+    "mt_median_s": 0.66,
+    "mt_ci95_s": [
+      0.635,
+      0.9299999999999999
+    ],
+    "failures": 0,
+    "overshoot_rate": 0.0,
+    "overshoot_ci95": [
+      0.0,
+      0.11351339317396876
+    ],
+    "max_penetration_mm": 1.2213702618662503,
+    "energy_mean_j": 160.9731351977579,
+    "final_error_mm": 0.8759982789793144,
+    "peak_torque_nm": 110.36028610337435,
+    "noise_label": "sigma xyz = 2, 2, 4 mm"
+  }
+}

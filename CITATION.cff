@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "robosimu: a dependency-light 6-axis arm reaching simulator"
+type: software
+version: 0.1.0
+date-released: 2026-11-11
+license: MIT
+authors:
+  - family-names: "Ozkul"
+    given-names: "Iskender"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+keywords:
+  - robotics
+  - simulation
+  - visual servoing
+  - reaching
+  - delay
+  - dynamics
+repository-code: "https://github.com/iskenderozkul/robosimu"
+abstract: >-
+  A rigid-body simulator for a six-axis serial arm with per-joint motor and
+  drive models, used to test a delay-derived reaching controller against
+  conventional baselines under reproducible academic scenarios.

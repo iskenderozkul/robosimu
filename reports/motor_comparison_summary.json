@@ -1,0 +1,126 @@
+{
+  "nominal": {
+    "dc": {
+      "fixed": {
+        "energy_j_mean": 206.21652348278275,
+        "copper_loss_j_mean": 193.29643718391827,
+        "peak_current_a_mean": 14.97888850427552,
+        "saturation_steps_mean": 0.0,
+        "overshoot_pct_mean": 4.064702280017022,
+        "settling_s_mean": 2.895,
+        "peak_torque_nm_mean": 116.47583700924642
+      },
+      "governor": {
+        "energy_j_mean": 193.61576372559873,
+        "copper_loss_j_mean": 185.50169067664558,
+        "peak_current_a_mean": 13.53158492478109,
+        "saturation_steps_mean": 0.0,
+        "overshoot_pct_mean": 0.0,
+        "settling_s_mean": 1.03,
+        "peak_torque_nm_mean": 105.22160437509773
+      }
+    },
+    "bldc": {
+      "fixed": {
+        "energy_j_mean": 170.33096583414994,
+        "copper_loss_j_mean": 158.30525705516186,
+        "peak_current_a_mean": 13.480999653847967,
+        "saturation_steps_mean": 0.0,
+        "overshoot_pct_mean": 4.064702280017022,
+        "settling_s_mean": 2.895,
+        "peak_torque_nm_mean": 116.47583700924642
+      },
+      "governor": {
+        "energy_j_mean": 159.70695660088467,
+        "copper_loss_j_mean": 151.91824923431693,
+        "peak_current_a_mean": 12.178426432302977,
+        "saturation_steps_mean": 0.0,
+        "overshoot_pct_mean": 0.0,
+        "settling_s_mean": 1.03,
+        "peak_torque_nm_mean": 105.22160437509773
+      }
+    },
+    "stepper": {
+      "fixed": {
+        "energy_j_mean": 250.6778827407789,
+        "copper_loss_j_mean": 237.17129712696644,
+        "peak_current_a_mean": 16.591999573966728,
+        "saturation_steps_mean": 0.0,
+        "overshoot_pct_mean": 4.064702280017022,
+        "settling_s_mean": 2.895,
+        "peak_torque_nm_mean": 116.47583700924642
+      },
+      "governor": {
+        "energy_j_mean": 235.67673351348498,
+        "copper_loss_j_mean": 227.60728153082397,
+        "peak_current_a_mean": 14.988832532065203,
+        "saturation_steps_mean": 0.0,
+        "overshoot_pct_mean": 0.0,
+        "settling_s_mean": 1.03,
+        "peak_torque_nm_mean": 105.22160437509773
+      }
+    }
+  },
+  "fast": {
+    "dc": {
+      "fixed": {
+        "energy_j_mean": 321.740245854264,
+        "copper_loss_j_mean": 260.9904440132742,
+        "peak_current_a_mean": 23.40071711315243,
+        "saturation_steps_mean": 2.0,
+        "overshoot_pct_mean": 11.680351983432125,
+        "settling_s_mean": NaN,
+        "peak_torque_nm_mean": 181.96397627187332
+      },
+      "governor": {
+        "energy_j_mean": 198.23686527457113,
+        "copper_loss_j_mean": 186.7381302182663,
+        "peak_current_a_mean": 15.399024214082539,
+        "saturation_steps_mean": 0.0,
+        "overshoot_pct_mean": 0.0,
+        "settling_s_mean": 0.71,
+        "peak_torque_nm_mean": 119.7428122887058
+      }
+    },
+    "bldc": {
+      "fixed": {
+        "energy_j_mean": 271.3577398016324,
+        "copper_loss_j_mean": 214.82726090643342,
+        "peak_current_a_mean": 21.02136142143607,
+        "saturation_steps_mean": 2.0,
+        "overshoot_pct_mean": 11.68852483258209,
+        "settling_s_mean": NaN,
+        "peak_torque_nm_mean": 181.62456268120764
+      },
+      "governor": {
+        "energy_j_mean": 163.70710256602172,
+        "copper_loss_j_mean": 152.9600148319683,
+        "peak_current_a_mean": 13.859121792674284,
+        "saturation_steps_mean": 0.0,
+        "overshoot_pct_mean": 0.0,
+        "settling_s_mean": 0.71,
+        "peak_torque_nm_mean": 119.7428122887058
+      }
+    },
+    "stepper": {
+      "fixed": {
+        "energy_j_mean": 437.55119429018885,
+        "copper_loss_j_mean": 218.08689788892337,
+        "peak_current_a_mean": 30.715481110180463,
+        "saturation_steps_mean": 511.5,
+        "overshoot_pct_mean": 9.83132610597248,
+        "settling_s_mean": NaN,
+        "peak_torque_nm_mean": 215.62267739346686
+      },
+      "governor": {
+        "energy_j_mean": 241.19876349487237,
+        "copper_loss_j_mean": 229.1243708997619,
+        "peak_current_a_mean": 17.057380667906813,
+        "saturation_steps_mean": 0.0,
+        "overshoot_pct_mean": 0.0,
+        "settling_s_mean": 0.71,
+        "peak_torque_nm_mean": 119.7428122887058
+      }
+    }
+  }
+}
