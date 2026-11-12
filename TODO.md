@@ -119,4 +119,4 @@ Status: work in progress. Each item is `[ ]`, `[x]` or `[~]` (partial).
 | 2026-11-10 | audit | 19/19 tests pass; delay+payload sweeps done; HTML viewer and motor comparison were missing |
 | 2026-11-11 | expansion | driver limits, jitter/schedule, anisotropic noise, 6 new controllers (7 total incl. LQR), 6 scenarios, paired Holm-corrected comparisons, stats, HTML viewer; 46 tests |
 | 2026-11-12 | correctness | two-rate plant (1 kHz servo / 15–100 Hz vision) fixed the spurious 15–30 Hz failures; median bootstrap CI; baselines retuned once at 30 ms and frozen; rebuild script |
-| 2026-11-12 | scenarios | per-frame delay tracking (governor + Smith) removed the delay-jump artefact; Fitts redesigned to feasible workspace (0.10–0.25 m, 8–32 mm targets, 60 ms stress); full matrix re-run: 3720 reaches, 48 tests |
+| 2026-11-12 | scenarios | per-frame delay tracking (governor + Smith) removed the delay-jump artefact; Fitts redesigned to feasible workspace (0.10–0.25 m, 8–32 mm targets, 60 ms stress); full matrix re-run: 3660 reaches, 48 tests |
