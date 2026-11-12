@@ -86,8 +86,8 @@ Status: work in progress. Each item is `[ ]`, `[x]` or `[~]` (partial).
 
 ## P8 — publication
 
-- [ ] commit everything and push to GitHub
-- [ ] tag `v0.1.0` + release notes
+- [x] commit everything and push to GitHub (`origin/main`, 2026-11-12)
+- [x] tag `v0.1.0` (release notes in the commit message and `reports/concept_validation.md`)
 - [ ] Zenodo DOI (requires the owner's Zenodo account — metadata is ready)
 
 ## P9 — concept validation report (for the article)
