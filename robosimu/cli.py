@@ -50,7 +50,8 @@ def cmd_simulate(args):
     noise = tuple(args.noise_vec) if args.noise_vec else args.noise
     cfg = SimConfig(duration=args.duration, delay=args.delay, payload=args.payload,
                     seed=args.seed, eps=args.eps, noise=noise,
-                    delay_jitter=args.delay_jitter)
+                    delay_jitter=args.delay_jitter, wn=12.0, zeta=1.0,
+                    max_qd=1.5, max_qdd=5.0)
     r = simulate_reach(m, q0, target, ctrl, cfg)
     print(json.dumps({k: (round(v, 4) if isinstance(v, float) else v)
                       for k, v in r.metrics.items()}, indent=2))
@@ -104,7 +105,8 @@ def cmd_html(args):
                            fps=1.0 / args.control_dt, control_dt=args.control_dt,
                            eps=args.eps, vmax=args.vmax, k=args.k)
     cfg = SimConfig(duration=args.duration, delay=args.delay, payload=args.payload,
-                    seed=args.seed, eps=args.eps, noise=args.noise)
+                    seed=args.seed, eps=args.eps, noise=args.noise,
+                    wn=12.0, zeta=1.0, max_qd=1.5, max_qdd=5.0)
     r = simulate_reach(m, q0, target, ctrl, cfg)
     from .render import save_html
     save_html(m, r, args.out)
@@ -154,6 +156,10 @@ def main(argv=None):
     p.add_argument("--control-dt", type=float, default=0.01)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--noise", type=float, default=0.0005)
+    p.add_argument("--noise-vec", type=float, nargs=3, default=None,
+                   help="anisotropic noise (x, y, z) in metres")
+    p.add_argument("--delay-jitter", type=float, default=0.0,
+                   help="std-dev of the visual delay (s)")
     p.add_argument("--eps", type=float, default=0.004)
     p.add_argument("--k", type=float, default=None, help="override the controller gain")
     p.add_argument("--vmax", type=float, default=0.6)
