@@ -1,0 +1,343 @@
+{
+  "name": "human_arm_like_v1",
+  "description": "Design-study 6R arm with human-limb proportions: upper arm 0.31 m, forearm 0.26 m, hand 0.12 m from the wrist joint to the fingertip. Shoulder height 0.90 m above the hip base; the kinematic base is mounted at the LEFT SHOULDER (base_origin = [0, +0.19, 0]) while the trunk and the stereo head stay centred at y = 0 — like a human, the head is in the middle and the arm hangs off to the side. Masses are scaled from adult-male arm segments (total ~5.0 kg). q2 = q3 = 0 is the neutral hanging pose (arm straight down alongside the trunk); raising the arm forward-horizontal is +90 deg. Joint DOFs are anatomical: j1 trunk/shoulder-girdle rotation (vertical axis), j2 shoulder flexion/extension (mediolateral axis), j3 elbow flexion (mediolateral axis, hyperextension forbidden), j4 wrist flexion/extension (mediolateral axis at the wrist), j5 wrist radial/ulnar deviation (anterior-posterior axis), j6 hand axial rotation (forearm axis). IMPORTANT DH-anchor limitation: with the vertical-trunk/horizontal-shoulder anchor, true forearm pronation/supination CANNOT be represented as a rotation axis (a DH twist rotates about the x-axis of the preceding frame, which is horizontal when the arm hangs vertically, so it can never align with the near-vertical forearm). The three wrist DOFs (j4/j5/j6) model flexion/extension, radial/ulnar deviation and axial hand rotation; forearm pronation/supination is NOT represented (the palm cannot be rotated from palm-forward to palm-backward). Glenohumeral abduction/adduction and isolated internal/external rotation are also not modeled; j1 (trunk/scapular-girdle rotation) plus j2 partially cover the transverse reach component. Parameters are representative, not measured.",
+  "base_origin": [
+    0.0,
+    0.19,
+    0.0
+  ],
+  "gravity": [
+    0.0,
+    0.0,
+    -9.81
+  ],
+  "payload": {
+    "mass": 0.0,
+    "com": [
+      0.0,
+      0.0,
+      0.05
+    ]
+  },
+  "postures": {
+    "hanging_natural": [
+      0.0,
+      0.0,
+      12.0,
+      0.0,
+      3.0,
+      0.0
+    ],
+    "hanging_vertical": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "ready_desk": [
+      0.0,
+      55.0,
+      55.0,
+      0.0,
+      15.0,
+      0.0
+    ],
+    "reach_high": [
+      0.0,
+      150.0,
+      15.0,
+      0.0,
+      15.0,
+      0.0
+    ],
+    "side_guard": [
+      32.0,
+      40.0,
+      85.0,
+      -15.0,
+      5.0,
+      12.0
+    ],
+    "low_table_pick": [
+      -18.0,
+      28.0,
+      72.0,
+      -25.0,
+      0.0,
+      -18.0
+    ],
+    "shelf_pre_reach": [
+      12.0,
+      95.0,
+      45.0,
+      -10.0,
+      8.0,
+      15.0
+    ],
+    "cross_body_rest": [
+      -35.0,
+      35.0,
+      95.0,
+      0.0,
+      -10.0,
+      -20.0
+    ],
+    "retracted_compact": [
+      0.0,
+      -15.0,
+      125.0,
+      -30.0,
+      0.0,
+      10.0
+    ],
+    "axial_pronation_reach": [
+      14.0,
+      48.0,
+      64.0,
+      -18.0,
+      10.0,
+      26.0
+    ],
+    "axial_supination_grasp": [
+      -16.0,
+      38.0,
+      78.0,
+      22.0,
+      -12.0,
+      -26.0
+    ]
+  },
+  "links": [
+    {
+      "name": "link1_trunk_shoulder_yaw",
+      "a": 0.0,
+      "alpha_deg": 90.0,
+      "d": 0.9,
+      "theta_offset_deg": 0.0,
+      "mass": 6.0,
+      "com": [
+        0.0,
+        0.0,
+        0.45
+      ],
+      "inertia": [
+        0.06,
+        0.06,
+        0.03
+      ],
+      "limits_deg": [
+        -60.0,
+        60.0
+      ],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 120.0,
+        "efficiency": 0.78,
+        "kt": 0.09,
+        "resistance": 0.5,
+        "voltage": 48.0,
+        "stall_torque": 3.5,
+        "no_load_speed": 380.0,
+        "continuous_torque": 1.8,
+        "rotor_inertia": 0.0002,
+        "viscous_friction": 0.05,
+        "coulomb_friction": 0.15,
+        "brake_torque_nm": 1.0
+      }
+    },
+    {
+      "name": "link2_upper_arm",
+      "a": 0.31,
+      "alpha_deg": 0.0,
+      "d": 0.0,
+      "theta_offset_deg": -90.0,
+      "mass": 2.3,
+      "com": [
+        0.155,
+        0.0,
+        0.0
+      ],
+      "inertia": [
+        0.018,
+        0.018,
+        0.008
+      ],
+      "limits_deg": [
+        -35.0,
+        175.0
+      ],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 100.0,
+        "efficiency": 0.8,
+        "kt": 0.09,
+        "resistance": 0.5,
+        "voltage": 48.0,
+        "stall_torque": 2.8,
+        "no_load_speed": 400.0,
+        "continuous_torque": 1.5,
+        "rotor_inertia": 0.00015,
+        "viscous_friction": 0.06,
+        "coulomb_friction": 0.18,
+        "brake_torque_nm": 42.595
+      }
+    },
+    {
+      "name": "link3_forearm",
+      "a": 0.26,
+      "alpha_deg": 0.0,
+      "d": 0.0,
+      "theta_offset_deg": 0.0,
+      "mass": 1.4,
+      "com": [
+        0.13,
+        0.0,
+        0.0
+      ],
+      "inertia": [
+        0.01,
+        0.01,
+        0.005
+      ],
+      "limits_deg": [
+        0.0,
+        140.0
+      ],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 100.0,
+        "efficiency": 0.78,
+        "kt": 0.09,
+        "resistance": 0.55,
+        "voltage": 48.0,
+        "stall_torque": 2.2,
+        "no_load_speed": 420.0,
+        "continuous_torque": 1.2,
+        "rotor_inertia": 0.0001,
+        "viscous_friction": 0.05,
+        "coulomb_friction": 0.15,
+        "brake_torque_nm": 14.567
+      }
+    },
+    {
+      "name": "link4_wrist_flexion",
+      "a": 0.0,
+      "alpha_deg": 90.0,
+      "d": 0.0,
+      "theta_offset_deg": 0.0,
+      "mass": 0.4,
+      "com": [
+        0.0,
+        0.0,
+        0.02
+      ],
+      "inertia": [
+        0.0008,
+        0.0008,
+        0.0006
+      ],
+      "limits_deg": [
+        -70.0,
+        75.0
+      ],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 60.0,
+        "efficiency": 0.75,
+        "kt": 0.05,
+        "resistance": 0.8,
+        "voltage": 48.0,
+        "stall_torque": 0.7,
+        "no_load_speed": 500.0,
+        "continuous_torque": 0.35,
+        "rotor_inertia": 5e-05,
+        "viscous_friction": 0.02,
+        "coulomb_friction": 0.05,
+        "brake_torque_nm": 1.564
+      }
+    },
+    {
+      "name": "link5_wrist_radial_ulnar",
+      "a": 0.0,
+      "alpha_deg": 90.0,
+      "d": 0.0,
+      "theta_offset_deg": 90.0,
+      "mass": 0.35,
+      "com": [
+        0.0,
+        0.0,
+        0.02
+      ],
+      "inertia": [
+        0.0006,
+        0.0006,
+        0.0004
+      ],
+      "limits_deg": [
+        -40.0,
+        20.0
+      ],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 60.0,
+        "efficiency": 0.75,
+        "kt": 0.05,
+        "resistance": 0.85,
+        "voltage": 48.0,
+        "stall_torque": 0.5,
+        "no_load_speed": 500.0,
+        "continuous_torque": 0.25,
+        "rotor_inertia": 4e-05,
+        "viscous_friction": 0.02,
+        "coulomb_friction": 0.05,
+        "brake_torque_nm": 0.999
+      }
+    },
+    {
+      "name": "link6_hand_rotation",
+      "a": 0.0,
+      "alpha_deg": 0.0,
+      "d": 0.12,
+      "theta_offset_deg": 0.0,
+      "mass": 0.55,
+      "com": [
+        0.0,
+        0.0,
+        0.06
+      ],
+      "inertia": [
+        0.0004,
+        0.0004,
+        0.0003
+      ],
+      "limits_deg": [
+        -30.0,
+        30.0
+      ],
+      "motor": {
+        "type": "bldc",
+        "gear_ratio": 40.0,
+        "efficiency": 0.72,
+        "kt": 0.04,
+        "resistance": 1.0,
+        "voltage": 48.0,
+        "stall_torque": 0.4,
+        "no_load_speed": 600.0,
+        "continuous_torque": 0.18,
+        "rotor_inertia": 2e-05,
+        "viscous_friction": 0.01,
+        "coulomb_friction": 0.03,
+        "brake_torque_nm": 0.05
+      }
+    }
+  ],
+  "brake": {
+    "auto": true,
+    "factor": 1.5,
+    "samples": 15000,
+    "seed": 42,
+    "note": "tau_b = factor * max|tau_g(q)| over random anatomical samples (+ named postures). j1/j6 floors applied. Recompute with scripts/compute_brake_torques.py after geometry changes."
+  }
+}

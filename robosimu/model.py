@@ -74,6 +74,9 @@ class ArmModel:
     gravity: np.ndarray = field(default_factory=lambda: np.array([0.0, 0.0, -9.81]))
     payload_mass: float = 0.0
     payload_com: np.ndarray = field(default_factory=lambda: np.zeros(3))
+    # Mount point of the kinematic base in the world frame (e.g. the left
+    # shoulder at [0, 0.19, 0] while the trunk/head stay centred at y = 0).
+    base_origin: np.ndarray = field(default_factory=lambda: np.zeros(3))
 
     @property
     def n(self) -> int:
@@ -193,9 +196,35 @@ def model_from_dict(data: dict) -> ArmModel:
         name=str(data.get("name", "arm")),
         links=links,
         gravity=np.asarray(data.get("gravity", [0, 0, -9.81]), float),
+        base_origin=np.asarray(data.get("base_origin", [0, 0, 0]), float),
         payload_mass=float(payload.get("mass", 0.0)),
         payload_com=np.asarray(payload.get("com", [0, 0, 0]), float),
     )
+
+
+def postures(data: dict) -> dict:
+    """Named joint-angle presets (degrees) embedded in the model JSON.
+
+    A model may carry a ``postures`` key mapping a preset name to the joint
+    angles in degrees, e.g. ``{"hanging_natural": [0, 0, 12, 0, 3, 0]}``.  The
+    simulator and the workbench both read the same presets.
+    """
+    raw = data.get("postures") or {}
+    n_links = len(data.get("links", []))
+    out = {}
+    for name, vals in raw.items():
+        try:
+            angles = [float(v) for v in vals]
+        except (TypeError, ValueError):
+            continue
+        if len(angles) == n_links:
+            out[str(name)] = angles
+    return out
+
+
+def load_postures(path: str | Path) -> dict:
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    return postures(data)
 
 
 def load_model(path: str | Path, payload_mass: float | None = None) -> ArmModel:

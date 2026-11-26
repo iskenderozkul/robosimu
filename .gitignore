@@ -1,8 +1,18 @@
 __pycache__/
 *.pyc
+*.egg-info/
 .venv/
+.venv-*/
 .pytest_cache/
+.ipynb_checkpoints/
 reports/_*.txt
 reports/_*.log
 reports/_*.py
 reports/_*.out
+reports/_*.err.log
+
+# the manuscript is kept outside this repository (journal policy / double-blind review)
+manuscript/
+makale/
+*.docx
+~$*

@@ -48,25 +48,44 @@ class GovernorCartesian:
 
     def __init__(self, delay: float, fps: float, eps: float = 0.003,
                  kappa: float = 1.0 / math.e, k_hi: float = 40.0,
-                 vmax: float = 0.5, sigma=0.0005, axes: int = 3):
+                 vmax: float = 0.5, sigma=0.0005, axes: int = 3,
+                 per_axis: bool = False, clip_kappa: bool = True,
+                 exact_group_delay: bool = False):
         self.delay = float(delay)
         self.T = 1.0 / float(fps)
         self.eps = float(eps)
-        self.kappa = float(min(kappa, 1.0 / math.e))
+        self.clip_kappa = bool(clip_kappa)
+        self.exact_group_delay = bool(exact_group_delay)
+        self.kappa = (min(kappa, 1.0 / math.e) if self.clip_kappa
+                      else float(kappa))
         self.k_hi = float(k_hi)
         self.vmax = float(vmax)
+        self.axes = int(axes)
+        self.per_axis = bool(per_axis)
         sig = np.broadcast_to(np.atleast_1d(np.asarray(sigma, float)),
                               (axes,)).astype(float)
+        self.sigma_vec = sig.copy()
         self.n_req = np.ceil((2.0 * sig / self.eps) ** 2).astype(int)
         self._buf = None
         self._apply(self.delay)
 
     def _apply(self, delay: float) -> None:
         self.delay = max(0.0, float(delay))
-        n_max = max(1, int(math.floor(2.0 * self.delay / self.T)))
-        self.n = np.maximum(1, np.minimum(self.n_req, n_max))
-        self.n_max = int(self.n.max())
-        self.delta_eff = self.delay + self.n_max * self.T / 2.0
+        if self.exact_group_delay:
+            # V4.3 convention: no double counting; window n* adds (n*-1)T/2.
+            n_max = max(1, int(math.floor(2.0 * self.delay / self.T)) + 1)
+            self.n = np.maximum(1, np.minimum(self.n_req, n_max))
+            self.n_max = int(self.n.max())
+            self.delta_eff_vec = self.delay + (self.n - 1) * self.T / 2.0
+        else:
+            # Legacy convention (keeps the 80-test baseline green).
+            n_max = max(1, int(math.floor(2.0 * self.delay / self.T)))
+            self.n = np.maximum(1, np.minimum(self.n_req, n_max))
+            self.n_max = int(self.n.max())
+            self.delta_eff_vec = self.delay + self.n * self.T / 2.0
+        self.n_max_window = int(n_max)
+        self.k_vec = self.kappa / self.delta_eff_vec
+        self.delta_eff = float(self.delta_eff_vec.max())
         self.k = self.kappa / self.delta_eff
         if self._buf is not None and self._buf.maxlen != self.n_max:
             self._buf = deque(self._buf, maxlen=self.n_max)
@@ -75,17 +94,88 @@ class GovernorCartesian:
         """Recompute the gain schedule from the currently measured delay."""
         self._apply(delay)
 
+    def set_sigma(self, sigma) -> None:
+        """Update per-axis noise estimate (e.g. from stereo disparity depth)."""
+        sig = np.broadcast_to(np.atleast_1d(np.asarray(sigma, float)),
+                              (self.axes,)).astype(float)
+        self.sigma_vec = sig.copy()
+        self.n_req = np.ceil((2.0 * sig / self.eps) ** 2).astype(int)
+        self._apply(self.delay)
+
     def __call__(self, error: np.ndarray) -> np.ndarray:
         e = np.asarray(error, float)
         if self._buf is None:
             self._buf = deque(maxlen=int(self.n_max))
         self._buf.append(e.copy())
-        filt = np.mean(np.asarray(self._buf), axis=0)
+        arr = np.asarray(self._buf)
+        if self.per_axis:
+            filt = np.array([
+                float(np.mean(arr[-int(self.n[j]):, j]))
+                for j in range(e.size)
+            ])
+            if float(np.linalg.norm(filt)) <= self.eps:
+                return np.zeros(e.size)
+            v_vec = np.zeros(e.size)
+            for j in range(e.size):
+                aj = abs(float(filt[j]))
+                if aj > 0.25 * self.eps:
+                    vj = min(self.k_hi * aj, float(self.k_vec[j]) * (self.eps + aj))
+                    v_vec[j] = math.copysign(vj, float(filt[j]))
+            norm_v = float(np.linalg.norm(v_vec))
+            if norm_v > self.vmax:
+                v_vec *= self.vmax / norm_v
+            return v_vec
+        filt = np.mean(arr, axis=0)
         r = float(np.linalg.norm(filt))
         if r <= self.eps:
             return np.zeros(e.size)
         v = min(self.k_hi * r, self.k * (self.eps + r), self.vmax)
         return filt / r * v
+
+
+class DelayScaledP:
+    """Delay-scaled proportional law: ``k = c / delta`` (dimensionless gain c).
+
+    The minimal delay-aware P law used by the A3 fair-simulation programme
+    (``docs/dogru_yol_Faz0.md``).  ``c`` is dimensionless; ``c = 1/e`` places
+    the law exactly on the classical monotone real-root bound
+    ``k * delta <= 1/e`` (Hayes/Corless), with no tuning per condition.
+    ``clip_kappa=True`` clips ``c`` to ``1/e`` so that a *tuned* gain can never
+    exceed the monotone bound.
+    """
+
+    name = "dps"
+
+    def __init__(self, delay: float, c: float = 1.0 / math.e,
+                 clip_kappa: bool = False, eps: float = 0.003,
+                 vmax: float = 0.5, k_hi: float = 40.0):
+        self.delay = float(delay)
+        self.c = float(c)
+        self.clip_kappa = bool(clip_kappa)
+        self.eps = float(eps)
+        self.vmax = float(vmax)
+        self.k_hi = float(k_hi)
+        self._apply(self.delay)
+
+    def _apply(self, delay: float) -> None:
+        self.delay = max(0.0, float(delay))
+        c = self.c
+        if self.clip_kappa:
+            c = min(c, 1.0 / math.e)
+        self.c_eff = c
+        self.k = c / self.delay if self.delay > 1e-9 else self.k_hi
+
+    def set_delay(self, delay: float) -> None:
+        """Recompute the gain from the currently measured delay."""
+        self._apply(delay)
+
+    def __call__(self, error: np.ndarray) -> np.ndarray:
+        e = np.asarray(error, float)
+        r = float(np.linalg.norm(e))
+        if r <= self.eps:
+            return np.zeros(e.size)
+        v = min(self.k_hi * r, self.k * (self.eps + r), self.vmax)
+        return e / r * v
 
 
 def _cap(v: np.ndarray, vmax: float) -> np.ndarray:
@@ -304,20 +394,33 @@ class PidCartesian:
 def make_controller(name: str, delay: float = 0.06, fps: float = 100.0,
                     control_dt: float = 0.01, eps: float = 0.003,
                     vmax: float = 0.5, k: float | None = None,
-                    noise: float = 0.0005):
+                    noise: float = 0.0005, c: float | None = None,
+                    clip_kappa: bool = False, exact_group_delay: bool = False,
+                    gaze_comp: bool = True, delay_align: bool = True):
     """Build a Cartesian velocity controller by name.
 
     ``k`` overrides the controller's own gain when given; the defaults are the
     parameters selected once at the nominal 30 ms condition (see
     ``scripts/tune_baselines.py``) and are frozen for every other condition.
+    ``c``/``clip_kappa`` configure the delay-scaled law (``dps``).
     """
     name = name.lower()
+    if name in ("v43", "v4.3"):
+        # V4.3 zero-oracle controller: emits 5 joint rates, not Cartesian v.
+        from .v43 import V43Controller
+        return V43Controller(fps=fps, dt=control_dt, eps=eps, vmax=vmax,
+                             gaze_comp=gaze_comp, delay_align=delay_align)
     if name == "fixed":
         return FixedCartesian(**({} if k is None else {"k": k}),
                               vmax=vmax, eps=eps)
+    if name == "dps" or name == "delayscaledp":
+        return DelayScaledP(delay=delay,
+                            **({} if c is None else {"c": c}),
+                            clip_kappa=clip_kappa, eps=eps, vmax=vmax)
     if name == "governor":
         return GovernorCartesian(delay=delay, fps=fps, eps=eps, vmax=vmax,
-                                 sigma=noise)
+                                 sigma=noise, clip_kappa=clip_kappa,
+                                 exact_group_delay=exact_group_delay)
     if name == "adaptive":
         return AdaptiveCartesian(**({} if k is None else {"lam0": k}),
                                  vmax=vmax, eps=eps)
@@ -335,4 +438,10 @@ def make_controller(name: str, delay: float = 0.06, fps: float = 100.0,
                             vmax=vmax, eps=eps)
     if name == "lqr":
         return LqrCartesian(control_dt=control_dt, vmax=vmax, eps=eps)
+    if name in ("hlsl", "human_looming"):
+        from .stereo import HumanLoomingController
+        return HumanLoomingController(delay=delay, fps=fps, eps=eps, vmax=vmax, sigma=noise)
+    if name == "hdap":
+        from .stereo import HumanApproachController
+        return HumanApproachController(delay=delay, fps=fps, eps=eps, vmax=vmax, sigma=noise)
     raise ValueError(f"unknown controller {name!r}")

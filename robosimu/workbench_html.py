@@ -1,0 +1,10904 @@
+﻿"""Self-contained interactive Human-Like Stereo Looming & Singularity Workbench HTML template.
+Designed with a restrained scholarly monograph & laboratory instrument aesthetic (neutral stone paper,
+crisp hairline borders, Oxford navy & muted burgundy accents, Crimson Pro / Source Sans 3 / Consolas typography).
+Simulates:
+1. Shoulder-mounted anthropomorphic stereo cameras (above & slightly behind Joint 1).
+2. Active camera micro-movement (parallax) + apparent target size reachability & singularity prediction.
+3. Left & Right Eye perspective viewports showing the gripper shrinking in perspective (s_g = f W_g / Z_g)
+   as it extends forward toward the target until normalized apparent scale matches (rho_s -> 1.00).
+4. HLSL (Human-Like Stereo Looming & Bell-Shaped Delay Governor) vs PID vs LQR vs Sabit Kazanç (P).
+"""
+WORKBENCH_HTML_TEMPLATE = r"""<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>İnsansı Stereo Perspektif & Singularity Laboratuvarı — __TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3f4f6;
+    --card: #ffffff;
+    --card-alt: #f8fafc;
+    --ink: #111827;
+    --ink-soft: #374151;
+    --ink-muted: #6b7280;
+    --border: #d1d5db;
+    --border-strong: #9ca3af;
+    --teal: #1e3a5f;
+    --teal-soft: #e8eef5;
+    --terra: #7c3f23;
+    --terra-red: #8b2635;
+    --terra-soft: #f9ebed;
+    --ochre: #7c4d12;
+    --slate: #334155;
+    --ok: #1e5631;
+    --ok-bg: #eaf2ec;
+    --warn: #7c4d12;
+    --warn-bg: #f7f0e6;
+    --danger: #8b1e1e;
+    --danger-bg: #f9eaea;
+    --font-sans: 'Source Sans 3', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+    --font-mono: 'Consolas', 'SFMono-Regular', 'Liberation Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 5px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 40px;
+  }
+  html, body { margin: 0; padding: 0; width: 100%; max-width: 100vw; overflow-x: clip; }
+  body { overscroll-behavior-x: none; }
+  .title-block { flex: 1 1 auto; min-width: 0; }
+  .title-block h1 {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--ink);
+    letter-spacing: -0.1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .title-block p {
+    display: none;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 3px;
+    border: 1px solid var(--border-strong);
+    background: var(--card);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .btn:hover { background: var(--card-alt); border-color: var(--ink-soft); }
+  .btn-primary {
+    background: var(--teal);
+    color: #fff;
+    border-color: var(--teal);
+  }
+  .btn-primary:hover { background: #152b47; border-color: #152b47; }
+  .btn-accent {
+    background: var(--terra-red);
+    color: #fff;
+    border-color: var(--terra-red);
+  }
+  .btn-accent:hover { background: #6d1c28; }
+  /* Pre-reach assessment strip — kompakt */
+  .assessment-bar {
+    background: var(--card-alt);
+    border-bottom: 1px solid var(--border);
+    padding: 2px 12px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 5px;
+    font-size: 9px;
+    overflow-x: auto;
+  }
+  .assess-left {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+  .status-pill {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--ok-bg);
+    color: var(--ok);
+    border: 1px solid #a7f3d0;
+    white-space: nowrap;
+  }
+  .status-pill.warn {
+    background: var(--warn-bg);
+    color: var(--warn);
+    border-color: #fde68a;
+  }
+  .status-pill.danger {
+    background: var(--danger-bg);
+    color: var(--danger);
+    border-color: #fecaca;
+  }
+  .assess-right { display: none; }
+  .status-pill.warn { white-space: nowrap; }
+  .status-pill.danger { white-space: nowrap; }
+  .math-chip {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .math-chip b { color: var(--teal); }
+
+  /* ===== Görünüm kipi düğmeleri & Kavram Rehberi çekmecesi ===== */
+  .btn-toggle-active {
+    background: var(--ink) !important;
+    color: #f8fafc !important;
+    border-color: var(--ink) !important;
+  }
+  .btn-theorem-on {
+    background: var(--terra-red) !important;
+    color: #fff !important;
+    border-color: var(--terra-red) !important;
+  }
+  .concept-drawer {
+    background: #f8f9fb;
+    border-bottom: 1px solid var(--border-strong);
+    padding: 10px 14px;
+    display: none;
+  }
+  .concept-drawer.open { display: block; }
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  @media (max-width: 1050px) { .concept-grid { grid-template-columns: 1fr; } }
+  .concept-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+  .concept-item.refusal-1 { border-left-color: var(--terra-red); }
+  .concept-item.refusal-2 { border-left-color: var(--teal); }
+  .concept-item.refusal-3 { border-left-color: var(--slate); }
+  .concept-item h4 {
+    margin: 0 0 4px 0;
+    font-family: var(--font-serif);
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .concept-item p {
+    margin: 0 0 4px 0;
+    font-size: 11px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .concept-item .how-test {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--teal);
+    background: var(--card-alt);
+    padding: 3px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+  .concept-card-wide { grid-column: 1 / -1; }
+  .diag-caption { font-size: 9.5px; line-height: 1.45; color: #475569; padding: 5px 10px 0; border-top: 1px dashed #e7e5df; margin-top: 2px; }
+  .ctrl-diag-wrap {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px;
+    margin: 6px 0 8px 0;
+  }
+  .ctrl-diag-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    font-family: var(--font-sans);
+  }
+  .diag-block-rect {
+    fill: #ffffff;
+    stroke: #94a3b8;
+    stroke-width: 1.3;
+    transition: stroke 0.15s, fill 0.15s;
+  }
+  .diag-block-rect.active-phase {
+    fill: #eef3f8;
+    stroke: #1e3a5f;
+    stroke-width: 2.0;
+  }
+  .diag-block-rect.ballistic-phase {
+    fill: #fdf4f5;
+    stroke: #8b2635;
+    stroke-width: 2.0;
+  }
+  .math-summary-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 6px 0;
+  }
+  @media (max-width: 960px) { .math-summary-row { grid-template-columns: 1fr; } }
+  .math-mini-card {
+    background: var(--card-alt);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+  .math-mini-card b { color: var(--ink); }
+  .math-eq {
+    font-family: var(--font-mono);
+    font-size: 10.2px;
+    color: var(--teal);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 7px;
+    margin: 4px 0;
+    display: block;
+  }
+  .diag-mode-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-left: 3px solid #1e3a5f;
+    border-radius: 4px;
+    padding: 7px 10px;
+    margin: 4px 0 6px 0;
+  }
+  .diag-mode-note {
+    font-size: 11px;
+    line-height: 1.42;
+    color: var(--ink-soft);
+  }
+  .diag-mode-note b { color: var(--ink); }
+  .diag-mode-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+  }
+  .diag-mode-btn {
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 3px;
+    border: 1px solid var(--border-strong);
+    background: #ffffff;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .diag-mode-btn:hover { border-color: #1e3a5f; color: #1e3a5f; background: #eef3f8; }
+  .diag-mode-btn.active {
+    background: #1e3a5f;
+    border-color: #1e3a5f;
+    color: #ffffff;
+  }
+  .kin-diag-wrap {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px;
+    margin: 8px 0 6px 0;
+  }
+  /* Makale/grafik fontu: Times New Roman (şema metinleri) */
+  .kin-diag-svg text, .ctrl-diag-svg text, .math-illu text, .hw-diag-svg text {
+    font-family: 'Times New Roman', Times, serif !important;
+  }
+  .kin-diag-svg text.lab-halo, .hw-diag-svg text.lab-halo {
+    paint-order: stroke fill;
+    stroke: #fcfcfd;
+    stroke-width: 2.4px;
+    stroke-linejoin: round;
+  }
+  .hw-diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0 6px 0; }
+  @media (max-width: 1200px) { .hw-diag-grid { grid-template-columns: 1fr; } }
+  .hw-diag-svg { width: 100%; height: auto; display: block; background: #fff;
+    border: 1px solid var(--border); border-radius: 4px; }
+  .kin-diag-title {
+    font-family: var(--font-serif);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 4px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .kin-diag-title span.sub {
+    font-family: var(--font-mono);
+    font-size: 9.8px;
+    font-weight: 500;
+    color: var(--ink-muted);
+  }
+  .kin-diag-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    font-family: var(--font-sans);
+  }
+  .param-dict-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 6px 0 4px 0;
+  }
+  @media (max-width: 1050px) { .param-dict-grid { grid-template-columns: 1fr; } }
+  .param-dict-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-top: 2px solid #1e3a5f;
+    border-radius: 4px;
+    padding: 6px 8px;
+  }
+  .param-dict-card h5 {
+    margin: 0 0 5px 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 3px;
+  }
+  .param-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+    line-height: 1.32;
+  }
+  .param-table td {
+    padding: 3px 4px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+    color: var(--ink-soft);
+  }
+  .param-table tr:last-child td { border-bottom: none; }
+  .param-sym {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: #1e3a5f;
+    white-space: nowrap;
+    width: 68px;
+  }
+  .param-val {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: #0f766e;
+    text-align: right;
+    white-space: nowrap;
+    width: 64px;
+  }
+  .value-compare-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin: 6px 0;
+  }
+  @media (max-width: 960px) { .value-compare-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .vc-pill {
+    background: #ffffff;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    padding: 7px 9px;
+  }
+  .vc-pill .vc-k {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+  }
+  .vc-pill .vc-v {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--teal);
+  }
+  .vc-pill .vc-c {
+    font-size: 10px;
+    color: var(--terra-red);
+    margin-top: 2px;
+  }
+  .chart-explain-note {
+    font-size: 10.5px;
+    line-height: 1.38;
+    color: var(--ink-soft);
+    background: #ffffff;
+    border-left: 3px solid var(--teal);
+    padding: 4px 7px;
+    margin-top: 5px;
+    border-radius: 0 3px 3px 0;
+  }
+  .dash-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #ffffff;
+    border-radius: 3px;
+  }
+  .theorem-strip {
+    display: none;
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 6px 14px;
+    border-bottom: 2px solid var(--terra-red);
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;         /* asla alt satıra geçme (dalgalanma önleme) */
+    overflow: hidden;          /* taşarsa clip: yeniden yerleşim yok */
+    height: 29px;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  body.theorem-mode .theorem-strip { display: flex; }
+  body.theorem-mode .metric-only { display: none !important; }
+  .th-badge {
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    font-size: 10.5px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+  .th-badge:first-child {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .th-badge b { color: #93c5fd; }
+  .th-badge.warn b { color: #fca5a5; }
+
+  .symbol-drawer {
+    display: none;
+    background: #fffdf7;
+    border-bottom: 2px solid var(--teal);
+    padding: 8px 16px 10px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .symbol-drawer.open { display: block; }
+  .symbol-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .symbol-head b { font-size: 12px; letter-spacing: .08em; color: var(--teal); }
+  .sym-note { font-size: 9.5px; color: var(--ink-soft); }
+  .symbol-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px 16px;
+  }
+  @media (max-width: 1500px) { .symbol-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .sym-group h5 {
+    margin: 0 0 3px 0; font-size: 9px; letter-spacing: .08em; text-transform: uppercase;
+    color: #334155; border-bottom: 1px solid #e7e5df; padding-bottom: 2px;
+  }
+  .sym-row { display: flex; gap: 7px; font-size: 9.5px; line-height: 1.35; padding: 1px 0; }
+  .sym-s { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1e3a5f; min-width: 62px; }
+
+
+  .math-illu { display: block; width: 100%; height: 92px; margin: 5px 0 3px; background: #f8fafc; border: 1px solid #e7e5df; border-radius: 4px; }
+  .method-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  @media (max-width: 1500px) { .method-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .method-item { background: var(--card-alt); border: 1px solid var(--border); border-radius: 5px; padding: 6px 8px; }
+  .method-item b { font-size: 9.5px; color: var(--ink); display: block; margin-bottom: 3px; line-height: 1.3; }
+  .method-item p { font-size: 8.5px; color: var(--ink-soft); margin: 0; line-height: 1.42; }
+  .method-item a { color: var(--teal); text-decoration: none; }
+  .method-item a:hover { text-decoration: underline; }
+  .method-refs { margin-top: 6px; font-size: 8px; color: var(--ink-soft); border-top: 1px solid var(--border); padding-top: 5px; }
+  .method-refs ol { margin: 3px 0 0; padding-left: 16px; columns: 3; column-gap: 14px; }
+  .method-refs li { margin: 1px 0; line-height: 1.3; }
+
+  /* ===== Ana Akademik Çalışma Alanı (Doğal okuma ve yeniden boyutlandırma) ===== */
+  html, body { margin: 0; padding: 0; width: 100%; max-width: 100vw; overflow-x: clip; }
+  .lab {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 6px 10px 14px;
+    --cockpit-h: clamp(460px, 62vh, 640px);
+    --aux-w: 46%;
+    --eyes-h: 48%;
+    --side-w: 50%;
+    --bottom-h: clamp(220px, 29vh, 330px);
+  }
+  .row-top {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    height: var(--cockpit-h);
+    min-height: 360px;
+  }
+  .aux-matrix {
+    flex: 0 0 var(--aux-w);
+    width: var(--aux-w);
+    min-width: 300px;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  #layerEyes {
+    flex: 0 0 var(--eyes-h);
+    height: var(--eyes-h);
+    min-height: 115px;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+  }
+  #layerEyes.collapsed,
+  #rowViews.collapsed {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .eye-win { flex: 1 1 0; min-width: 0; min-height: 0; }
+  .eye-win > .panel-body { flex: 1 1 auto; min-height: 0; }
+  .eye-box {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 3px;
+    background: transparent;
+  }
+  .eye-hdr {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .eye-hdr span:first-child { overflow: hidden; text-overflow: ellipsis; }
+  .eye-hdr span:last-child {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: var(--ink-soft);
+  }
+  .canvas-wrap {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+  }
+  .eye-win .canvas-wrap { flex: 1 1 auto; min-height: 60px; background: #14161a; border: 0; }
+  .eye-win canvas { width: 100% !important; height: 100% !important; display: block; }
+  canvas { display: block; width: 100%; }
+  #cv3d { cursor: grab; touch-action: none; width: 100% !important; height: 100% !important; display: block; }
+
+  #layerStage { flex: 1 1 0; min-width: 340px; min-height: 0; display: flex; flex-direction: column; }
+  #layerStage > #pwScene { flex: 1 1 0; min-width: 0; min-height: 0; }
+  #pwScene > .panel-body { flex: 1 1 auto; min-height: 0; padding: 0 3px 3px; }
+  #sceneWrap { flex: 1 1 auto; min-height: 150px; }
+
+  /* Alt Görünümler: Üstten X-Y | Yandan X-Z (Sağ Matris Alt Sıra) */
+  .row-views {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: row;
+    min-height: 115px;
+    min-width: 0;
+    gap: 0;
+  }
+  #pwKuview { flex: 1 1 0; min-width: 130px; min-height: 0; }
+  #pwSideview { flex: 0 0 var(--side-w); width: var(--side-w); min-width: 130px; min-height: 0; }
+  #pwKuview > .panel-body, #pwSideview > .panel-body { flex: 1 1 auto; min-height: 0; }
+  #pwKuview .canvas-wrap, #pwSideview .canvas-wrap { flex: 1 1 auto; min-height: 60px; }
+  #cvStereoTop, #cvSide { width: 100% !important; height: 100% !important; display: block; }
+  #rowViews.side-off > #viewSplitter,
+  #rowViews.top-off > #viewSplitter { display: none !important; }
+  #rowViews.top-off > #pwSideview { flex: 1 1 100% !important; width: auto !important; }
+  #rowViews.side-off > #pwKuview { flex: 1 1 100% !important; width: auto !important; }
+  .aux-matrix.views-off > #eyesSplitter,
+  .aux-matrix.eyes-off > #eyesSplitter { display: none !important; }
+  .aux-matrix.views-off > #layerEyes { flex: 1 1 100% !important; height: auto !important; }
+  .row-top.aux-off > #topSplitter,
+  .row-top.aux-off > #auxMatrix { display: none !important; }
+  .row-top.stage-off > #topSplitter,
+  .row-top.stage-off > #layerStage { display: none !important; }
+  .row-top.stage-off > #auxMatrix { flex: 1 1 100% !important; width: auto !important; }
+  .kuview-metrics {
+    display: flex;
+    gap: 3px 8px;
+    flex-wrap: wrap;
+    padding: 2px 6px;
+    border-top: 1px solid var(--border);
+    background: var(--card-alt);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--ink-soft);
+  }
+  .kuview-metrics span b { color: var(--teal); }
+
+  @media (max-width: 1100px) {
+    .row-top { flex-direction: column; height: auto; }
+    #layerStage { height: 400px; flex: 0 0 auto; min-width: 0; }
+    #topSplitter { display: none !important; }
+    .aux-matrix { flex: 0 0 auto; width: 100% !important; height: 420px; min-width: 0; margin-top: 6px; }
+  }
+
+  /* Ayırıcılar */
+  .splitter {
+    flex: 0 0 8px;
+    height: 8px;
+    min-height: 8px;
+    cursor: ns-resize;
+    position: relative;
+  }
+  .splitter::after {
+    content: '';
+    position: absolute;
+    left: 42%;
+    right: 42%;
+    top: 2px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border-strong);
+  }
+  .splitter:hover::after { background: var(--teal); }
+  .splitter-v {
+    flex: 0 0 8px;
+    width: 8px;
+    min-width: 8px;
+    cursor: ew-resize;
+    position: relative;
+  }
+  .splitter-v::after {
+    content: '';
+    position: absolute;
+    top: 42%;
+    bottom: 42%;
+    left: 2px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--border-strong);
+  }
+  .splitter-v:hover::after { background: var(--teal); }
+
+  /* Akademik Panel Başlıkları (sahte trafik ışığı yok) */
+  .panel-window {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(24, 24, 27, 0.06);
+  }
+  .panel-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    background: #eceff4;
+    border-bottom: 1px solid var(--border);
+    user-select: none;
+    min-height: 24px;
+  }
+  .pw-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: var(--teal);
+    color: #fff;
+    flex: 0 0 auto;
+  }
+  .pw-title {
+    flex: 1;
+    min-width: 0;
+    color: var(--ink);
+    font-family: var(--font-serif);
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pw-live-stat {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--teal);
+    background: rgba(30, 58, 95, 0.08);
+    border: 1px solid rgba(30, 58, 95, 0.22);
+    padding: 1px 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+    max-width: 185px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 1 auto;
+  }
+  .aux-matrix .pw-title { flex: 0 0 auto; }
+  .aux-matrix .pw-live-stat { flex: 1 1 auto; margin-left: auto; max-width: 195px; text-align: center; }
+  .pw-desc {
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
+    padding: 2px 8px;
+    line-height: 1.25;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pw-desc sub, .pw-desc sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  .pw-desc sub { bottom: -0.2em; }
+  .pw-controls { display: flex; gap: 3px; }
+  .pw-btn {
+    min-width: 21px;
+    height: 18px;
+    padding: 0 4px;
+    border: 1px solid var(--border-strong);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11.5px;
+    line-height: 1;
+  }
+  .pw-btn:hover { background: var(--teal-soft); border-color: var(--teal); color: var(--teal); }
+  .panel-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .panel-window.collapsed .panel-body,
+  .panel-window.collapsed .pw-desc,
+  .panel-window.collapsed .ghost-bar { display: none; }
+  .panel-window.hidden { display: none !important; }
+  .pw-restore { font-size: 10px; padding: 3px 8px; opacity: 0.55; }
+  .pw-restore.on { opacity: 1; background: var(--teal); color: #fff; border-color: var(--teal); }
+
+  /* Sahne HUD düğmeleri ve kontrolleri — mat laboratuvar aracı stili */
+  .hud {
+    position: absolute;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .hud-tl { top: 8px; left: 8px; right: 8px; }
+  .hud-bl { bottom: 8px; left: 8px; max-width: calc(100% - 205px); flex-wrap: nowrap; }
+  .hud-chip {
+    background: rgba(255, 255, 255, 0.94);
+    color: #111827;
+    border: 1px solid #9ca3af;
+    border-radius: 3px;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 5px 10px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .hud-chip:hover { background: #ffffff; border-color: #1e3a5f; }
+  .hud-chip:disabled { opacity: 0.45; cursor: not-allowed; }
+  .hud-chip.hud-primary { background: #1e3a5f; color: #ffffff; border-color: #1e3a5f; }
+  .hud-chip.hud-primary:hover:not(:disabled) { background: #152b47; border-color: #152b47; }
+  .hud-chip.hud-wake { background: #334155; color: #ffffff; border-color: #334155; }
+  .hud-chip.hud-wake:hover { background: #1f2937; border-color: #1f2937; }
+  .hud-chip.hud-chip-sub { background: rgba(30, 58, 95, 0.88); color: #e8e6df; border-color: rgba(232,230,223,0.25); }
+  .hud-chip.hud-chip-sub:hover { background: #1e3a5f; border-color: #93c5fd; }
+  .hud-chip.hud-bench { background: #7c2d12; color: #fdba74; border-color: #c2410c; }
+  .hud-chip.hud-bench:hover { background: #9a3412; color: #fed7aa; border-color: #fb923c; }
+  .hud-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.94);
+    color: #111827;
+    border: 1px solid #9ca3af;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  }
+  .hud-check input { accent-color: #1e3a5f; margin: 0; cursor: pointer; }
+  .ghost-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    background: #f1f5f9;
+    border-bottom: 1px solid var(--border);
+    padding: 3px 8px;
+    flex: 0 0 auto;
+  }
+  .ghost-bar.hidden { display: none !important; }
+  .ghost-bar-lbl {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: 2px;
+  }
+  .ghost-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.12s;
+  }
+  .ghost-pill:hover { border-color: #64748b; color: #0f172a; }
+  .ghost-pill.active {
+    background: #ffffff;
+    color: #0f172a;
+    font-weight: 700;
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+  .ghost-pill.is-primary-ctrl {
+    opacity: 0.55;
+    border-style: dashed;
+  }
+  .ghost-swatch {
+    width: 14px;
+    height: 3px;
+    border-radius: 1px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .hud-select {
+    background: rgba(255, 255, 255, 0.95);
+    color: #111827;
+    border: 1px solid #9ca3af;
+    border-radius: 3px;
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 5px 8px;
+    width: auto;
+    min-width: 0;
+    flex: 1 1 auto;
+    max-width: min(310px, 100%);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  }
+  .hud-select option { color: #111827; background: #fff; }
+  #pwScene.compact .hud-chip { font-size: 10.5px; padding: 4px 7px; }
+  #pwScene.compact .hud-bl > span { display: none; }
+  #pwScene.compact .hud-select { font-size: 10.5px; padding: 4px 6px; max-width: 100%; }
+
+  .hud-telemetry {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: rgba(248, 250, 252, 0.95);
+    border: 1px solid #9ca3af;
+    border-radius: 3px;
+    padding: 5px 8px;
+    min-width: 175px;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+    z-index: 5;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+  .hud-telemetry .tel-title {
+    font-size: 8.5px;
+    letter-spacing: .08em;
+    font-weight: 700;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1px;
+    border-bottom: 1px solid #d1d5db;
+    padding-bottom: 2px;
+  }
+  .hud-telemetry .tel-badge {
+    color: #1e3a5f;
+    background: #e8eef5;
+    border: 1px solid #9ca3af;
+    border-radius: 2px;
+    padding: 0 4px;
+    font-size: 8.5px;
+  }
+  .hud-telemetry .tel-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 9px;
+    line-height: 1.25;
+    color: #4b5563;
+  }
+  .hud-telemetry .tel-row b { color: #111827; font-weight: 700; }
+
+  /* Alt Sekmeli Akademik Çalışma Alanı */
+  #layerBottom {
+    margin-top: 2px;
+    background: var(--card);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 8px 10px 12px;
+  }
+  #layerBottom.collapsed > *:not(.bottom-bar) { display: none; }
+  .bottom-bar {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    padding: 8px 10px;
+    margin: -8px -10px 10px;
+    border-bottom: 2px solid var(--border);
+    border-radius: 6px 6px 0 0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  }
+  .tab-bar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    flex: 1;
+    min-width: 0;
+  }
+  .tab-btn {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    background: var(--card-alt);
+    color: var(--ink-soft);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.12s;
+  }
+  .tab-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .tab-btn.active {
+    background: var(--teal);
+    color: #fff;
+    border-color: var(--teal);
+  }
+  .tab-panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .tab-panels .card { margin: 0; }
+  .tab-hidden { display: none !important; }
+  body.show-all-tabs .tab-hidden { display: flex !important; }
+  .dash-card { grid-column: 1 / -1; }
+  .fs-table { grid-column: 1 / -1; overflow-x: auto; }
+  .fs-academic { grid-column: 1 / -1; }
+  .dash-toolbar { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+  .dash-status { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); }
+  .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 1000px) { .dash-grid { grid-template-columns: 1fr; } }
+  .dash-cell { background: var(--card-alt); border: 1px solid var(--border); border-radius: 4px; padding: 8px; }
+  .dash-cell canvas { width: 100%; height: auto; display: block; background: #ffffff; border-radius: 3px; }
+  .dash-label { font-size: 10.5px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+  .bench-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin: 6px 0 8px 0;
+  }
+  @media (max-width: 1050px) { .bench-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .bench-kpi-box {
+    background: var(--card-alt);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 4px;
+    padding: 6px 9px;
+  }
+  .bench-kpi-box .bk-lbl { font-size: 9.5px; color: var(--ink-soft); font-weight: 600; text-transform: uppercase; letter-spacing: 0.25px; }
+  .bench-kpi-box .bk-val { font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+  .bench-kpi-box .bk-sub { font-size: 10px; color: var(--ink-muted); margin-top: 2px; line-height: 1.3; }
+  .bench-repro {
+    margin-top: 9px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-left: 3px solid #1e3a5f;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+  .bench-repro code {
+    font-family: var(--font-mono);
+    font-size: 10.2px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: #0f172a;
+  }
+  .bench-badge-ok {
+    display: inline-block; padding: 1px 5px; border-radius: 3px; font-weight: 700;
+    background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 10px;
+  }
+  .bench-badge-warn {
+    display: inline-block; padding: 1px 5px; border-radius: 3px; font-weight: 700;
+    background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-size: 10px;
+  }
+  .academic-plots-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+  }
+  @media (max-width: 1100px) { .academic-plots-row { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 13px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .card-title {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 8px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title span.sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink-muted);
+  }
+  .card-explain {
+    font-size: 11px;
+    color: var(--ink-soft);
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 5px 8px;
+    margin-bottom: 9px;
+    line-height: 1.38;
+  }
+  .ctrl-group { margin-bottom: 9px; }
+  .ctrl-group label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .ctrl-group label span.val {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--teal);
+    font-weight: 600;
+  }
+  input[type=range] { width: 100%; accent-color: var(--teal); cursor: pointer; margin: 0; }
+  select {
+    width: 100%;
+    padding: 5px 8px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--card-alt);
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+  }
+  .preset-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+  .preset-btn {
+    font-size: 11px;
+    padding: 5px 8px;
+    background: var(--card-alt);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--ink);
+    text-align: left;
+  }
+  .preset-btn:hover { border-color: var(--teal); background: #eef3f8; }
+
+  .playback-strip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    background: var(--card-alt);
+    border-top: 1px solid var(--border);
+    margin-top: 2px;
+    flex-wrap: wrap;
+  }
+  .playback-strip .time-lbl {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    min-width: 72px;
+  }
+  .time-scale { display: inline-flex; align-items: center; gap: 2px; }
+  .time-scale .ts-lbl {
+    font-size: 9px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--ink-soft); margin-right: 3px;
+  }
+  .time-scale .ts-btn { padding: 3px 7px; font-size: 10px; min-width: 30px; }
+  .mini-reset {
+    font-size: 9px; line-height: 1; padding: 2px 4px; margin-left: 5px;
+    cursor: pointer; border: 1px solid var(--border); background: transparent;
+    border-radius: 3px; color: var(--ink-soft); vertical-align: middle;
+  }
+  .mini-reset:hover { color: var(--teal); border-color: var(--teal); }
+  .brake-cell { display: flex; flex-direction: column; gap: 2px; font-size: 9.5px; color: var(--ink-soft); }
+  .brake-cell input {
+    width: 100%; font-family: var(--font-mono); font-size: 10.5px;
+    padding: 3px 4px; box-sizing: border-box;
+    border: 1px solid var(--border-strong); border-radius: 3px; background: #fff;
+  }
+  .brake-cell input:disabled { opacity: .60; background: var(--card-alt); }
+  .drag-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    margin-top: 2px;
+    background: var(--card-alt);
+    border: 1px dashed var(--border-strong);
+    border-radius: 4px;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    flex-wrap: wrap;
+  }
+  .drag-plane { display: flex; gap: 4px; }
+  .seg {
+    padding: 3px 9px;
+    border: 1px solid var(--border-strong);
+    background: var(--card);
+    border-radius: 3px;
+    font-size: 10.5px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    color: var(--ink-soft);
+  }
+  .seg:hover { border-color: var(--teal); color: var(--teal); }
+  .seg.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+  .drag-hint { margin-left: auto; font-size: 10px; color: var(--ink-muted); line-height: 1.25; }
+  .joint-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin-top: 2px; }
+  .joint-grid .jr { display: flex; align-items: center; gap: 4px; font-size: 10.5px; }
+  .joint-grid .jr label { font-family: var(--font-mono); color: var(--ink-soft); min-width: 26px; margin: 0; }
+  .joint-grid .jr input[type=range] { flex: 1; }
+  .joint-grid .jr .jv { font-family: var(--font-mono); min-width: 44px; text-align: right; color: var(--ink); }
+  .ee-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 6px; align-items: center; }
+  .ee-grid input[type=number] {
+    width: 100%; font-family: var(--font-mono); font-size: 11.5px;
+    padding: 4px 6px; border: 1px solid var(--border-strong); border-radius: 3px; background: #fff; color: var(--ink);
+  }
+  .limit-table { display: flex; flex-direction: column; gap: 4px; font-family: var(--font-mono); font-size: 10.5px; }
+  .limit-row {
+    display: grid; grid-template-columns: 36px 1fr 1fr; gap: 6px; align-items: center;
+    padding: 3px 5px; border-radius: 3px; background: var(--card-alt);
+  }
+  .limit-row .lm-nm { color: var(--ink-soft); }
+  .limit-row input[type=number] {
+    width: 100%; font-family: var(--font-mono); font-size: 10.5px;
+    padding: 3px 5px; border: 1px solid var(--border-strong); border-radius: 3px;
+    background: var(--card); color: var(--ink);
+  }
+  .ik-hint code { font-family: var(--font-mono); background: var(--card-alt); padding: 0 3px; border-radius: 3px; }
+  .ik-hint { font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft); margin-top: 4px; min-height: 14px; }
+  .lock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 10px; margin-bottom: 4px; }
+  .lock-row { display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer; padding: 3px 5px; border-radius: 3px; }
+  .lock-row:hover { background: var(--card-alt); }
+  .lock-row input[type=checkbox] { accent-color: var(--terra-red); width: 14px; height: 14px; }
+  .lock-row .lock-nm { font-family: var(--font-mono); min-width: 30px; color: var(--ink-soft); }
+  .lock-row.locked .lock-nm { color: var(--danger); font-weight: 700; }
+  .lock-row.locked::after { content: "\1F512"; margin-left: auto; font-size: 11px; }
+  .limb-panel, .joint-panel {
+    position: fixed; z-index: 999; background: var(--card);
+    border: 1px solid var(--border-strong); border-left: 3px solid var(--teal);
+    border-radius: 4px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.18);
+    padding: 10px 12px; width: 274px; font-size: 11px;
+    max-height: calc(100vh - 20px); overflow-y: auto;
+  }
+  .joint-panel { border-left-color: #7c4d12; width: 292px; }
+  .limb-panel h4, .joint-panel h4 { margin: 0 0 4px 0; font-size: 12px; padding-right: 18px; }
+  .limb-panel .limb-val, .joint-panel .jp-val { font-family: var(--font-mono); color: var(--teal); font-weight: 700; }
+  .limb-panel input[type=range], .joint-panel input[type=range] { width: 100%; margin: 2px 0 0 0; }
+  .limb-panel .limb-presets { display: flex; gap: 4px; margin: 8px 0 0 0; }
+  .limb-panel .limb-presets .btn { font-size: 10px; padding: 3px 8px; flex: 1; }
+  .limb-panel .limb-presets .btn.active { background: var(--teal); color: #fff; border-color: var(--teal); font-weight: 600; }
+  .limb-panel .limb-custom { display: flex; gap: 4px; margin-top: 6px; }
+  .limb-panel .limb-custom input[type=text] { flex: 1; font-size: 10.5px; padding: 4px 6px; border: 1px solid var(--border-strong); border-radius: 3px; }
+  .limb-panel .limb-custom button { font-size: 10px; padding: 3px 8px; }
+  .limb-panel .close-x, .joint-panel .close-x { position: absolute; top: 6px; right: 8px; cursor: pointer; border: 0; background: transparent; font-size: 17px; line-height: 1; color: var(--ink-muted); }
+  .jp-sub { font-size: 10px; color: var(--ink-soft); margin-bottom: 6px; line-height: 1.35; }
+  .jp-sec { border-top: 1px solid var(--border); margin-top: 7px; padding-top: 6px; }
+  .jp-slider-row { margin-top: 5px; }
+  .jp-slider-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 10.5px; }
+  .jp-steps { display: flex; gap: 4px; margin-top: 3px; }
+  .jp-steps .btn { flex: 1; font-size: 10px; padding: 2px 4px; }
+  .jp-limits { display: grid; grid-template-columns: 1fr 1fr auto; gap: 4px; align-items: center; margin-top: 4px; }
+  .jp-limits input[type=number] { width: 100%; font-family: var(--font-mono); font-size: 10.5px; padding: 2px 4px; border: 1px solid var(--border-strong); border-radius: 3px; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; margin-bottom: 10px; }
+  @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .kpi { background: var(--card-alt); border: 1px solid var(--border); border-radius: 3px; padding: 7px 9px; }
+  .kpi .k-lbl { font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.3px; }
+  .kpi .k-val { font-family: var(--font-mono); font-size: 13.5px; font-weight: 600; color: var(--ink); margin-top: 2px; }
+  table.comp-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 4px; }
+  table.comp-table th, table.comp-table td {
+    padding: 5px 6px; border-bottom: 1px solid var(--border);
+    text-align: right; font-family: var(--font-mono);
+  }
+  table.comp-table th:first-child, table.comp-table td:first-child {
+    text-align: left; font-family: var(--font-sans); font-weight: 600;
+  }
+  table.comp-table th { background: var(--card-alt); color: var(--ink-soft); font-size: 10px; text-transform: uppercase; }
+  table.comp-table tr.active-row { background: #eef3f8; }
+  details { margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+  details summary { cursor: pointer; font-weight: 600; font-size: 11.5px; color: var(--slate); }
+  textarea.code-box {
+    width: 100%; height: 110px; font-family: var(--font-mono); font-size: 11px;
+    background: var(--card-alt); color: var(--ink); border: 1px solid var(--border-strong);
+    border-radius: 3px; padding: 8px; margin-top: 6px;
+  }
+  .tier-desc {
+    font-size: 11px; color: var(--ink-soft); background: var(--card-alt);
+    border-left: 3px solid var(--terra-red); padding: 6px 9px; border-radius: 3px;
+    margin: 4px 0 8px 0; line-height: 1.4;
+  }
+  .mode-banner {
+    font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+    padding: 3px 9px; border-radius: 3px; background: #eef3f8; color: #1e3a5f; border: 1px solid #cbd5e1;
+  }
+  .mode-banner.running { background: var(--terra-soft); color: var(--terra-red); border-color: #d8b4b8; }
+  .mode-banner.done { background: var(--ok-bg); color: var(--ok); border-color: #a7f3d0; }
+
+  /* Üst ince formül şeridi */
+  .formula-strip-top {
+    display: flex; align-items: center; gap: 16px; overflow-x: auto;
+    background: var(--card-alt); border-bottom: 1px solid var(--border);
+    padding: 3px 14px; font-family: var(--font-mono); font-size: 9px;
+  }
+  .formula-strip-top .f-item { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+  .formula-strip-top .f-label { font-size: 8.5px; color: var(--ink-soft); font-weight: 600; }
+  .formula-strip-top .f-math { font-size: 9.5px; color: var(--teal); font-weight: 600; }
+
+  /* ===== Sahne Tam Ekran Overlay ===== */
+  .scene-overlay {
+    position: fixed; inset: 0; z-index: 3000;
+    background: #eceff3; display: flex; flex-direction: column;
+  }
+  body.overlay-on { overflow: hidden !important; }
+  .so-top {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px; background: var(--ink); border-bottom: 1px solid rgba(255,255,255,0.15);
+    flex: 0 0 auto;
+  }
+  .so-title {
+    flex: 1; font-family: var(--font-serif); font-size: 14px; color: #f8fafc;
+  }
+  .so-body {
+    flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 8px 10px; overflow: hidden; min-height: 0;
+  }
+  .so-eyesrow {
+    flex: 0 0 auto; height: clamp(140px, 24vh, 230px);
+    display: flex; gap: 8px; min-height: 0;
+  }
+  .so-eyesrow #layerEyes { flex: 1; height: 100% !important; flex-basis: auto !important; }
+  .so-eyesrow .eye-win { height: 100%; }
+  .so-mainrow {
+    flex: 1; display: grid; grid-template-columns: 310px minmax(0, 1fr) 360px; gap: 10px; min-height: 0;
+  }
+  .so-col { overflow-y: auto; min-height: 0; }
+  .so-left .card, .so-right .card { margin-bottom: 10px; display: flex !important; }
+  .so-center { overflow: hidden; display: flex; }
+  .so-center .panel-window { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .so-center #sceneWrap { flex: 1; min-height: 0; }
+  .scene-overlay .fs-plot, .scene-overlay .fs-table { display: none !important; }
+  .scene-overlay .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 1200px) {
+    .so-mainrow { grid-template-columns: 260px minmax(0, 1fr) 280px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="title-block">
+    <h1>İnsansı Stereo Perspektif (Looming) &amp; Singularity Kontrollü Robot Laboratuvarı</h1>
+    <p>Üç Reddiye (Enkodersiz Enerji Darbesi + Tutma Frenleri · Sabit XYZ Yerine Ordinal Perspektif Konisi · Kesintili S0–S6 Bakış + Çan-Eğrisi HDA/HLSL) Çalışma Tezgahı</p>
+  </div>
+  <div class="header-actions">
+    <button class="btn" id="btnViewMode" title="Metrik sayıları (cm, px, derece) gizle ve algoritmanın gerçekten gördüğü yalnızca ordinal/perspektif durumu göster">Teorem Görünümü: Sayı Yok</button>
+    <button class="btn" id="btnConceptGuide" title="Üç Reddiye kuramını ve her panelin neyi kanıtladığını aç/kapat">Kavram &amp; Okuma Rehberi</button>
+    <button class="btn" id="btnSymbolGlossary" title="Programdaki tüm sembol ve kısaltmaların açıklaması">Sembol Rehberi</button>
+    <button class="btn" id="btnReset">&#8634; Kuruluma Dön</button>
+    <button class="btn" id="btnParallax">Aktif Kamera Mikro-Hareketi (Paralks Testi)</button>
+    <span style="font-size:10px;color:var(--ink-soft);margin-left:4px;">Paneller:</span>
+    <button class="btn pw-restore on" id="pwRestoreEyeL" data-target="pwEyeL" title="Sol göz panelini göster/gizle">Sol Göz</button>
+    <button class="btn pw-restore on" id="pwRestoreEyeR" data-target="pwEyeR" title="Sağ göz panelini göster/gizle">Sağ Göz</button>
+    <button class="btn pw-restore on" id="pwRestoreScene" data-target="pwScene" title="3B sahneyi göster/gizle">3B Sahne</button>
+    <button class="btn pw-restore on" id="pwRestoreTop" data-target="pwKuview" title="Üstten görünüşü göster/gizle">Üstten</button>
+    <button class="btn pw-restore on" id="pwRestoreSide" data-target="pwSideview" title="Yandan görünüşü göster/gizle">Yandan</button>
+    <button class="btn" id="btnSaveSettings" title="Tüm ayarları bu tarayıcıya kaydet">&#128190; Kaydet</button>
+    <button class="btn" id="btnDefaultSettings" title="Tüm ayarları varsayılana döndür ve kaydı sil">&#8634; Varsayılanlar</button>
+  </div>
+</header>
+<div class="concept-drawer" id="conceptDrawer" aria-label="Akademik Kavram ve Okuma Rehberi">
+  <div class="concept-grid">
+    <div class="concept-item refusal-1">
+      <h4>I. Enkoder Reddiyesi — Enerji Darbesi + Tutma Freni + Efference Copy</h4>
+      <p>Klasik robotlar her milisaniye mutlak eklem enkoderi okuyup yerçekimini sürekli motor akımıyla tutar. Önerilen mimari, hedefe doğru sinerjik <b>enerji darbesi (pulse)</b> uygular; durunca <b>mekanik tutma frenleri (&tau;_b)</b> kilitlenir ve başlangıç pozu <b>efference copy</b> ile saklanır.</p>
+      <div class="how-test">Nasıl Test Edilir: Tab 2 &rarr; <b>Frenler SERBEST</b> yapın (kol sarkar, eyleme geçemez) ardından <b>İlk Uyanış (Kalibrasyon)</b> ile optik akıştan konumu geri kazanın.</div>
+    </div>
+    <div class="concept-item refusal-2">
+      <h4>II. Metrik XYZ Reddiyesi — Binoküler Looming &amp; Göreceli Derinlik Konileri</h4>
+      <p>Kontrolör (x, y, z) santimetresi veya mutlak derinlik Z hesaplamaz. Omuz üstü iki kameradan el ve hedefin göreceli açısal konisini (u<sub>L</sub>, u<sub>R</sub>, &Delta;u, &Delta;v, &Delta;d) ve <b>perspektif küçülme oranı &rho;_s(t) &rarr; 1.0</b>'ı okuyarak ordinal sınıfa (UZAK &rarr; YAKIN &rarr; TEMAS) göre yaklaşır.</p>
+      <div class="how-test">Nasıl Test Edilir: Üstten <b>Teorem Görünümü: Sayı Yok</b> düğmesini açın ve algoritmanın metrik cm olmadan yalnız ordinal işaretle ulaştığını görün.</div>
+    </div>
+    <div class="concept-item refusal-3">
+      <h4>III. Sürekli Bakış &amp; P-Kazancı Reddiyesi — S0–S6 Göz Makinesi + HDA/HLSL</h4>
+      <p>Gözler her kare tam doğrulukla takip edilmez: <b>S0–S6 kesintili sakkadik durum makinesi</b> bakışı hedef↔el arasında paylaştırır; S3 kör uçuşunda (hold) örnek tutulur. Sabit kazanç veya PID sıçraması yerine <b>g = 1/(e·&delta;_eff)</b> üst sınırı ve insansı çan-eğrisi rampa uygulanır.</p>
+      <div class="how-test">Nasıl Test Edilir: <b>Hayalet İkiz (PID)</b> ve <b>Göreceli Derinlik Konileri</b>ni açık bırakıp ağır çekimde (<b>x0.25</b>) HDA vs PID aşmasını karşılaştırın.</div>
+    </div>
+  </div>
+</div>
+<div class="symbol-drawer" id="symbolDrawer" aria-label="Sembol Rehberi">
+  <div class="symbol-head">
+    <b>SEMBOL REHBERİ</b><span class="sym-note">Programdaki tüm kısaltmaların ne anlama geldiği — 4 grup</span>
+    <button class="btn" id="btnSymbolClose" style="padding:2px 10px;font-size:10px;">&#10005; Kapat</button>
+  </div>
+  <div class="symbol-grid">
+    <div class="sym-group">
+      <h5>A. Uzamsal Kinematik &amp; Geometri</h5>
+      <div class="sym-row"><span class="sym-s">F₀</span><span>Sabit taban referans çerçevesi (O₀-XYZ) — enkoder yok, mutlak dünya yok</span></div>
+      <div class="sym-row"><span class="sym-s">F_ee</span><span>Tutucu (el) 3B yönelim çerçevesi — SO(3) grubu içinde RPY</span></div>
+      <div class="sym-row"><span class="sym-s">F_hedef</span><span>Hedef nesne yönelim çerçevesi — SO(3)</span></div>
+      <div class="sym-row"><span class="sym-s">SE(3)</span><span>6-DOF uzaysal tutucu pozu: konum (ℝ³) + yönelim (SO(3)) — yarı-direkt çarpım SO(3)⋊ℝ³</span></div>
+      <div class="sym-row"><span class="sym-s">SO(3)</span><span>3B dönme grubu (roll φ_x, pitch θ_y, yaw ψ_z) — bilek ve kafa yönelimi</span></div>
+      <div class="sym-row"><span class="sym-s">ẑᵢ</span><span>i-inci eklem eksen vektörü (z₁…z₆; DH konvansiyonu)</span></div>
+      <div class="sym-row"><span class="sym-s">J(q)</span><span>6×6 geometrik Jacobian — [J_v; J_ω]: öteleme + dönme blokları</span></div>
+      <div class="sym-row"><span class="sym-s">J_v / J_ω</span><span>Jacobian'ın ℝ³×⁶ öteleme ve ℝ³×⁶ dönme alt-matrisleri</span></div>
+      <div class="sym-row"><span class="sym-s">w(q)</span><span>Yoshikawa manipülabilite ölçüsü √det(J·Jᵀ); tekillikte 0</span></div>
+      <div class="sym-row"><span class="sym-s">κ(J)</span><span>Jacobian koşul sayısı — tekillik yakınında ∞'a ıraksar</span></div>
+      <div class="sym-row"><span class="sym-s">N(J_v)</span><span>Boşluk uzayı — tork doğurmadan tutucu yönelimini değiştiren eksenel dengede</span></div>
+      <div class="sym-row"><span class="sym-s">θ_bel</span><span>Merkezi sütun (bel) Z₀-ekseni dönüşü — ±60° anatomik limit</span></div>
+      <div class="sym-row"><span class="sym-s">d₁</span><span>Omuz yüksekliği (pedestal tabanından eklem 1 eksenine)</span></div>
+      <div class="sym-row"><span class="sym-s">y₀</span><span>Klavikula yanal ofseti (omuz-omuz arası ≈ 19 cm)</span></div>
+      <div class="sym-row"><span class="sym-s">L₂ / L₃</span><span>Üst kol (humerus) / ön kol uzunluğu (31 / 26 cm)</span></div>
+      <div class="sym-row"><span class="sym-s">L_el</span><span>El (tutucu) uzunluğu — 12 cm</span></div>
+      <div class="sym-row"><span class="sym-s">R_max</span><span>Güvenli 3B erişim yarıçapı (0.88 × ΣL ≈ 61 cm)</span></div>
+      <div class="sym-row"><span class="sym-s">ẑ₆ (Roll)</span><span>j₆ wrist roll — el/tutucu rotasyonu</span></div>
+    </div>
+    <div class="sym-group">
+      <h5>B. Optik, Stereo &amp; Looming</h5>
+      <div class="sym-row"><span class="sym-s">B</span><span>İki göz arasındaki baz mesafesi (interpupillary ≈ 65 mm)</span></div>
+      <div class="sym-row"><span class="sym-s">B_boyun</span><span>Tek gözde boyun-paralaks sentetik tabanı — boyut yanılsamasını kırmak için</span></div>
+      <div class="sym-row"><span class="sym-s">f</span><span>Kamera/göz odak uzaklığı (piksel, pinhole modeli)</span></div>
+      <div class="sym-row"><span class="sym-s">E_L / E_R</span><span>Sol / sağ göz optik merkezleri</span></div>
+      <div class="sym-row"><span class="sym-s">(u, v)</span><span>Retina (yatay, dikey) piksel koordinatları</span></div>
+      <div class="sym-row"><span class="sym-s">s_g / s_t</span><span>El (grabber) / hedef nesne piksel boyu (apparent size)</span></div>
+      <div class="sym-row"><span class="sym-s">ρ_s</span><span>Ölçek yakınsama oranı = (s_g/W_g) / (s_t/W_t); hedefe varınca → 1.00</span></div>
+      <div class="sym-row"><span class="sym-s">Δu / Δv</span><span>Sol–sağ göz yatay / dikey piksel farkı ( disparite bileşeni)</span></div>
+      <div class="sym-row"><span class="sym-s">Δd</span><span>Toplam disparite (u_L − u_R); Z = f·B / Δd</span></div>
+      <div class="sym-row"><span class="sym-s">Z_mp</span><span>Boyun paralaksından elde edilen derinlik tahmini</span></div>
+      <div class="sym-row"><span class="sym-s">Z</span><span>Kameraya göre 3B derinlik (optik eksen doğrultusu)</span></div>
+      <div class="sym-row"><span class="sym-s">W_g / W_t</span><span>El ve hedefin gerçek fiziksel genişliği (kalibrasyonda bilinir)</span></div>
+      <div class="sym-row"><span class="sym-s">Ŵ_t</span><span>Paralaksla yolda kalibre edilen hedef genişliği tahmini</span></div>
+      <div class="sym-row"><span class="sym-s">PARALAKS</span><span>Bakış doğrultusunu ≥40 ms değiştirmeden stereonun yeniden yerleşmesi</span></div>
+      <div class="sym-row"><span class="sym-s">u_mp</span><span>Monoküler boyun kaymasındaki piksel yer değiştirmesi</span></div>
+      <div class="sym-row"><span class="sym-s">F_ee/F_t SAPMASI</span><span>İki çerçevenin görüntüsündeki ayrışma — konum/yönelim hatası vekili</span></div>
+    </div>
+    <div class="sym-group">
+      <h5>C. Kontrol Yasası &amp; Gecikme</h5>
+      <div class="sym-row"><span class="sym-s">τ_d</span><span>Görsel-sinirsel iletişim gecikmesi (ms cinsinden)</span></div>
+      <div class="sym-row"><span class="sym-s">δ_etkin</span><span>Toplam etkin gecikme (tutma süresi dahil) — k = 1/(e·δ_etkin)</span></div>
+      <div class="sym-row"><span class="sym-s">κ = g = k·δ</span><span>Taşmama kuralı: κ ≤ 1/e ⇒ monoton yaklaşım; aşma yok</span></div>
+      <div class="sym-row"><span class="sym-s">φ(p)</span><span>İlerleme oranına bağlı çan-eğrisi hız rampası (0→1→0)</span></div>
+      <div class="sym-row"><span class="sym-s">v_el / ω_el</span><span>Tutucunun doğrusal / açısal hızı</span></div>
+      <div class="sym-row"><span class="sym-s">e_ret</span><span>Retinal konum hata vektörü (yatay, dikey)</span></div>
+      <div class="sym-row"><span class="sym-s">e_ω</span><span>SO(3) yönelim hatası: ½(x̂×x̂_d + ŷ×ŷ_d + ẑ×ẑ_d)</span></div>
+      <div class="sym-row"><span class="sym-s">J⁺ / Jᵀ</span><span>Pseudoinvers / devrik — null-space gradyanı</span></div>
+      <div class="sym-row"><span class="sym-s">λ(w)</span><span>Manipülabiliteye bağlı sönümleme: w↓ ⇒ λ↑</span></div>
+      <div class="sym-row"><span class="sym-s">P_N</span><span>Null-space projeksiyon (bilek hizalama alt-uzayında)</span></div>
+      <div class="sym-row"><span class="sym-s">τ_b</span><span>Tutma freni torku (hedefte kilit; sürekli akım gerektirmez)</span></div>
+      <div class="sym-row"><span class="sym-s">T_comp</span><span>Kompanzasyon süresi — kalan hatanın kapandığı süre</span></div>
+      <div class="sym-row"><span class="sym-s">S0–S6</span><span>Kesintili bakış durum makinesi (Ara→Ele→Hedefe→Kör Uçuş→Yeniden→Komp.→Kilit)</span></div>
+      <div class="sym-row"><span class="sym-s">Ĝ</span><span>Öğrenilmiş ileri model — efference copy integrali (kör uçuşta tek bilgi)</span></div>
+      <div class="sym-row"><span class="sym-s">Σ_eff</span><span>Efference copy belirsizlik çapı — bakış tetiğinin girdisi</span></div>
+      <div class="sym-row"><span class="sym-s">R_max</span><span>Erişim sınırı — bel döndürülerek telafi edilir</span></div>
+    </div>
+    <div class="sym-group">
+      <h5>D. Biyomekanik &amp; Akademik Kıyas Ölçütleri</h5>
+      <div class="sym-row"><span class="sym-s">E_init</span><span>İlk Yaklaşım Hatası (Initial Approach Error) — ilk darbe sonundaki kalan mesafe</span></div>
+      <div class="sym-row"><span class="sym-s">%T_comp</span><span>Kompanzasyon süresinin toplam süreye ora(n)lı — balistik/düzeltme ayrımını verir</span></div>
+      <div class="sym-row"><span class="sym-s">L_vis</span><span>Görsel işlem yükü — saniyede tüketilen görsel örnek/kare sayısı</span></div>
+      <div class="sym-row"><span class="sym-s">η_pulse</span><span>Darbe enerji verimliliği — faydalı mekanik işin harcanan elektrik enerjisine oranı</span></div>
+      <div class="sym-row"><span class="sym-s">T_s</span><span>Yerleşme süresi — 5 mm banda oturma; yerleşmeyen süre tavanından skorlanır</span></div>
+      <div class="sym-row"><span class="sym-s">ID_e</span><span>Effective Fitts zorluk indeksi — log₂(D/W_e + 1)</span></div>
+      <div class="sym-row"><span class="sym-s">TP</span><span>Throughput (bit/s) = ID_e / T_eff — ISO 9241-9 Fitts performans ölçüsü</span></div>
+      <div class="sym-row"><span class="sym-s">W_e</span><span>Effective width = max(W_t, 4.133·σ_e)</span></div>
+      <div class="sym-row"><span class="sym-s">w_min</span><span>Erişim boyunca minimum manipülabilite — tekillik riski göstergesi</span></div>
+      <div class="sym-row"><span class="sym-s">τ_max</span><span>Tepe eklem torku (Nm) — motor koruma/rezerv ölçütü</span></div>
+      <div class="sym-row"><span class="sym-s">GA95</span><span>%95 bootstrap güven aralığı (10 000 tekrar, seed=42)</span></div>
+      <div class="sym-row"><span class="sym-s">p_Holm</span><span>Holm step-down düzeltmeli permutasyon p-değeri (25 karşılaştırma)</span></div>
+      <div class="sym-row"><span class="sym-s">HDA</span><span>İnsansı Dinamik Yaklaşım — mesafe+aciliyet uyarlamalı hız zarfı (bu makale)</span></div>
+      <div class="sym-row"><span class="sym-s">HLSL</span><span>Bell-shaped gecikme-türevi yönetici ile İnsansı Stereo Looming (bu makale)</span></div>
+      <div class="sym-row"><span class="sym-s">SE(3) / SO(3)</span><span>6-DOF pozu / 3B yönelim grubu — enkoder ile değil, hareket alanı ile tanımlı</span></div>
+      <div class="sym-row"><span class="sym-s">F₀ / F_ee / F_t</span><span>Taban / tutucu / hedef referans çerçeveleri</span></div>
+    </div>
+  </div>
+</div>
+<div class="theorem-strip" id="theoremStrip">
+  <span class="th-badge" title="Metrik cm / px / derece sayıları arayüzden kaldırıldı; yalnızca kontrolörün gördüğü ordinal + topolojik sinyaller"><b>TEOREM KİPİ AKTİF</b> — metrikler gizli: yalnızca ordinal + topolojik sinyaller</span>
+  <span class="th-badge" id="thProx">Yakınlık Sınıfı: <b>UZAK</b></span>
+  <span class="th-badge" id="thGazeState">Bakış Durumu: <b>S0 HEDEF KİLİTLİ</b></span>
+  <span class="th-badge" id="thPulse">Enerji Sinerjisi: <b>BEKLEMEDE</b></span>
+  <span class="th-badge" id="thEfference">Efference Copy: <b>FRENLE KORUNMUŞ</b></span>
+</div>
+<div class="formula-strip formula-strip-top" id="formulaStripTop">
+  <div class="f-item"><div class="f-label">1. Elin Perspektif Küçülmesi</div><div class="f-math" id="mathGripperSize">s_g(t) = f·W_g / Z_g(t) = -- px</div></div>
+  <div class="f-item"><div class="f-label">2. Hedef Perspektif Boyu &amp; Paralks</div><div class="f-math" id="mathTargetSize">s_t = f·W_t / Z_t = -- px</div></div>
+  <div class="f-item"><div class="f-label">3. Perspektif Ölçek Yakınsaması</div><div class="f-math" id="mathScaleRatio">ρ_s(t) = (s_g/W_g)/(s_t/W_t) = -- → 1.00</div></div>
+</div>
+<!-- Pre-reach prediction and live optical looming math bar -->
+<div class="assessment-bar">
+  <div class="assess-left">
+    <span class="mode-banner" id="modeBanner">KURULUM MODU — kolu ve hedefi ayarlayın, sonra Başlat</span>
+    <span class="status-pill" id="reachBadge">STEREO PARALKS ANALİZİ HAZIR</span>
+    <span class="math-chip" id="chipReachDist">Tahmini Mesafe: <b>-- cm</b> / Güvenli Kol Sınırı: <b>-- cm</b></span>
+    <span class="math-chip" id="chipLooming">El Perspektif Boyu s_g: <b>-- px</b> &rarr; Hedef Ölçeği ρ_s: <b>--</b></span>
+    <span class="math-chip" id="chipSing">Singularity İndeksi w(q): <b>--</b></span>
+    <span class="math-chip" id="chipGaze">Kafa: <b>otomatik alterasyon</b> · geri besleme: yalnızca stereo görüş</span>
+  </div>
+  <div class="assess-right" style="font-size:11px;color:var(--ink-soft);">
+    Kamera Konumu: <b>Eklem-1 (Omuz) Üstü ve Hafif Gerisi</b> (İnsan Gözü Perspektifi)
+  </div>
+</div>
+<div class="lab">
+
+  <div class="row-top" id="rowTop">
+
+  <section class="layer layer-mid" id="layerStage">
+    <div class="panel-window" id="pwScene">
+      <div class="panel-titlebar">
+        <span class="pw-tag">PANEL III</span>
+        <span class="pw-title" title="3B İnsansı Robot Kol — Enerji Akışı, Derinlik Konileri & Hayalet İkiz">3B İNSANSI ROBOT KOL &mdash; Enerji Akışı &amp; Derinlik Konileri</span>
+        <span class="pw-live-stat" id="lblSceneStat">Kurulum Kipi</span>
+        <div class="pw-controls">
+          <button class="pw-btn" data-act="toggle" title="Daralt / Genişlet">&#8211;</button>
+          <button class="pw-btn" data-act="close" title="Kapat">&#10005;</button>
+          <button class="pw-btn" id="btnSceneFS" title="Tam Ekran (iki göz + sahne + temel ayarlar)" aria-label="Tam Ekran">&#x26F6;</button>
+        </div>
+      </div>
+      <div class="pw-desc" title="Omuzdan parmak ucuna aktif kas enerjisi akışı (amber), binoküler derinlik konileri (camgöbeği/turuncu) ve seçilebilir çoklu kontrol modeli hayalet ikiz karşılaştırması">Omuzdan parmak ucuna kas enerjisi akışı (amber), binoküler derinlik konileri ve çoklu model hayalet ikiz karşılaştırması (renkli kesikli)</div>
+      <div class="ghost-bar" id="ghostModelBar" title="Hayalet ikiz olarak görmek istediğiniz modelleri seçin (her model kendi rengiyle kesikli çizilir)"></div>
+      <div class="panel-body">
+        <div class="canvas-wrap" id="sceneWrap">
+          <canvas id="cv3d" width="720" height="400"></canvas>
+          <div class="hud hud-tl">
+            <button class="hud-chip hud-primary" id="btnRunReach">&#9654; Simülasyonu Başlat</button>
+            <button class="hud-chip hud-chip-sub" id="btnResetToStart" title="Zaman çizelgesini 0. kareye alır (Başa Sar)">&#9198; Başa Al</button>
+            <button class="hud-chip hud-bench" id="btnOpenBenchmark" title="5-senaryo × 6-kontrolcü akademik benchmark'u Sekme 5'te çalıştır">&#128202; Akademik Benchmark</button>
+            <button class="hud-chip hud-wake" id="btnSelfCalibration" title="Enkoder yok: kolun yerini mikro darbelerle optik akıştan keşfet">&#10024; İlk Uyanış (Kalibrasyon)</button>
+            <label class="hud-check" title="Seçili kontrol modellerinin hayalet ikizlerini kendi renkleriyle aynı anda çizer"><input type="checkbox" id="chkGhostRobot" checked> Hayalet İkizler</label>
+            <label class="hud-check" title="İki gözden ele ve hedefe uzanan göreceli derinlik konilerini gösterir"><input type="checkbox" id="chkDepthCones" checked> Derinlik Konileri</label>
+            <label class="hud-check" title="Omuz merkezli saydam 3B erişim küresini gösterir"><input type="checkbox" id="chkReachSphere" checked> Erişim Küresi</label>
+          </div>
+          <div class="hud hud-bl">
+            <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#e8e6df;opacity:.85;margin-right:2px">Model</span>
+            <select id="selController" class="hud-select">
+              <option value="hdap" selected>&#304;nsan-HDA &mdash; Dinamik Yakla&#351;&#305;m (Mesafe+Aciliyet Uyarlamal&#305; &Ccedil;an-E&#287;risi + Trifazik S&#305;ralama)</option>
+              <option value="hlsl">HLSL (Bizim Modelimiz: &#304;nsans&#305; &Ccedil;an-E&#287;risi Rampa + Perspektif + 1/e.&delta;_eff)</option>
+              <option value="governor">Iskender Governor (Basamak Ba&#351;lang&#305;&#351;l&#305; k = 1 / e&middot;&delta;_eff)</option>
+              <option value="pid">Klasik PID Kontrolc&uuml; (Sabit Kazan&ccedil;l&#305;)</option>
+              <option value="lqr">LQR Durum Geri Besleme (Sabit Kazan&ccedil;l&#305;)</option>
+              <option value="fixed">Sabit Kazan&ccedil; (P) &mdash; v = k&middot;e, Rampas&#305;z Do&#287;rudan Komut</option>
+              <option value="bio">Biyomimetik Pulse (Enerji S&uuml;resi / Duty-Cycle)</option>
+              <option value="custom">&Ouml;zel Matematiksel Form&uuml;l (Alttaki Kod Kutusundan)</option>
+            </select>
+          </div>
+          <div class="hud hud-telemetry" id="telemetryHud" title="Sahne telemetrisi — ağır çekimde darbe/bakış sınırlarını ayırt etmek için">
+            <div class="tel-title">TELEMETRİ <span id="telTimeScale" class="tel-badge">x1</span></div>
+            <div class="tel-row"><span>Zaman</span><b id="telTime">0.00 s</b></div>
+            <div class="tel-row"><span>Bakış</span><b id="telGaze">OTOMATİK</b></div>
+            <div class="tel-row"><span>Bakış Fazı</span><b id="telGazePhase">S0 HEDEF KİLİT</b></div>
+            <div class="tel-row"><span>Örnek Yaşı</span><b id="telSampleAge">0 ms (TAZE)</b></div>
+            <div class="tel-row"><span>Ordinal Durum</span><b id="telOrdinal">UZAK</b></div>
+            <div class="tel-row"><span>&rho;_s (el/hedef boy)</span><b id="telRho">&mdash;</b></div>
+            <div class="tel-row"><span>Disparite</span><b id="telDisp">&mdash;</b></div>
+            <div class="tel-row"><span>&delta; gecikme</span><b id="telDelay">&mdash;</b></div>
+            <div class="tel-row"><span>Aktif Sinerji</span><b id="telPulse">BEKLEME</b></div>
+            <div class="tel-row"><span>Efference &Sigma;</span><b id="telEffSigma">0.0° (KİLİTLİ)</b></div>
+            <div class="tel-row"><span>3B Yönelim |e_&omega;|</span><b id="telOrient">0°,0°,0°</b></div>
+            <div class="tel-row"><span>Frenler</span><b id="telBrake">AKTİF</b></div>
+          </div>
+        </div>
+        <div class="drag-bar">
+          <span><b>S&uuml;r&uuml;kleme</b></span>
+          <div class="drag-plane">
+            <button class="seg active" id="segXZ">X&ndash;Z</button>
+            <button class="seg" id="segYZ">Y&ndash;Z</button>
+            <button class="seg" id="segXY">X&ndash;Y</button>
+          </div>
+          <span style="margin-left:6px;"><b>G&ouml;r&uuml;n&uuml;&#351;</b></span>
+          <div class="drag-plane" id="camViewGroup">
+            <button class="seg cam-view-btn active" id="btnViewPersp" data-cam-view="persp" title="3B Perspektif / &#304;zometrik G&ouml;r&uuml;n&uuml;&#351;">Perspektif</button>
+            <button class="seg cam-view-btn" id="btnViewFront" data-cam-view="front" title="&Ouml;nden G&ouml;r&uuml;n&uuml;&#351; (Y&ndash;Z Koronal D&uuml;zlem)">&Ouml;nden</button>
+            <button class="seg cam-view-btn" id="btnViewSide" data-cam-view="side" title="Yandan G&ouml;r&uuml;n&uuml;&#351; (X&ndash;Z Sagital D&uuml;zlem)">Yandan</button>
+            <button class="seg cam-view-btn" id="btnViewTop" data-cam-view="top" title="&Uuml;stten G&ouml;r&uuml;n&uuml;&#351; (X&ndash;Y Yatay D&uuml;zlem)">&Uuml;stten</button>
+          </div>
+          <button class="seg" id="btnResetView" title="Kameray&#305; varsay&#305;lana d&ouml;nd&uuml;r">&#8982; S&#305;f&#305;rla</button>
+          <span class="drag-hint">Sol: d&ouml;nd&uuml;r &middot; Sa&#287;: kayd&#305;r &middot; Tekerlek: yak&#305;nla&#351;t&#305;r/uzakla&#351;t&#305;r &middot; Halkalar: hedefi/kolu ayarla</span>
+        </div>
+        <div class="playback-strip">
+          <button class="btn" id="btnResetTimeline" style="padding:3px 10px;">&#8634; Ba&#351;a Sar</button>
+          <button class="btn" id="btnPlayPause" style="padding:3px 10px;">&#9654; Oynat</button>
+          <input type="range" id="rngScrub" min="0" max="100" value="0" step="1" style="flex:1;">
+          <span class="time-lbl" id="lblTime">t = 0.00 s</span>
+          <span class="time-scale" id="timeScaleGroup" title="Animasyon h&#305;z&#305; — fizik ve metrikler (E_init, T_comp) de&#287;i&#351;mez">
+            <span class="ts-lbl">Zaman</span>
+            <button class="seg ts-btn active" data-ts="1">x1</button>
+            <button class="seg ts-btn" data-ts="0.75">x0.75</button>
+            <button class="seg ts-btn" data-ts="0.5">x0.5</button>
+            <button class="seg ts-btn" data-ts="0.25">x0.25</button>
+            <button class="seg ts-btn" data-ts="0.1">x0.1</button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="splitter-v" id="topSplitter" title="Sürükle: 3B sahne &harr; göz/ortografik paneller genişliği"></div>
+
+  <div class="aux-matrix" id="auxMatrix">
+
+  <section class="layer layer-top" id="layerEyes">
+    <div class="panel-window eye-win" id="pwEyeL">
+      <div class="panel-titlebar">
+        <span class="pw-tag">PANEL I</span>
+        <span class="pw-title" title="SOL GÖZ — Omuz Üstü Stereo Retina">SOL GÖZ</span>
+        <span class="pw-live-stat" id="lblLeftEye">u_L, v_L | s_g = -- px</span>
+        <div class="pw-controls">
+          <button class="pw-btn" data-act="toggle" title="Daralt / Genişlet">&#8211;</button>
+          <button class="pw-btn" data-act="close" title="Kapat">&#10005;</button>
+        </div>
+      </div>
+      <div class="pw-desc" title="Sol göz retinasındaki el (yeşil koni kesiti) ve hedef (turuncu) izdüşümü — S0–S6 bakış penceresi ve odak artısı">Sol retina el (yeşil) / hedef (turuncu) izdüşümü — S0–S6 bakış penceresi</div>
+      <div class="panel-body">
+        <div class="eye-box">
+          <div class="canvas-wrap">
+            <canvas id="cvLeftEye" width="620" height="380"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-window eye-win" id="pwEyeR">
+      <div class="panel-titlebar">
+        <span class="pw-tag">PANEL II</span>
+        <span class="pw-title" title="SAĞ GÖZ — Omuz Üstü Stereo Retina">SAĞ GÖZ</span>
+        <span class="pw-live-stat" id="lblRightEye">u_R, v_R | d = -- px</span>
+        <div class="pw-controls">
+          <button class="pw-btn" data-act="toggle" title="Daralt / Genişlet">&#8211;</button>
+          <button class="pw-btn" data-act="close" title="Kapat">&#10005;</button>
+        </div>
+      </div>
+      <div class="pw-desc" title="Sağ göz retinası ve sol göze göre yatay disparite d = u_L - u_R; paralks derinlik yakınsamasını belirler">Sağ retina ve yatay disparite d = u<sub>L</sub> &minus; u<sub>R</sub></div>
+      <div class="panel-body">
+        <div class="eye-box">
+          <div class="canvas-wrap">
+            <canvas id="cvRightEye" width="620" height="380"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="splitter" id="eyesSplitter" title="Sürükle: göz retinaları &harr; üstten/yandan görünüş yüksekliği"></div>
+
+  <section class="row-views" id="rowViews">
+    <div class="panel-window kuview-card" id="pwKuview">
+      <div class="panel-titlebar">
+        <span class="pw-tag">PANEL IV</span>
+        <span class="pw-title" title="ÜSTTEN GÖRÜNÜŞ — Stereo Koni Kesişimi (X–Y)">ÜSTTEN (X&ndash;Y)</span>
+        <span class="pw-live-stat" id="lblTopView">&Delta;u = -- px | Z = -- m</span>
+        <div class="pw-controls">
+          <button class="pw-btn" data-act="toggle" title="Daralt / Genişlet">&#8211;</button>
+          <button class="pw-btn" data-act="close" title="Kapat">&#10005;</button>
+        </div>
+      </div>
+      <div class="pw-desc" title="İki gözün görüş ışınlarının hedef ve el üzerinde oluşturduğu yatay binoküler açısal paralks ve göreceli derinlik konileri">Yatay stereo koni kesişimi ve göreceli derinlik paralksı (X&ndash;Y)</div>
+      <div class="panel-body">
+        <div class="eye-box">
+          <div class="canvas-wrap">
+            <canvas id="cvStereoTop" width="620" height="380"></canvas>
+          </div>
+        </div>
+        <div class="kuview-metrics" id="kuviewMetrics"></div>
+      </div>
+    </div>
+
+    <div class="splitter-v" id="viewSplitter" title="Sürükle: üstten &harr; yandan görünüş"></div>
+
+    <div class="panel-window" id="pwSideview">
+      <div class="panel-titlebar">
+        <span class="pw-tag">PANEL V</span>
+        <span class="pw-title" title="YANDAN GÖRÜNÜŞ — Dik Düzlem Erişim & Yükseklik (X–Z)">YANDAN (X&ndash;Z)</span>
+        <span class="pw-live-stat" id="lblSideView">&Delta;X = -- m | &Delta;Z = -- m</span>
+        <div class="pw-controls">
+          <button class="pw-btn" data-act="toggle" title="Daralt / Genişlet">&#8211;</button>
+          <button class="pw-btn" data-act="close" title="Kapat">&#10005;</button>
+        </div>
+      </div>
+      <div class="pw-desc" title="İleri/yukarı düzlemde omuz–dirsek–bilek geometrisi, kamera bakış konisi ve hayalet PID yörünge karşılaştırması">Dik düzlem eklem geometrisi ve hayalet PID yörüngesi (X&ndash;Z)</div>
+      <div class="panel-body">
+        <div class="eye-box">
+          <div class="canvas-wrap">
+            <canvas id="cvSide" width="620" height="380"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </div>
+
+</div>
+
+<div class="splitter" id="bottomSplitter" title="Sürükle: üst görsel sahne &harr; alt kontrol paneli yüksekliği"></div>
+
+<section class="layer layer-bottom" id="layerBottom">
+    <div class="bottom-bar" id="layerBottomBar">
+      <button class="btn" id="btnToggleBottom" style="font-size:10.5px;padding:4px 10px;">&#9662; Kontrol Panelini Daralt</button>
+      <div class="tab-bar" id="bottomTabBar" role="tablist" aria-label="Çalışma Tezgahı Sekmeleri">
+        <button class="tab-btn active" data-tab="tab1" role="tab" aria-selected="true">1. Kavram &amp; Kontrol Modeli</button>
+        <button class="tab-btn" data-tab="tab2" role="tab" aria-selected="false">2. Antropomorfik Kol, Gözler &amp; Frenler</button>
+        <button class="tab-btn" data-tab="tab3" role="tab" aria-selected="false">3. Kinematik Editör &amp; Eklem Sınırları</button>
+        <button class="tab-btn" data-tab="tab4" role="tab" aria-selected="false">4. Hedef, Gecikme &amp; Özel Yasa</button>
+        <button class="tab-btn" data-tab="tab5" role="tab" aria-selected="false">5. Karşılaştırma &amp; Akademik Analiz</button>
+      </div>
+      <button class="btn" id="btnShowAllTabs" style="font-size:10.5px;padding:4px 9px;" title="Tüm sekme kartlarını tek sayfada alt alta göster">Tüm Sekmeleri Aç</button>
+    </div>
+    <div class="tab-panels" id="tabPanels">
+    <div class="card fs-basic" data-tab="tab1">
+      <div class="card-title">1. İnsansı Kontrol Modeli <span class="sub">PID / LQR Alternatifi</span></div>
+      <div class="card-explain">Enkodersiz görsel-balistik ulaşma yasası (HDA / HLSL) ile klasik sabit kazançlı yöntemleri (PID, LQR, P) karşılaştırın; hız sınıfı ve singularity korumasını seçin.</div>
+      <div class="ctrl-group">
+        <label>Singularity & Eklem Koordinasyonu</label>
+        <select id="selSingularity">
+          <option value="human_wdls" selected>İnsansı Tork-Bütçeli & Singularity Korumalı (Omuz→Dirsek→Bilek)</option>
+          <option value="plain_dls">Düz DLS Ters Kinematik (Tork/Singularity Korumasız)</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>Görüş ve Derinlik Algı Kipi (Binoküler / Monoküler Boyun–Göz Senkronu)</label>
+        <select id="selVisionMode">
+          <option value="binocular" selected>Çift Göz Stereo + Retinal Ölçek (Binoküler)</option>
+          <option value="mono_left">Sol Tek Göz Açık + Yavaş Boyun–Göz Paralaksı (Sağ Kapalı)</option>
+          <option value="mono_right">Sağ Tek Göz Açık + Yavaş Boyun–Göz Paralaksı (Sol Kapalı)</option>
+          <option value="mono_static">Sol Tek Göz SABİT Kafa — Boyun Paralaksı YOK (Boyut Yanılsaması Testi)</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>İnsansı Hız Sınıfı (Aciliyet Seviyesi)</label>
+        <select id="selSpeedTier">
+          <option value="reflex">1. Acil / Refleks (Balistik, ~120–250 ms)</option>
+          <option value="fast">2. Hızlı / Atik Ulaşma</option>
+          <option value="normal" selected>3. Normal / Doğal Günlük Ulaşma</option>
+          <option value="careful">4. Dikkatli / Yumuşak Taşıma</option>
+          <option value="precision">5. Hassas / Cerrahi Mikro-Ulaşma</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>Alt Durum (Görev Bağlamı)</label>
+        <select id="selSpeedSub"></select>
+      </div>
+      <div class="tier-desc" id="tierDesc">—</div>
+      <details>
+        <summary>Detaylı Hız / Rampa Ayarları (sınıf seçince otomatik dolar)</summary>
+        <div class="ctrl-group" style="margin-top:8px;">
+          <label>Maks. El Hızı v_max <span class="val" id="valVmax">0.50 m/s</span></label>
+          <input type="range" id="rngVmax" min="0.05" max="1.50" step="0.01" value="0.50">
+        </div>
+        <div class="ctrl-group">
+          <label>Maks. Eklem Hızı q̇_max <span class="val" id="valMaxQd">1.40 rad/s</span></label>
+          <input type="range" id="rngMaxQd" min="0.30" max="3.50" step="0.05" value="1.40">
+        </div>
+        <div class="ctrl-group">
+          <label>Kazanç Çarpanı κ/(1/e) <span class="val" id="valKScale">1.00</span></label>
+          <input type="range" id="rngKScale" min="0.40" max="1.25" step="0.01" value="1.00">
+        </div>
+        <div class="ctrl-group">
+          <label>Varış Toleransı ε <span class="val" id="valEps">4.0 mm</span></label>
+          <input type="range" id="rngEps" min="1.0" max="10.0" step="0.5" value="4.0">
+        </div>
+        <div class="ctrl-group">
+          <label>Kalkış Rampası Taban φ_min <span class="val" id="valPhiMin">0.28</span></label>
+          <input type="range" id="rngPhiMin" min="0.05" max="0.90" step="0.01" value="0.28">
+        </div>
+        <div class="ctrl-group">
+          <label>Rampa Eğriliği γ <span class="val" id="valGamma">0.55</span></label>
+          <input type="range" id="rngGamma" min="0.20" max="1.00" step="0.01" value="0.55">
+        </div>
+        <div class="ctrl-group">
+          <label>Frenleme Bölgesi Başlangıcı p_term <span class="val" id="valTermP">0.45</span></label>
+          <input type="range" id="rngTermP" min="0.20" max="0.85" step="0.01" value="0.45">
+        </div>
+        <div class="ctrl-group">
+          <label>Simülasyon Süresi <span class="val" id="valDur">2.8 s</span></label>
+          <input type="range" id="rngDur" min="1.0" max="6.0" step="0.1" value="2.8">
+        </div>
+      </details>
+      <div class="preset-bar">
+        <button class="preset-btn" data-preset="nominal">1. Standart İnsansı Ulaşma</button>
+        <button class="preset-btn" data-preset="extended">2. Uzak Hedef (Singularity Sınırı)</button>
+        <button class="preset-btn" data-preset="unreachable">3. Kol Boyunu Aşan Hedef Testi</button>
+        <button class="preset-btn" data-preset="highdelay">4. Yüksek Görsel Gecikme (120 ms)</button>
+        <button class="preset-btn" data-preset="mononeck">5. Tek Göz + Yavaş Boyun–Göz Senkronu</button>
+        <button class="preset-btn" data-preset="waist_sync">6. Belden (Sütun) + Kol Senkron Ulaşma</button>
+      </div>
+    </div>
+    <div class="card concept-card-wide" data-tab="tab1" id="cardConceptGuide">
+      <div class="card-title">XYZ Koordinatsız Retinal Looming Kontrol Döngüsü, Matematiksel İzah &amp; Kinematik Şema <span class="sub">Senaryoya Uyarlanan Lisans Düzeyi Anlatım · Enkoder=YOK · (X,Y,Z)=YOK</span></div>
+      <div class="diag-mode-bar" id="diagModeBar">
+        <div class="diag-mode-note">
+          <b>Bu model bütün senaryolar için geçerli mi?</b> Aşağıdaki <b>4 aşamalı kapalı çevrim omurgası</b> tüm senaryolarda aynıdır; ancak seçtiğiniz <b>Görüş Kipine</b> (Çift Göz / Tek Göz+Boyun / Tek Göz Sabit), <b>Kontrol Yasasına</b> ve <b>Bel/Bilek Hareketine</b> göre kutuların içindeki denklemler canlı olarak değişir:
+        </div>
+        <div class="diag-mode-pills">
+          <button type="button" class="diag-mode-btn active" data-diag-mode="binocular">1. Çift Göz Stereo (Standart)</button>
+          <button type="button" class="diag-mode-btn" data-diag-mode="mono_left">2. Tek Göz + Boyun Paralaksı (Kalibrasyonlu)</button>
+          <button type="button" class="diag-mode-btn" data-diag-mode="mono_static">3. Tek Göz Sabit Kafa (Boyut Yanılsaması)</button>
+          <button type="button" class="diag-mode-btn" data-diag-mode="waist_sync">4. Bel (Sütun) + Kol Senkron Ulaşma</button>
+        </div>
+      </div>
+
+      <div class="ctrl-diag-wrap">
+        <svg id="svgControlDiagram" class="ctrl-diag-svg" viewBox="0 0 920 342" role="img" aria-label="Senaryoya Uyarlanan XYZ Koordinatsız Kontrol Blok Diyagramı">
+          <defs>
+            <marker id="arrTeal" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#1e3a5f"/>
+            </marker>
+          </defs>
+          <!-- Referans & Toplama Düğümü -->
+          <text id="diagRefTop" x="46" y="40" text-anchor="middle" font-size="9.5" font-weight="700" fill="#18181b">Hedef: ρ_s = 1</text>
+          <text id="diagRefSub" x="46" y="53" text-anchor="middle" font-size="8.0" fill="#475569">(e_ret=0, e_ω=0)</text>
+          <line x1="8" y1="90" x2="27" y2="90" stroke="#1e3a5f" stroke-width="1.8" marker-end="url(#arrTeal)"/>
+          <circle cx="46" cy="90" r="18" fill="#ffffff" stroke="#1e3a5f" stroke-width="2"/>
+          <text x="46" y="95" text-anchor="middle" font-size="14" font-weight="700" fill="#1e3a5f">Σ</text>
+          <text x="17" y="82" font-size="11" font-weight="700" fill="#1e3a5f">+</text>
+          <text x="53" y="122" font-size="12" font-weight="700" fill="#8b2635">−</text>
+          <line x1="64" y1="90" x2="88" y2="90" stroke="#1e3a5f" stroke-width="1.8" marker-end="url(#arrTeal)"/>
+
+          <!-- Blok 1: Görsel / Retinal Ölçüm -->
+          <rect id="diagBlkRetina" class="diag-block-rect" x="90" y="20" width="192" height="134" rx="3"/>
+          <rect x="90" y="20" width="192" height="24" rx="3" fill="#e5e9f0"/>
+          <rect x="90" y="36" width="192" height="8" fill="#e5e9f0"/>
+          <text id="diagRetTitle" x="186" y="36" text-anchor="middle" font-size="9.0" font-weight="700" fill="#0f172a">1. ÖLÇÜM (ÇİFT GÖZ STEREO)</text>
+          <text id="diagRetSub" x="186" y="58" text-anchor="middle" font-size="7.8" fill="#475569">Cetvel/XYZ yok; piksel + boy oranı</text>
+          <text id="diagRetEq1" x="186" y="76" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#18181b">Yön: Δu=u_h−u_e , Δv=v_h−v_e</text>
+          <text id="diagRetEq2" x="186" y="93" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#1e3a5f" font-weight="600">Boy: ρ_s=(s_e/W_e)/(s_h/W_h)→1</text>
+          <text id="diagRetEq3" x="186" y="110" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#0f766e">Stereo: Z = f·B / (u_sol−u_sağ)</text>
+          <rect x="97" y="121" width="178" height="26" rx="2" fill="#f8fafc" stroke="#cbd5e1"/>
+          <text id="diagRetinaVal" x="186" y="138" text-anchor="middle" font-size="9.0" font-weight="700" font-family="Consolas, monospace" fill="#1e3a5f">Δu=-- px | ρ_s=--</text>
+
+          <line x1="282" y1="90" x2="306" y2="90" stroke="#1e3a5f" stroke-width="1.8" marker-end="url(#arrTeal)"/>
+          <rect x="281" y="70" width="26" height="12" rx="2" fill="#ffffff"/>
+          <text x="294" y="79" text-anchor="middle" font-size="7.5" font-family="Consolas, monospace" fill="#475569">e_ret</text>
+
+          <!-- Blok 2: Gecikme & S0-S6 Bakış Kapısı -->
+          <rect id="diagBlkGaze" class="diag-block-rect" x="308" y="20" width="178" height="134" rx="3"/>
+          <rect x="308" y="20" width="178" height="24" rx="3" fill="#e5e9f0"/>
+          <rect x="308" y="36" width="178" height="8" fill="#e5e9f0"/>
+          <text id="diagGazeTitle" x="397" y="36" text-anchor="middle" font-size="9.0" font-weight="700" fill="#0f172a">2. GECİKME &amp; BAKIŞ KAPISI</text>
+          <text id="diagGazeSub" x="397" y="58" text-anchor="middle" font-size="7.8" fill="#475569">Gecikme + aralıklı bakışı yönetir</text>
+          <text id="diagGazeEq1" x="397" y="76" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#18181b">Sinir Gecikmesi: τ_d + Sakkad</text>
+          <text id="diagGazeEq2" x="397" y="93" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#1e3a5f" font-weight="600">Etkin Gecikme: δ = τ_d + 0.5·τ_tut</text>
+          <text id="diagGazeEq3" x="397" y="110" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#475569">Örnekleme: ~20–80 Hz (S3 Hold)</text>
+          <rect x="315" y="121" width="164" height="26" rx="2" fill="#f8fafc" stroke="#cbd5e1"/>
+          <text id="diagGazeVal" x="397" y="138" text-anchor="middle" font-size="9.0" font-weight="700" font-family="Consolas, monospace" fill="#1e3a5f">S0 KİLİT · L_vis=-- Hz</text>
+
+          <line x1="486" y1="90" x2="510" y2="90" stroke="#1e3a5f" stroke-width="1.8" marker-end="url(#arrTeal)"/>
+          <text x="498" y="79" text-anchor="middle" font-size="8.4" font-family="Consolas, monospace" fill="#475569">ê</text>
+
+          <!-- Blok 3: Hız Yasası (HDA / HLSL / PID) -->
+          <rect id="diagBlkLaw" class="diag-block-rect" x="512" y="20" width="194" height="134" rx="3"/>
+          <rect x="512" y="20" width="194" height="24" rx="3" fill="#e5e9f0"/>
+          <rect x="512" y="36" width="194" height="8" fill="#e5e9f0"/>
+          <text id="diagLawTitle" x="609" y="36" text-anchor="middle" font-size="9.0" font-weight="700" fill="#0f172a">3. HIZ YASASI (HDA / HLSL)</text>
+          <text id="diagLawSub" x="609" y="58" text-anchor="middle" font-size="7.8" fill="#475569">Hız eğrisi &amp; taşmama güvenliği</text>
+          <text id="diagLawEq1" x="609" y="76" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#18181b">Faz 1: v_el = φ(t)·k·e (Çan Eğrisi)</text>
+          <text id="diagLawEq2" x="609" y="93" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#8b2635" font-weight="600">Faz 2: k ≤ 0.37 / δ_etkin (Fren)</text>
+          <text id="diagLawEq3" x="609" y="110" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#475569">Gecikme × 2 ⇒ hız kazancı k ÷ 2</text>
+          <rect x="519" y="121" width="180" height="26" rx="2" fill="#fdf4f5" stroke="#d8b4b8"/>
+          <text id="diagLawVal" x="609" y="138" text-anchor="middle" font-size="9.0" font-weight="700" font-family="Consolas, monospace" fill="#8b2635">BEKLEMEDE (FREN)</text>
+
+          <line x1="706" y1="90" x2="730" y2="90" stroke="#1e3a5f" stroke-width="1.8" marker-end="url(#arrTeal)"/>
+          <text x="717" y="73" text-anchor="middle" font-size="7.8" font-family="Consolas, monospace" fill="#475569">v_el</text>
+          <text x="717" y="84" text-anchor="middle" font-size="7.8" font-family="Consolas, monospace" fill="#0f766e">ω_el</text>
+
+          <!-- Blok 4: 6-DOF Uzaysal Eklem Dağılımı, SO(3) Bilek, Bel & Fren -->
+          <rect id="diagBlkSing" class="diag-block-rect" x="732" y="20" width="180" height="134" rx="3"/>
+          <rect x="732" y="20" width="180" height="24" rx="3" fill="#e5e9f0"/>
+          <rect x="732" y="36" width="180" height="8" fill="#e5e9f0"/>
+          <text id="diagSingTitle" x="822" y="36" text-anchor="middle" font-size="8.6" font-weight="700" fill="#0f172a">4. 6-DOF J(q), SO(3) &amp; FREN</text>
+          <text id="diagSingSub" x="822" y="58" text-anchor="middle" font-size="7.7" fill="#475569">3B öteleme + 3B yönelim (6×6)</text>
+          <text id="diagSingEq1" x="822" y="76" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#18181b">[v;ω] = J(q)θ̇  (J=[Jv;Jω])</text>
+          <text id="diagSingEq2" x="822" y="93" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#334155" font-weight="600">e_ω=½Σ(r×r_d), θ̇_ω=Jω^T e_ω</text>
+          <text id="diagSingEq3" x="822" y="110" text-anchor="middle" font-size="7.8" font-family="Consolas, monospace" fill="#475569">w(q)&lt;0.02⇒λ | Hedef⇒τ_b=kilit</text>
+          <rect x="739" y="121" width="166" height="26" rx="2" fill="#f8fafc" stroke="#cbd5e1"/>
+          <text id="diagSingVal" x="822" y="138" text-anchor="middle" font-size="9.0" font-weight="700" font-family="Consolas, monospace" fill="#1e293b">w(q)=-- | τ=-- Nm</text>
+
+          <!-- Geri Besleme Hattı -->
+          <polyline points="822,154 822,208 46,208 46,109" fill="none" stroke="#1e3a5f" stroke-width="1.9" stroke-dasharray="6 3" marker-end="url(#arrTeal)"/>
+          <rect id="diagFeedbackRect" x="120" y="193" width="660" height="28" rx="3" fill="#ffffff" stroke="#1e3a5f" stroke-width="1.3"/>
+          <text id="diagFeedbackTxt" x="450" y="211" text-anchor="middle" font-size="9.8" font-weight="600" fill="#1e3a5f">Geri Besleme (Çift Göz Stereo): u_sol, u_sağ, el boyutu s_g, hedef boyutu s_t</text>
+          <rect x="175" y="230" width="550" height="25" rx="3" fill="#fdf4f5" stroke="#8b2635" stroke-width="1.2"/>
+          <text x="450" y="246" text-anchor="middle" font-size="9.8" font-weight="700" fill="#8b2635">✕ Eklem Enkoderi (θ_i) YOK   ·   ✕ Mutlak (X, Y, Z) Dünya Koordinatı YOK</text>
+
+          <!-- Bakış zaman çizelgesi: S0→S6 (kesintili; örnek yalnızca fiksasyon sonunda üretilir) -->
+          <text x="24" y="274" font-size="8.8" font-weight="700" fill="#334155">BAKIŞ ZAMAN ÇİZELGESİ <tspan font-weight="400" fill="#64748b">— örnek yalnızca fiksasyon sonunda (sample-and-hold); arada efference copy + öğrenilmiş ileri model</tspan></text>
+          <line x1="24" y1="302" x2="912" y2="302" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#arrTeal)"/>
+          <text x="904" y="296" text-anchor="end" font-size="8" font-family="Consolas, monospace" fill="#64748b">t →</text>
+          <rect x="24" y="286" width="96" height="30" rx="4" fill="#e2e8f0" stroke="#64748b"/>
+          <text x="72" y="299" text-anchor="middle" font-size="8.2" font-weight="700" fill="#334155">S0 ARA</text>
+          <text x="72" y="311" text-anchor="middle" font-size="6.6" fill="#64748b">~120–200 ms</text>
+          <rect x="136" y="286" width="96" height="30" rx="4" fill="#1e3a5f"/>
+          <text x="184" y="299" text-anchor="middle" font-size="8.2" font-weight="700" fill="#ffffff">S1 ELE BAK</text>
+          <text x="184" y="311" text-anchor="middle" font-size="6.6" fill="#93c5fd">~120–200 ms</text>
+          <rect x="248" y="286" width="96" height="30" rx="4" fill="#1e3a5f"/>
+          <text x="296" y="299" text-anchor="middle" font-size="8.2" font-weight="700" fill="#ffffff">S2 HEDEFE BAK</text>
+          <text x="296" y="311" text-anchor="middle" font-size="6.6" fill="#93c5fd">sakkad 30–60 ms</text>
+          <rect x="360" y="286" width="96" height="30" rx="4" fill="#8b2635"/>
+          <text x="408" y="299" text-anchor="middle" font-size="8.2" font-weight="700" fill="#ffffff">S3 KÖR UÇUŞ</text>
+          <text x="408" y="311" text-anchor="middle" font-size="6.6" fill="#fda4af">δ ≈ 60–120 ms</text>
+          <rect x="472" y="286" width="96" height="30" rx="4" fill="#1e3a5f"/>
+          <text x="520" y="299" text-anchor="middle" font-size="8.2" font-weight="700" fill="#ffffff">S4 YENİDEN BAK</text>
+          <text x="520" y="311" text-anchor="middle" font-size="6.6" fill="#93c5fd">önce el, sonra hedef</text>
+          <rect x="584" y="286" width="96" height="30" rx="4" fill="#0f766e"/>
+          <text x="632" y="299" text-anchor="middle" font-size="8.2" font-weight="700" fill="#ffffff">S5 KOMPANZE</text>
+          <text x="632" y="311" text-anchor="middle" font-size="6.6" fill="#99f6e4">30–120 ms</text>
+          <rect x="696" y="286" width="96" height="30" rx="4" fill="#475569"/>
+          <text x="744" y="299" text-anchor="middle" font-size="8.2" font-weight="700" fill="#ffffff">S6 KİLİT</text>
+          <text x="744" y="311" text-anchor="middle" font-size="6.6" fill="#e2e8f0">ρ_s ≈ 1.00</text>
+        </svg>
+        <div class="diag-caption">
+          <b>Diyagramın omurgası (dört aşamalı kapalı çevrim):</b> ölç → gecikme/bakış kapısı → hız yasası → 6-DOF J(q) dağılımı. Geri beslemede yalnızca iki retinal görüntü ve boyut oranı vardır; mutlak <i>(X, Y, Z)</i> hiçbir kutuya girmez. Sıralı seçim (binoküler / monoküler / bel senkronlu), kutuların içindeki denklemleri canlı değiştirir — omurga sabittir.
+        </div>
+      </div>
+
+      <div class="math-summary-row">
+        <div class="math-mini-card">
+          <b>1. Kamera Cetvel Kullanmadan Derinliği Nasıl Bulur? (Benzer Üçgenler)</b>
+          <svg class="math-illu" viewBox="0 0 150 92" role="img" aria-label="Benzer üçgenlerle derinlik kestirimi">
+          <circle cx="12" cy="46" r="4.5" fill="#1e3a5f"/>
+          <text x="12" y="61" font-size="6.4" text-anchor="middle" fill="#475569">göz</text>
+          <line x1="16" y1="46" x2="138" y2="18" stroke="#0f766e" stroke-width="1.4"/>
+          <line x1="16" y1="46" x2="138" y2="74" stroke="#0f766e" stroke-width="1.4"/>
+          <line x1="44" y1="26" x2="44" y2="66" stroke="#2563eb" stroke-width="2.2"/>
+          <rect x="44" y="33" width="10" height="26" fill="rgba(15,118,110,0.75)"/>
+          <text x="49" y="76" font-size="6.2" text-anchor="middle" fill="#1e3a5f">s_g (yakın)</text>
+          <line x1="104" y1="30" x2="104" y2="62" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="3 2"/>
+          <rect x="104" y="37" width="10" height="18" fill="rgba(139,38,53,0.75)"/>
+          <text x="109" y="76" font-size="6.2" text-anchor="middle" fill="#8b2635">s_t (uzak)</text>
+          <line x1="66" y1="86" x2="134" y2="86" stroke="#475569" stroke-width="1"/>
+          <line x1="66" y1="83" x2="66" y2="89" stroke="#475569" stroke-width="1"/>
+          <line x1="134" y1="83" x2="134" y2="89" stroke="#475569" stroke-width="1"/>
+          <text x="100" y="84" font-size="6.2" text-anchor="middle" fill="#475569">Z (derinlik)</text>
+          </svg>
+          
+          <span class="math-eq">s = f · (W / Z) &nbsp;⇒&nbsp; ρ_s = (s_el / W_el) / (s_hedef / W_hedef) → 1.00</span>
+          İğne deliğinden giren görüntü boyutu uzaklıkla ters orantılıdır. <b>Örnek:</b> Odak <code>f=580 px</code>, hedef kupa <code>W_t=5 cm</code> ve <code>Z=52 cm</code> uzaktaysa ekranda <code>s_t ≈ 56 px</code> görünür. El kameradan uzaklaşıp hedefe vardıkça küçülür; <code>s_el/W_el</code> ile <code>s_hedef/W_hedef</code> oranı <b>1.00</b> olduğunda aynı derinliğe inmiş olur — santimetre ölçmeye gerek kalmaz.
+        </div>
+        <div class="math-mini-card">
+          <b>2. Tek Gözde Boyun Kayması (B_boyun) Gerçekten Ne İşe Yarar? (Dürüst Analiz)</b>
+          <svg class="math-illu" viewBox="0 0 150 92" role="img" aria-label="Monoküler boyut-uzaklık yanılsaması">
+          <circle cx="14" cy="46" r="4.5" fill="#1e3a5f"/>
+          <line x1="18" y1="46" x2="30" y2="34" stroke="#b45309" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <line x1="30" y1="34" x2="56" y2="26" stroke="#b45309" stroke-width="1.2"/>
+          <rect x="52" y="30" width="10" height="14" rx="1.5" fill="#b45309"/>
+          <text x="57" y="56" font-size="6.0" text-anchor="middle" fill="#b45309">küçük-yakın</text>
+          <line x1="18" y1="46" x2="138" y2="20" stroke="#475569" stroke-width="1" stroke-dasharray="3 3"/>
+          <line x1="18" y1="46" x2="138" y2="72" stroke="#475569" stroke-width="1" stroke-dasharray="3 3"/>
+          <rect x="124" y="20" width="16" height="22" rx="2" fill="#475569"/>
+          <text x="132" y="52" font-size="6.0" text-anchor="middle" fill="#475569">büyük-uzak</text>
+          <text x="75" y="82" font-size="6.6" text-anchor="middle" fill="#334155">aynı piksel boyu ⇒ boyut belirsiz</text>
+          </svg>
+          
+          <span class="math-eq">Z_mp = (f · B_boyun) / Δu_mp &nbsp;⇒&nbsp; Ŵ_hedef(t) = (s_hedef · Z_mp) / f → W_hedef</span>
+          Tek göz sabit kalırsa <b>Boyut–Uzaklık Yanılsaması</b> doğar (<code>s_t = f·W_t/Z_t</code> tek denklemde 2 bilinmeyen bırakır; küçük yakın bardak büyük uzak bardakla aynı pikselde görünür, örn. +%28 önbilgi hatası <b>~16 cm</b> derinlik sapması yaratır). Yalnız kafa döndürmek de işe yaramaz (<code>B_boyun=0</code>). Ancak boyun yana kayınca (<code>B_boyun ≈ 59 mm</code>) hedef ekranda <code>Δu_mp</code> piksel kayar; buradan boyuttan bağımsız <code>Z_mp</code> üçgenlenir ve hedefin gerçek boyu <code>Ŵ_hedef</code> yoldayken kalibre edilir.
+        </div>
+        <div class="math-mini-card">
+          <b>3. Gecikme Varken Kol Neden Hedefi Delip Geçmez? (Basit Çarpım Kuralı)</b>
+          <svg class="math-illu" viewBox="0 0 150 92" role="img" aria-label="Gecikmeye göre aşma yanıtı">
+          <polyline points="6,52 36,52 46,50 58,30 70,58 82,40 94,52 106,44 118,52 142,52" fill="none" stroke="#8b2635" stroke-width="1.8"/>
+          <text x="8" y="14" font-size="6.3" fill="#8b2635">k·δ &gt; 1/e ⇒ aşma/salınım</text>
+          <polyline points="6,84 40,84 52,78 64,70 76,66 92,63 142,62" fill="none" stroke="#0f766e" stroke-width="1.8"/>
+          <text x="8" y="42" font-size="6.3" fill="#0f766e">k·δ ≤ 1/e ⇒ monoton</text>
+          <line x1="6" y1="52" x2="142" y2="52" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 2"/>
+          </svg>
+          
+          <span class="math-eq">k · δ_etkin ≤ 1/e ≈ 0.37 &nbsp;⇒&nbsp; v_el = φ(t) · k · (ε + e_kalan)</span>
+          Beyne görüntü <code>τ_d</code> (örn. 120 ms) geç gelirse yüksek hız komutu hedefi aşar (salınım). Bu yasada hız kazancı <code>k</code>, toplam gecikme <code>δ_etkin = τ_d + τ_tutma/2</code> ile ters orantılı seçilir: <b>Örnek:</b> <code>δ = 0.10 s</code> iken <code>k ≤ 3.7 1/s</code>, gecikme <code>0.20 s</code>'ye çıkınca <code>k ≤ 1.85 1/s</code> olur. İlk aşamada <code>φ(t)</code> çan eğrisi enerjisi yumuşak kalkış ve yumuşak duruş verir.
+        </div>
+        <div class="math-mini-card">
+          <b>4. 6-DOF 3B Kinematik: Gövde (Bel), Omuz &amp; SO(3) Bilek Yönelimi</b>
+          <svg class="math-illu" viewBox="0 0 150 92" role="img" aria-label="Yakınsal ve distal eksen dağılımı">
+          <rect x="8" y="26" width="58" height="30" rx="3" fill="#1e3a5f"/>
+          <text x="37" y="44" font-size="7.2" font-weight="700" text-anchor="middle" fill="#ffffff">j₁–j₃</text>
+          <text x="37" y="68" font-size="6.0" text-anchor="middle" fill="#334155">omuz/dirsek</text>
+          <text x="37" y="79" font-size="6.0" text-anchor="middle" fill="#64748b">taşıma (J_v)</text>
+          <line x1="66" y1="41" x2="80" y2="41" stroke="#475569" stroke-width="1.6" marker-end="url(#arrBig)"/>
+          <rect x="80" y="26" width="60" height="30" rx="3" fill="#0f766e"/>
+          <text x="110" y="44" font-size="7.2" font-weight="700" text-anchor="middle" fill="#ffffff">j₄–j₆</text>
+          <text x="110" y="68" font-size="6.0" text-anchor="middle" fill="#334155">SO(3) bilek</text>
+          <text x="110" y="79" font-size="6.0" text-anchor="middle" fill="#64748b">yönelim (J_ω)</text>
+          <defs>
+            <marker id="arrBig" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+              <polygon points="0 0, 7 3, 0 6" fill="#475569"/>
+            </marker>
+          </defs>
+          </svg>
+          
+          <span class="math-eq">[v; ω] = J(q)θ̇ (J=[J_v; J_ω]∈ℝ⁶ˣ⁶) · e_ω∈SO(3) · Hedef≥R_max⇒θ_bel</span>
+          Tam 3B hareket hem <b>konum ötelemesini (J_v ∈ ℝ³ˣ⁶)</b> hem <b>3 eksen yönelimi (J_ω ∈ ℝ³ˣ⁶: Roll φ_x, Pitch θ_y, Yaw ψ_z)</b> kapsar. Büyük ötelemeyi <b>omuz/dirsek</b> (<code>j₁–j₃</code>) üstlenirken, 3-eksen küresel <b>bilek</b> (<code>j₄–j₆</code>) boşluk uzayında (<code>N(J_v)</code>) hedef tutma çerçevesine (<code>SO(3)</code>) kilitlenir. Erişim sınırı (<code>R_max</code>) dışına <b>bel (θ_bel)</b> döner, tekillikte (<code>w(q)&lt;0.02</code>) sönüm, hedefte <b>fren (τ_b)</b> devreye girer.
+        </div>
+      </div>
+
+                                                <div class="kin-diag-wrap">
+        <div class="kin-diag-title">
+          3B Uzaysal (SE(3)) Kinematik, Eklem Eksenleri (ẑᵢ), SO(3) Bilek ve Optik Parametre Şeması
+          <span class="sub">Ölçüler milimetre/cm cinsinden · çizim şematik ölçekte · sayısal değerler canlı senaryodan</span>
+        </div>
+        <svg id="svgKinematicDiagram" class="kin-diag-svg" viewBox="0 0 920 404" role="img" aria-label="SE(3) insansı kol kinematiği, ölçülü eklem zinciri, SO(3) çerçeveleri ve stereo göz izdüşümü">
+          <defs>
+            <marker id="kinArrSlate" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+              <polygon points="0 0, 7 3, 0 6" fill="#1e3a5f"/>
+            </marker>
+            <marker id="kinArrTeal" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+              <polygon points="0 0, 7 3, 0 6" fill="#0f766e"/>
+            </marker>
+            <marker id="kinArrAmber" markerWidth="5.5" markerHeight="4.5" refX="5" refY="2.25" orient="auto">
+              <polygon points="0 0, 5.5 2.25, 0 4.5" fill="#b45309"/>
+            </marker>
+            <marker id="kinArrX" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+              <polygon points="0 0, 6 2.5, 0 5" fill="#dc2626"/>
+            </marker>
+            <marker id="kinArrY" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+              <polygon points="0 0, 6 2.5, 0 5" fill="#16a34a"/>
+            </marker>
+            <marker id="kinArrZ" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+              <polygon points="0 0, 6 2.5, 0 5" fill="#2563eb"/>
+            </marker>
+            <marker id="kinDimA" markerWidth="6" markerHeight="5" refX="0.6" refY="2.5" orient="auto">
+              <polygon points="6 0, 0 2.5, 6 5" fill="#1e3a5f"/>
+            </marker>
+            <marker id="kinDimB" markerWidth="6" markerHeight="5" refX="5.4" refY="2.5" orient="auto">
+              <polygon points="0 0, 6 2.5, 0 5" fill="#1e3a5f"/>
+            </marker>
+          </defs>
+
+          <!-- ================= PANEL A — SE(3) kol, ölçüler, SO(3) ================= -->
+          <rect x="8" y="8" width="444" height="384" rx="4" fill="#fcfcfd" stroke="#cbd5e1" stroke-width="1.2"/>
+          <rect x="8" y="8" width="444" height="24" rx="4" fill="#eef2f7"/>
+          <rect x="8" y="24" width="444" height="8" fill="#eef2f7"/>
+          <text x="18" y="24" font-size="9.0" font-weight="700" fill="#0f172a">A. SE(3) zincir, eklem eksenleri (ẑᵢ) ve SO(3) bilek çerçeveleri</text>
+
+          <!-- zemin ve taban -->
+          <line x1="58" y1="288" x2="300" y2="288" stroke="#cbd5e1" stroke-width="1"/>
+          <ellipse cx="120" cy="288" rx="30" ry="7.5" fill="#334155"/>
+          <ellipse cx="120" cy="284" rx="30" ry="7" fill="#475569"/>
+
+          <!-- gövde sütunu, boyun ve kafa -->
+          <line x1="120" y1="280" x2="120" y2="104" stroke="#17202b" stroke-width="13" stroke-linecap="round"/>
+          <line x1="120" y1="104" x2="116" y2="72" stroke="#475569" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="114" cy="58" r="12" fill="#e2e8f0" stroke="#1e3a5f" stroke-width="1.6"/>
+          <circle cx="110" cy="56" r="1.9" fill="#0f766e"/>
+          <circle cx="118" cy="56" r="1.9" fill="#0f766e"/>
+          <text x="130" y="52" font-size="6.6" font-weight="600" fill="#475569">kafa (ψ, θ)</text>
+
+          <!-- omuz (j₂), üst kol (L₂), dirsek (j₃), ön kol (L₃), bilek (j₄–j₆), el (L_el) -->
+          <line x1="120" y1="104" x2="159" y2="104" stroke="#1e3a5f" stroke-width="7" stroke-linecap="round"/>
+          <line x1="159" y1="104" x2="159" y2="168" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
+          <line x1="159" y1="168" x2="212" y2="168" stroke="#334155" stroke-width="6.5" stroke-linecap="round"/>
+          <line x1="212" y1="168" x2="237" y2="168" stroke="#0f766e" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="159" cy="104" r="6" fill="#d97706" stroke="#ffffff" stroke-width="1.6"/>
+          <circle cx="159" cy="104" r="1.8" fill="#ffffff"/>
+          <circle cx="159" cy="168" r="5.5" fill="#1e3a5f" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="159" cy="168" r="1.7" fill="#ffffff"/>
+          <circle cx="212" cy="168" r="4.6" fill="#0f766e" stroke="#ffffff" stroke-width="1.2"/>
+          <circle cx="212" cy="168" r="1.4" fill="#ffffff"/>
+          <circle cx="237" cy="168" r="2.4" fill="#0f766e"/>
+          <text x="146" y="112" text-anchor="end" font-size="6.8" font-weight="700" fill="#1e293b">j₂</text>
+          <text x="146" y="176" text-anchor="end" font-size="6.8" font-weight="700" fill="#1e293b">j₃</text>
+          <text x="246" y="165" font-size="6.4" font-weight="700" fill="#0f766e">j₄–j₆</text>
+
+          <!-- R_max güvenli erişim yayı (etiketlerden önce çizilir, etiket dolguları yayı maskeler) -->
+          <path d="M 266.8 166.3 A 124.5 124.5 0 0 1 159 228.5" fill="none" stroke="rgba(15,118,110,0.45)" stroke-width="1.1" stroke-dasharray="5 4"/>
+
+          <!-- d₁ ölçüsü (omuz yüksekliği) -->
+          <line x1="82" y1="288" x2="82" y2="106" stroke="#1e3a5f" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="74" y1="288" x2="90" y2="288" stroke="#1e3a5f" stroke-width="1"/>
+          <line x1="74" y1="106" x2="92" y2="106" stroke="#1e3a5f" stroke-width="1"/>
+          <line x1="92" y1="104" x2="113" y2="104" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <rect x="16" y="182" width="62" height="15" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
+          <text id="kinSvgD1" x="47" y="192.5" text-anchor="middle" font-size="7.2" font-weight="700" fill="#1e3a5f">d₁ = 90 cm</text>
+
+          <!-- y₀ ölçüsü (klavikula) -->
+          <line x1="120" y1="94" x2="159" y2="94" stroke="#1e3a5f" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="120" y1="88" x2="120" y2="100" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <line x1="159" y1="88" x2="159" y2="100" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <rect x="128" y="72" width="62" height="15" rx="2" fill="#fffbeb" stroke="#d97706" stroke-width="0.8"/>
+          <text x="159" y="82.5" text-anchor="middle" font-size="6.9" font-weight="700" fill="#b45309">y₀ = 19 cm</text>
+
+          <!-- L₂ ölçüsü -->
+          <line x1="176" y1="104" x2="176" y2="168" stroke="#1e3a5f" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="163" y1="104" x2="182" y2="104" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <line x1="163" y1="168" x2="182" y2="168" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <rect x="184" y="126" width="58" height="15" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
+          <text id="kinSvgL2" x="213" y="136.5" text-anchor="middle" font-size="6.9" font-weight="700" fill="#1e3a5f">L₂ = 31 cm</text>
+
+          <!-- L₃ ölçüsü -->
+          <line x1="159" y1="182" x2="212" y2="182" stroke="#1e3a5f" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="159" y1="170" x2="159" y2="188" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <line x1="212" y1="170" x2="212" y2="188" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <rect x="151" y="192" width="58" height="15" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
+          <text id="kinSvgL3" x="180" y="202.5" text-anchor="middle" font-size="6.9" font-weight="700" fill="#1e3a5f">L₃ = 26 cm</text>
+
+          <!-- L_el ölçüsü -->
+          <line x1="212" y1="148" x2="237" y2="148" stroke="#1e3a5f" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="212" y1="152" x2="212" y2="163" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <line x1="237" y1="152" x2="237" y2="165" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <rect x="248" y="140" width="62" height="15" rx="2" fill="#ffffff" stroke="#0f766e" stroke-width="0.8"/>
+          <text id="kinSvgLEl" x="279" y="150.5" text-anchor="middle" font-size="6.9" font-weight="700" fill="#0f766e">L_el = 12 cm</text>
+
+          <!-- R_max güvenli erişim yayı etiketi -->
+          <line x1="246" y1="192" x2="270" y2="204" stroke="#0f766e" stroke-width="0.9" marker-end="url(#kinArrTeal)"/>
+          <rect x="274" y="198" width="92" height="15" rx="2" fill="#eefaf8" stroke="#0f766e" stroke-width="0.8"/>
+          <text id="kinSvgRMax" x="320" y="208.5" text-anchor="middle" font-size="6.9" font-weight="700" fill="#0f766e">R_max = 60,7 cm</text>
+
+          <!-- bel dönüşü (j₁) -->
+          <path d="M 134 240 A 15 15 0 0 1 134 270" fill="none" stroke="#b45309" stroke-width="1.4" marker-end="url(#kinArrAmber)"/>
+          <rect x="152" y="252" width="122" height="15" rx="2" fill="#fffbeb" stroke="#d97706" stroke-width="0.8"/>
+          <text id="kinSvgWaist" x="213" y="262.5" text-anchor="middle" font-size="6.8" font-weight="700" fill="#b45309">θ_bel = 0,0° · j₁, ẑ₀</text>
+
+          <!-- F₀ dünya çerçevesi -->
+          <line x1="34" y1="274" x2="60" y2="274" stroke="#dc2626" stroke-width="1.5" marker-end="url(#kinArrX)"/>
+          <line x1="34" y1="274" x2="47" y2="261" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#kinArrY)"/>
+          <line x1="34" y1="274" x2="34" y2="250" stroke="#2563eb" stroke-width="1.5" marker-end="url(#kinArrZ)"/>
+          <text x="26" y="282" text-anchor="end" font-size="6.6" font-weight="700" fill="#334155">F₀</text>
+          <text x="64" y="277" font-size="6.2" font-weight="700" fill="#dc2626">+X₀</text>
+          <text x="49" y="257" font-size="6.2" font-weight="700" fill="#16a34a">+Y₀</text>
+          <text x="30" y="246" text-anchor="end" font-size="6.2" font-weight="700" fill="#2563eb">+Z₀</text>
+
+          <!-- SO(3) yönelim çerçeveleri -->
+          <text x="378" y="50" text-anchor="middle" font-size="7.0" font-weight="700" fill="#0f172a">SO(3) yönelim çerçeveleri</text>
+
+          <circle cx="350" cy="100" r="3" fill="#0f766e"/>
+          <line x1="350" y1="100" x2="350" y2="78" stroke="#dc2626" stroke-width="1.5" marker-end="url(#kinArrX)"/>
+          <line x1="350" y1="100" x2="372" y2="108" stroke="#16a34a" stroke-width="1.5" marker-end="url(#kinArrY)"/>
+          <line x1="350" y1="100" x2="368" y2="86" stroke="#2563eb" stroke-width="1.5" marker-end="url(#kinArrZ)"/>
+          <text x="347" y="75" text-anchor="middle" font-size="6.0" font-weight="700" fill="#dc2626">x</text>
+          <text x="375" y="113" font-size="6.0" font-weight="700" fill="#16a34a">y</text>
+          <text x="370" y="83" font-size="6.0" font-weight="700" fill="#2563eb">z</text>
+          <text x="350" y="122" text-anchor="middle" font-size="6.8" font-weight="700" fill="#0f766e">F_ee (tutucu)</text>
+
+          <circle cx="410" cy="100" r="3" fill="#8b2635"/>
+          <line x1="410" y1="100" x2="410" y2="78" stroke="#dc2626" stroke-width="1.5" marker-end="url(#kinArrX)"/>
+          <line x1="410" y1="100" x2="432" y2="108" stroke="#16a34a" stroke-width="1.5" marker-end="url(#kinArrY)"/>
+          <line x1="410" y1="100" x2="428" y2="86" stroke="#2563eb" stroke-width="1.5" marker-end="url(#kinArrZ)"/>
+          <text x="407" y="75" text-anchor="middle" font-size="6.0" font-weight="700" fill="#dc2626">x</text>
+          <text x="435" y="113" font-size="6.0" font-weight="700" fill="#16a34a">y</text>
+          <text x="430" y="83" font-size="6.0" font-weight="700" fill="#2563eb">z</text>
+          <text x="410" y="122" text-anchor="middle" font-size="6.8" font-weight="700" fill="#8b2635">F_t (hedef)</text>
+
+          <text x="378" y="146" text-anchor="middle" font-size="6.4" fill="#475569">tutucu ve hedef çerçeveleri</text>
+          <text x="378" y="159" text-anchor="middle" font-size="6.4" fill="#475569">e_ω = ½ Σ (a_e × a_d)</text>
+
+          <!-- Panel A bilgi şeridi -->
+          <rect x="16" y="300" width="428" height="62" rx="3" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.9"/>
+          <text id="kinSvgOrient" x="24" y="314" font-size="7.0" font-weight="700" fill="#0f766e">SE(3): F_ee RPY(0°, 0°, 0°) | hedef (0°, 0°, 0°) | |e_ω| = 0,0°</text>
+          <text x="24" y="328" font-size="6.6" fill="#334155">J(q) = [J_v; J_ω] ∈ R^(6×6) · q̇ = J⁺v + (I − J⁺J) q̇₀ · enkoder yok; θᵢ yalnızca fiziksel</text>
+          <text x="24" y="342" font-size="6.4" fill="#475569">d₁ = 90 cm · L₂ = 31 cm · L₃ = 26 cm · L_el = 12 cm · y₀ = 19 cm (model: human_arm.json)</text>
+          <text x="24" y="356" font-size="6.4" fill="#475569">⊙: sayfa dışı eklem ekseni (j₂–j₆) · F₀/F_ee/F_t: taban/tutucu/hedef · R_max = 0,88·ΣLᵢ</text>
+          <text x="16" y="378" font-size="6.2" fill="#64748b">ẑᵢ: eklem ekseni yönü · ölçek: gövde ve kol aynı ölçekte (≈2,05 birim/cm) · eklem açıları canlı senaryodan</text>
+
+          <!-- ================= PANEL B — stereo izdüşüm, J(q), boyun paralaksı ================= -->
+          <rect x="468" y="8" width="444" height="384" rx="4" fill="#fcfcfd" stroke="#cbd5e1" stroke-width="1.2"/>
+          <rect x="468" y="8" width="444" height="24" rx="4" fill="#eef2f7"/>
+          <rect x="468" y="24" width="444" height="8" fill="#eef2f7"/>
+          <text x="478" y="24" font-size="8.8" font-weight="700" fill="#0f172a">B. Göz izdüşümü, J(q) ve boyun paralaksı</text>
+          <rect x="748" y="11" width="156" height="18" rx="3" fill="#1e3a5f"/>
+          <text id="kinSvgVisionBadge" x="826" y="23.5" text-anchor="middle" font-size="7.0" font-weight="700" fill="#ffffff">ÇİFT GÖZ STEREO</text>
+
+          <line x1="700" y1="40" x2="700" y2="246" stroke="#e2e8f0" stroke-width="1"/>
+
+          <!-- gözler ve baz -->
+          <circle cx="536" cy="86" r="6.5" fill="#1e3a5f" stroke="#ffffff" stroke-width="1.2"/>
+          <circle cx="536" cy="86" r="2.4" fill="#7dd3fc"/>
+          <circle cx="600" cy="86" r="6.5" fill="#1e3a5f" stroke="#ffffff" stroke-width="1.2"/>
+          <circle cx="600" cy="86" r="2.4" fill="#7dd3fc"/>
+          <text x="536" y="70" text-anchor="middle" font-size="6.8" font-weight="700" fill="#1e3a5f">E_L</text>
+          <text x="600" y="70" text-anchor="middle" font-size="6.8" font-weight="700" fill="#1e3a5f">E_R</text>
+          <line x1="536" y1="112" x2="600" y2="112" stroke="#1e3a5f" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="536" y1="107" x2="536" y2="117" stroke="#1e3a5f" stroke-width="0.9"/>
+          <line x1="600" y1="107" x2="600" y2="117" stroke="#1e3a5f" stroke-width="0.9"/>
+
+          <!-- optik eksen, retina düzlemi, odak -->
+          <line x1="568" y1="114" x2="568" y2="244" stroke="#94a3b8" stroke-width="0.9" stroke-dasharray="4 3"/>
+          <line x1="500" y1="156" x2="664" y2="156" stroke="#0f172a" stroke-width="1.3"/>
+          <text x="504" y="170" font-size="6.2" fill="#334155">retina düzlemi</text>
+          <line x1="500" y1="88" x2="500" y2="156" stroke="#1e3a5f" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="493" y1="88" x2="507" y2="88" stroke="#1e3a5f" stroke-width="0.9"/>
+          <line x1="493" y1="156" x2="507" y2="156" stroke="#1e3a5f" stroke-width="0.9"/>
+          <text id="kinSvgF" x="485" y="122" text-anchor="middle" font-size="6.4" font-weight="700" fill="#1e3a5f" transform="rotate(-90 485 122)">f = 580 px</text>
+
+          <!-- el ve hedef gövdeleri -->
+          <rect x="546" y="188" width="12" height="16" rx="1.5" fill="rgba(15,118,110,0.85)" stroke="#0f766e" stroke-width="1.1"/>
+          <rect x="620" y="206" width="14" height="18" rx="1.5" fill="rgba(139,38,53,0.85)" stroke="#8b2635" stroke-width="1.1"/>
+
+          <!-- ışınlar (etiketlerden önce; etiket halesi ışını maskeler) -->
+          <line x1="536" y1="86" x2="626" y2="214" stroke="rgba(139,38,53,0.60)" stroke-width="1.1"/>
+          <line x1="600" y1="86" x2="626" y2="214" stroke="rgba(139,38,53,0.45)" stroke-width="1.1" stroke-dasharray="3 2"/>
+
+          <!-- retina izdüşümleri ve Δu -->
+          <line x1="585" y1="151" x2="585" y2="161" stroke="#8b2635" stroke-width="2.2"/>
+          <line x1="618" y1="151" x2="618" y2="161" stroke="#8b2635" stroke-width="2.2"/>
+          <line x1="585" y1="176" x2="618" y2="176" stroke="#8b2635" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="585" y1="161" x2="585" y2="180" stroke="#8b2635" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <line x1="618" y1="161" x2="618" y2="180" stroke="#8b2635" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <text x="601" y="191" text-anchor="middle" font-size="6.4" font-weight="700" fill="#8b2635" class="lab-halo">Δu = u_L − u_R</text>
+          <text id="kinSvgB" x="568" y="103" text-anchor="middle" font-size="6.9" font-weight="700" fill="#1e3a5f" class="lab-halo">B = 65 mm</text>
+          <text x="552" y="218" text-anchor="middle" font-size="6.4" font-weight="700" fill="#0f766e" class="lab-halo">W_g (el)</text>
+          <text x="627" y="236" text-anchor="middle" font-size="6.4" font-weight="700" fill="#8b2635" class="lab-halo">W_t (hedef)</text>
+
+          <!-- Z derinlik ölçüsü -->
+          <line x1="676" y1="88" x2="676" y2="217" stroke="#1e3a5f" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="608" y1="88" x2="682" y2="88" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <line x1="640" y1="217" x2="682" y2="217" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <text x="688" y="152" text-anchor="middle" font-size="6.4" font-weight="700" fill="#1e3a5f" transform="rotate(-90 688 152)">Z (derinlik)</text>
+
+          <!-- boyun paralaksı -->
+          <text x="804" y="50" text-anchor="middle" font-size="6.9" font-weight="700" fill="#b45309">Boyun paralaksı (statik sahne)</text>
+          <circle cx="744" cy="94" r="5" fill="#fffbeb" stroke="#b45309" stroke-width="1.5"/>
+          <circle cx="804" cy="94" r="5" fill="#fffbeb" stroke="#b45309" stroke-width="1.5"/>
+          <text x="744" y="84" text-anchor="middle" font-size="5.9" fill="#b45309">E(t₀)</text>
+          <text x="804" y="84" text-anchor="middle" font-size="5.9" fill="#b45309">E(t₁)</text>
+          <line x1="744" y1="72" x2="804" y2="72" stroke="#b45309" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="744" y1="68" x2="744" y2="76" stroke="#b45309" stroke-width="0.9"/>
+          <line x1="804" y1="68" x2="804" y2="76" stroke="#b45309" stroke-width="0.9"/>
+          <text id="kinSvgBNeck" x="774" y="64" text-anchor="middle" font-size="6.1" font-weight="700" fill="#b45309">B_boy = 0,0 mm</text>
+
+          <rect x="876" y="173" width="10" height="14" rx="1.5" fill="rgba(100,116,139,0.9)" stroke="#64748b" stroke-width="1"/>
+          <text x="881" y="202" text-anchor="middle" font-size="5.9" fill="#64748b">W_mp</text>
+          <line x1="744" y1="94" x2="876" y2="180" stroke="rgba(180,83,9,0.65)" stroke-width="1.1"/>
+          <line x1="804" y1="94" x2="876" y2="180" stroke="rgba(180,83,9,0.45)" stroke-width="1.1" stroke-dasharray="3 2"/>
+          <line x1="846" y1="112" x2="846" y2="230" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <line x1="843" y1="141.5" x2="849" y2="141.5" stroke="#b45309" stroke-width="1.8"/>
+          <line x1="843" y1="158.5" x2="849" y2="158.5" stroke="#b45309" stroke-width="1.8"/>
+          <line x1="858" y1="141.5" x2="858" y2="158.5" stroke="#b45309" stroke-width="1" marker-start="url(#kinDimA)" marker-end="url(#kinDimB)"/>
+          <line x1="846" y1="141.5" x2="858" y2="141.5" stroke="#b45309" stroke-width="0.7" stroke-dasharray="1.5 1.5"/>
+          <line x1="846" y1="158.5" x2="858" y2="158.5" stroke="#b45309" stroke-width="0.7" stroke-dasharray="1.5 1.5"/>
+          <text x="864" y="154" font-size="6.2" font-weight="700" fill="#b45309">Δu_mp</text>
+          <text x="804" y="216" text-anchor="middle" font-size="6.5" font-weight="700" fill="#b45309">Z_mp = f · B_boy / Δu_mp</text>
+          <text x="804" y="230" text-anchor="middle" font-size="5.9" fill="#64748b">kamera kayması → retina kayması</text>
+
+          <!-- 6-DOF Jacobian şeridi -->
+          <rect x="478" y="250" width="424" height="38" rx="3" fill="#ecfeff" stroke="#99f6e4" stroke-width="0.9"/>
+          <text x="486" y="264" font-size="7.2" font-weight="700" fill="#0f766e">6-DOF büküm: [v; ω] = J(q)·q̇ ,  J = [J_v; J_ω] ∈ R^(6×6)</text>
+          <text x="486" y="279" font-size="6.6" fill="#134e4a">e_ω = ½ (x_e×x_d + y_e×y_d + z_e×z_d)  ⇒  θ̇_bilek ∈ N(J_v)</text>
+
+          <!-- Panel B bilgi şeridi -->
+          <rect x="478" y="294" width="424" height="80" rx="3" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.9"/>
+          <text id="kinSvgSgSt" x="486" y="309" font-size="7.4" font-weight="700" fill="#1e3a5f">s_g = -- px · s_t = -- px · Δu = -- px</text>
+          <text id="kinSvgRho" x="894" y="309" text-anchor="end" font-size="7.4" font-weight="700" fill="#0f766e">ρ_s = --</text>
+          <text id="kinSvgParallaxEq" x="486" y="324" font-size="6.6" fill="#334155">s = f·W/Z (benzer üçgen) · Z = f·B/Δu (stereo)</text>
+          <text x="486" y="338" font-size="6.2" fill="#475569">E_L/E_R: göz merkezleri · B: göz açıklığı · f: odak (px) · s_g/s_t: retina boyu · Δu_mp: boyun kayması</text>
+          <text x="486" y="352" font-size="6.2" fill="#475569">Z = f·B/Δu (stereo derinlik) · Z_mp = f·B_boy/Δu_mp (paralaks) · ρ_s = s_g/s_t → 1.00 (looming)</text>
+          <text x="478" y="386" font-size="5.9" fill="#64748b">Şematik ölçek: B, f ve Z ayrı ölçeklerde · sayısal değerler canlı senaryodan · F_ee/F_t ∈ SO(3)</text>
+        </svg>
+      </div>
+
+      <div class="hw-diag-grid" id="hwDiagGrid">
+        <svg id="svgHardwareCamera" class="hw-diag-svg" viewBox="0 0 440 300" role="img" aria-label="Kamera ve göz rigi donanım illüstrasyonu: ön ve yan görünüm, ölçüler">
+          <defs>
+            <marker id="hwA" markerWidth="6" markerHeight="5" refX="0.6" refY="2.5" orient="auto">
+              <polygon points="6 0, 0 2.5, 6 5" fill="#1e3a5f"/>
+            </marker>
+            <marker id="hwB" markerWidth="6" markerHeight="5" refX="5.4" refY="2.5" orient="auto">
+              <polygon points="0 0, 6 2.5, 0 5" fill="#1e3a5f"/>
+            </marker>
+          </defs>
+          <rect x="6" y="6" width="428" height="288" rx="4" fill="#fcfcfd" stroke="#cbd5e1"/>
+          <rect x="6" y="6" width="428" height="22" rx="4" fill="#eef2f7"/>
+          <rect x="6" y="20" width="428" height="8" fill="#eef2f7"/>
+          <text x="16" y="21" font-size="9.0" font-weight="700" fill="#0f172a">A. Kamera / göz rigi — ölçüler</text>
+
+          <!-- ÖN GÖRÜNÜM -->
+          <text x="16" y="43" font-size="7.2" font-weight="700" fill="#334155">Ön görünüm (göz rigi)</text>
+          <line x1="16" y1="49" x2="236" y2="49" stroke="#e2e8f0" stroke-width="0.8"/>
+          <rect x="34" y="78" width="72" height="50" rx="5" fill="#1e3a5f" stroke="#0f172a" stroke-width="1.2"/>
+          <rect x="142" y="78" width="72" height="50" rx="5" fill="#1e3a5f" stroke="#0f172a" stroke-width="1.2"/>
+          <rect x="106" y="99" width="36" height="8" fill="#334155"/>
+          <circle cx="70" cy="103" r="13" fill="#0b1220" stroke="#7dd3fc" stroke-width="1.5"/>
+          <circle cx="70" cy="103" r="4.4" fill="#7dd3fc"/>
+          <circle cx="178" cy="103" r="13" fill="#0b1220" stroke="#7dd3fc" stroke-width="1.5"/>
+          <circle cx="178" cy="103" r="4.4" fill="#7dd3fc"/>
+          <text x="70" y="141" text-anchor="middle" font-size="6.4" fill="#475569">sol kamera</text>
+          <text x="178" y="141" text-anchor="middle" font-size="6.4" fill="#475569">sağ kamera</text>
+
+          <line x1="70" y1="156" x2="178" y2="156" stroke="#1e3a5f" stroke-width="1" marker-start="url(#hwA)" marker-end="url(#hwB)"/>
+          <line x1="70" y1="151" x2="70" y2="161" stroke="#1e3a5f" stroke-width="0.9"/>
+          <line x1="178" y1="151" x2="178" y2="161" stroke="#1e3a5f" stroke-width="0.9"/>
+          <text x="124" y="172" text-anchor="middle" font-size="6.9" font-weight="700" fill="#1e3a5f">B = 65 mm (göz açıklığı)</text>
+
+          <line x1="34" y1="192" x2="214" y2="192" stroke="#1e3a5f" stroke-width="1" marker-start="url(#hwA)" marker-end="url(#hwB)"/>
+          <line x1="34" y1="187" x2="34" y2="197" stroke="#1e3a5f" stroke-width="0.9"/>
+          <line x1="214" y1="187" x2="214" y2="197" stroke="#1e3a5f" stroke-width="0.9"/>
+          <text x="124" y="208" text-anchor="middle" font-size="6.2" fill="#475569">kamera gövdesi (şematik)</text>
+
+          <text x="16" y="230" font-size="6.2" fill="#334155">görüntü 640 × 480 px · odak f = 580 px</text>
+          <text x="16" y="243" font-size="6.2" fill="#334155">σ ≈ 0,35 px · 100 Hz · iki pinhole kamera</text>
+          <text x="16" y="256" font-size="6.2" fill="#475569">paralaks Δu = u_L − u_R · B = 65 mm</text>
+          <text x="16" y="269" font-size="6.2" fill="#475569">kamera 10 cm geride, omuzdan 22 cm yukarıda;</text>
+          <text x="16" y="282" font-size="6.2" fill="#475569">gövde (j₁) dönünce rig birlikte taşınır.</text>
+
+          <!-- YAN GÖRÜNÜM -->
+          <text x="250" y="43" font-size="7.2" font-weight="700" fill="#334155">Yan görünüm (kafa / trunk)</text>
+          <line x1="246" y1="49" x2="426" y2="49" stroke="#e2e8f0" stroke-width="0.8"/>
+          <line x1="336" y1="58" x2="336" y2="282" stroke="#94a3b8" stroke-width="1.1" stroke-dasharray="5 3"/>
+          <text x="340" y="282" font-size="5.9" fill="#475569">j₁ ekseni</text>
+
+          <!-- boyun ve kafa -->
+          <line x1="280" y1="198" x2="280" y2="236" stroke="#475569" stroke-width="8" stroke-linecap="round"/>
+          <line x1="280" y1="240" x2="336" y2="240" stroke="#1e3a5f" stroke-width="7" stroke-linecap="round"/>
+          <rect x="238" y="124" width="56" height="74" rx="5" fill="#e2e8f0" stroke="#1e3a5f" stroke-width="1.4"/>
+          <rect x="288" y="143" width="8" height="30" rx="2" fill="#1e3a5f"/>
+          <circle cx="297" cy="158" r="5" fill="#0b1220" stroke="#7dd3fc" stroke-width="1.3"/>
+          <circle cx="297" cy="158" r="1.9" fill="#7dd3fc"/>
+          <text x="262" y="146" text-anchor="middle" font-size="6.2" font-weight="700" fill="#1e3a5f">kafa</text>
+          <text x="262" y="158" text-anchor="middle" font-size="6.0" fill="#334155">kamera</text>
+
+          <!-- omuz -->
+          <line x1="300" y1="240" x2="336" y2="240" stroke="#1e3a5f" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="336" cy="240" r="5" fill="#d97706" stroke="#ffffff" stroke-width="1.2"/>
+          <text x="326" y="254" text-anchor="end" font-size="6.0" fill="#334155">omuz</text>
+
+          <!-- ΔX ve ΔZ ölçüleri -->
+          <line x1="297" y1="100" x2="336" y2="100" stroke="#1e3a5f" stroke-width="1" marker-start="url(#hwA)" marker-end="url(#hwB)"/>
+          <line x1="297" y1="96" x2="297" y2="104" stroke="#1e3a5f" stroke-width="0.9"/>
+          <line x1="336" y1="96" x2="336" y2="104" stroke="#1e3a5f" stroke-width="0.9"/>
+          <text id="kinSvgCamX" x="316" y="93" text-anchor="middle" font-size="6.2" font-weight="700" fill="#1e3a5f">ΔX = −10 cm</text>
+
+          <line x1="232" y1="158" x2="232" y2="240" stroke="#1e3a5f" stroke-width="1" marker-start="url(#hwA)" marker-end="url(#hwB)"/>
+          <line x1="228" y1="158" x2="236" y2="158" stroke="#1e3a5f" stroke-width="0.9"/>
+          <line x1="228" y1="240" x2="236" y2="240" stroke="#1e3a5f" stroke-width="0.9"/>
+          <text id="kinSvgCamZ" x="224" y="199" text-anchor="middle" font-size="6.2" font-weight="700" fill="#1e3a5f" transform="rotate(-90 224 199)">ΔZ = +22 cm</text>
+        </svg>
+
+        <svg id="svgHardwareActuator" class="hw-diag-svg" viewBox="0 0 440 300" role="img" aria-label="Aktüatör ve tutma freni kesit illüstrasyonu ve eklem başına fren torku">
+          <defs>
+            <marker id="hwA2" markerWidth="6" markerHeight="5" refX="0.6" refY="2.5" orient="auto">
+              <polygon points="6 0, 0 2.5, 6 5" fill="#1e3a5f"/>
+            </marker>
+            <marker id="hwB2" markerWidth="6" markerHeight="5" refX="5.4" refY="2.5" orient="auto">
+              <polygon points="0 0, 6 2.5, 0 5" fill="#1e3a5f"/>
+            </marker>
+            <marker id="hwTorque" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+              <polygon points="0 0, 7 3, 0 6" fill="#b45309"/>
+            </marker>
+          </defs>
+          <rect x="6" y="6" width="428" height="288" rx="4" fill="#fcfcfd" stroke="#cbd5e1"/>
+          <rect x="6" y="6" width="428" height="22" rx="4" fill="#eef2f7"/>
+          <rect x="6" y="20" width="428" height="8" fill="#eef2f7"/>
+          <text x="16" y="21" font-size="9.0" font-weight="700" fill="#0f172a">B. Aktüatör + tutma freni — kesit</text>
+
+          <!-- motor -->
+          <rect x="24" y="74" width="92" height="64" rx="7" fill="#1e3a5f" stroke="#0f172a" stroke-width="1.3"/>
+          <rect x="24" y="74" width="12" height="64" rx="5" fill="#334155"/>
+          <text x="70" y="98" text-anchor="middle" font-size="7.4" font-weight="700" fill="#ffffff">BLDC</text>
+          <text x="70" y="112" text-anchor="middle" font-size="6.2" fill="#cbd5e1">48 V · 1,8 Nm sürekli</text>
+          <text x="70" y="125" text-anchor="middle" font-size="6.2" fill="#94a3b8">8 kutup · Hall sensör</text>
+
+          <!-- redüktör -->
+          <rect x="116" y="66" width="60" height="80" rx="5" fill="#475569" stroke="#0f172a" stroke-width="1.3"/>
+          <text x="146" y="96" text-anchor="middle" font-size="6.9" font-weight="700" fill="#ffffff">redüktör</text>
+          <text x="146" y="109" text-anchor="middle" font-size="6.2" fill="#e2e8f0">100–120 : 1</text>
+          <text x="146" y="122" text-anchor="middle" font-size="6.0" fill="#cbd5e1">η ≈ 0,78</text>
+
+          <!-- mil ve fren diski -->
+          <rect x="176" y="102" width="46" height="8" fill="#334155"/>
+          <circle cx="260" cy="106" r="38" fill="#e2e8f0" stroke="#334155" stroke-width="2"/>
+          <circle cx="260" cy="106" r="9" fill="#334155"/>
+          <circle cx="260" cy="106" r="3.5" fill="#e2e8f0"/>
+          <rect x="244" y="50" width="32" height="18" rx="3" fill="#b45309" stroke="#7c2d12" stroke-width="1.1"/>
+          <text x="260" y="44" text-anchor="middle" font-size="6.4" font-weight="700" fill="#b45309">fren pabucu</text>
+          <path d="M 302 92 A 44 44 0 0 1 298 136" fill="none" stroke="#b45309" stroke-width="1.5" marker-end="url(#hwTorque)"/>
+          <text x="312" y="150" font-size="7.0" font-weight="700" fill="#b45309">τ_b</text>
+
+          <!-- motor ölçüsü -->
+          <line x1="24" y1="152" x2="176" y2="152" stroke="#1e3a5f" stroke-width="1" marker-start="url(#hwA2)" marker-end="url(#hwB2)"/>
+          <line x1="24" y1="148" x2="24" y2="156" stroke="#1e3a5f" stroke-width="0.9"/>
+          <line x1="176" y1="148" x2="176" y2="156" stroke="#1e3a5f" stroke-width="0.9"/>
+          <text x="100" y="166" text-anchor="middle" font-size="6.1" fill="#475569">motor + redüktör</text>
+
+          <!-- τ_b tablosu -->
+          <rect x="16" y="176" width="408" height="104" rx="3" fill="#fffbeb" stroke="#d97706" stroke-width="0.9"/>
+          <text x="24" y="190" font-size="6.6" font-weight="700" fill="#b45309">τ_b = 1,5 · maks |τ_g(q)| — 15 000 rastgele duruş + tüm adlandırılmış duruşlar</text>
+
+          <rect x="22" y="197" width="60" height="26" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.7"/>
+          <text x="52" y="207" text-anchor="middle" font-size="6.0" fill="#475569">j₁</text>
+          <text x="52" y="219" text-anchor="middle" font-size="6.6" font-weight="700" fill="#1e3a5f">1,0 Nm</text>
+          <rect x="86" y="197" width="60" height="26" rx="2" fill="#fff7ed" stroke="#d97706" stroke-width="1"/>
+          <text x="116" y="207" text-anchor="middle" font-size="6.0" fill="#b45309">j₂</text>
+          <text x="116" y="219" text-anchor="middle" font-size="6.6" font-weight="700" fill="#b45309">42,6 Nm</text>
+          <rect x="150" y="197" width="60" height="26" rx="2" fill="#fff7ed" stroke="#d97706" stroke-width="1"/>
+          <text x="180" y="207" text-anchor="middle" font-size="6.0" fill="#b45309">j₃</text>
+          <text x="180" y="219" text-anchor="middle" font-size="6.6" font-weight="700" fill="#b45309">14,6 Nm</text>
+          <rect x="214" y="197" width="60" height="26" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.7"/>
+          <text x="244" y="207" text-anchor="middle" font-size="6.0" fill="#475569">j₄</text>
+          <text x="244" y="219" text-anchor="middle" font-size="6.6" font-weight="700" fill="#1e3a5f">1,6 Nm</text>
+          <rect x="278" y="197" width="60" height="26" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.7"/>
+          <text x="308" y="207" text-anchor="middle" font-size="6.0" fill="#475569">j₅</text>
+          <text x="308" y="219" text-anchor="middle" font-size="6.6" font-weight="700" fill="#1e3a5f">1,0 Nm</text>
+          <rect x="342" y="197" width="60" height="26" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.7"/>
+          <text x="372" y="207" text-anchor="middle" font-size="6.0" fill="#475569">j₆</text>
+          <text x="372" y="219" text-anchor="middle" font-size="6.6" font-weight="700" fill="#1e3a5f">0,05 Nm</text>
+
+          <text x="24" y="238" font-size="6.1" fill="#334155">j₂/j₃: distal yerçekimi torkunun en büyük değeri · j₆ için 0,05 Nm taban</text>
+          <text x="24" y="251" font-size="6.1" fill="#475569">Tutma freni darbe bitince devreye girer; kilitleme enerji harcamaz.</text>
+          <text x="24" y="264" font-size="6.0" fill="#64748b">değerler: models/human_arm.json → brake_torque_nm (auto, factor 1,5)</text>
+        </svg>
+      </div>
+
+
+      <div class="param-dict-grid" id="paramDictGrid">
+        <div class="param-dict-card">
+          <h5>1. 3B Kinematik &amp; SO(3) Eklem Parametreleri</h5>
+          <table class="param-table">
+            <tr><td class="param-sym">d₁</td><td>Omuz yüksekliği (yerden kol eksenine)</td><td class="param-val" id="pd_d1">90 cm</td></tr>
+            <tr><td class="param-sym">θ_bel</td><td>Merkezi sütun (bel) Z₀-ekseni dönüşü</td><td class="param-val" id="pd_waist">0.0°</td></tr>
+            <tr><td class="param-sym">L₂ / L₃</td><td>Üst kol (humerus) / Ön kol uzunluğu</td><td class="param-val" id="pd_L23">31 / 26 cm</td></tr>
+            <tr><td class="param-sym">R_max</td><td>Güvenli 3B erişim küresi sınırı (0.88·ΣL)</td><td class="param-val" id="pd_rmax">60.7 cm</td></tr>
+            <tr><td class="param-sym">SE(3)</td><td>6-DOF uzaysal tutucu pozu (Konum + RPY / |e_ω|)</td><td class="param-val" id="pd_qsum">6-DOF SO(3)</td></tr>
+            <tr><td class="param-sym">w(q)</td><td>Konum &amp; dönme manipüle edilebilirliği (6×6 J)</td><td class="param-val" id="pd_w">0.065</td></tr>
+          </table>
+        </div>
+        <div class="param-dict-card">
+          <h5>2. Optik, Göz &amp; Boyun Parametreleri</h5>
+          <table class="param-table">
+            <tr><td class="param-sym">B</td><td>İki göz arası baz mesafesi (binoküler)</td><td class="param-val" id="pd_B">65 mm</td></tr>
+            <tr><td class="param-sym">B_boyun</td><td>Tek gözde boyun kayması sentetik tabanı</td><td class="param-val" id="pd_Bneck">0.0 mm</td></tr>
+            <tr><td class="param-sym">f</td><td>Kamera/göz odak uzaklığı (piksel)</td><td class="param-val" id="pd_f">580 px</td></tr>
+            <tr><td class="param-sym">s_g, s_t</td><td>El ve hedefin retinadaki piksel boyutu</td><td class="param-val" id="pd_sgst">-- / --</td></tr>
+            <tr><td class="param-sym">ρ_s</td><td>Ölçek oranı: (s_g/W_g)/(s_t/W_t) → 1.00</td><td class="param-val" id="pd_rho">--</td></tr>
+            <tr><td class="param-sym">Δu / Δu_mp</td><td>Yön farkı (px) / boyun paralaks kayması</td><td class="param-val" id="pd_du">--</td></tr>
+          </table>
+        </div>
+        <div class="param-dict-card">
+          <h5>3. Kontrol, Gecikme &amp; Fren Parametreleri</h5>
+          <table class="param-table">
+            <tr><td class="param-sym">τ_d</td><td>Görsel-sinirsel iletişim gecikmesi</td><td class="param-val" id="pd_td">60 ms</td></tr>
+            <tr><td class="param-sym">δ_etkin</td><td>Tutma süresi dahil toplam etkin gecikme</td><td class="param-val" id="pd_delta">85 ms</td></tr>
+            <tr><td class="param-sym">g = k·δ</td><td>Taşmama kuralı (≤ 1/e ≈ 0.368)</td><td class="param-val" id="pd_g">--</td></tr>
+            <tr><td class="param-sym">E_init</td><td>İlk balistik itki sonu kalan hata (mm)</td><td class="param-val" id="pd_einit">--</td></tr>
+            <tr><td class="param-sym">%T_comp</td><td>Kapalı-çevrim ince düzeltme süresi oranı</td><td class="param-val" id="pd_tcomp">--</td></tr>
+            <tr><td class="param-sym">τ_b</td><td>Hedef temasta motor akımını kesen fren</td><td class="param-val" id="pd_brake">KİLİTLİ</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="value-compare-grid" id="valueCompareGrid">
+        <div class="vc-pill">
+          <div class="vc-k">Donanım &amp; Koordinat İhtiyacı</div>
+          <div class="vc-v" id="vcSensor">Önerilen: Enkoder=0 · XYZ=YOK</div>
+          <div class="vc-c">Klasik: 6 eklem enkoderi + 3B kalibre XYZ</div>
+        </div>
+        <div class="vc-pill">
+          <div class="vc-k">Hedefi Aşma (120 ms Gecikme)</div>
+          <div class="vc-v" id="vcOvershoot">HDA/HLSL: --% aşma</div>
+          <div class="vc-c" id="vcOvershootPid">Klasik PID: --% aşma</div>
+        </div>
+        <div class="vc-pill">
+          <div class="vc-k">Görsel İşlem Yükü (S0–S6)</div>
+          <div class="vc-v" id="vcVisLoad">HDA/HLSL: -- Hz</div>
+          <div class="vc-c">Klasik Takip: 100.0 Hz sürekli kilit</div>
+        </div>
+        <div class="vc-pill">
+          <div class="vc-k">Balistik İlk Yaklaşım (E_init)</div>
+          <div class="vc-v" id="vcEInit">HDA/HLSL: -- mm</div>
+          <div class="vc-c" id="vcEInitPid">PID: -- mm</div>
+        </div>
+      </div>
+
+      <div class="tier-desc" style="border-left-color:var(--teal);margin-top:4px;">
+        <b>4-Eksen Akademik Okuma Anahtarı:</b>
+        <b>1. İlk Yaklaşım Hatası (E_init, mm):</b> İlk açık-çevrim balistik darbe penceresi sonunda kalan mesafe.
+        &nbsp;|&nbsp; <b>2. Kompanzasyon Payı (%T_comp):</b> Sürenin yüzde kaçının kapalı-çevrim düzeltmede geçtiği.
+        &nbsp;|&nbsp; <b>3. Etkin Görsel Yük (L_vis, Hz):</b> S0–S6 bakış makinesinin saniyede tükettiği görsel örnek sayısı.
+        &nbsp;|&nbsp; <b>4. Darbe Verimi (&eta;_pulse, %):</b> Harcanan mekanik işin faydalı yaklaşmaya oranı.
+      </div>
+      <div class="ik-hint" style="line-height:1.45;margin-top:4px;">
+        <b>Hızlı Deney Akışı:</b> Yukarıdaki senaryo düğmelerinden birini seçin veya sol üstten <b>&#9654; Simülasyonu Başlat</b>'a basın &rarr; <b>Sol/Sağ Göz</b> pencerelerinde kesikli halkaları izleyin &rarr; <b>5. Sekme</b>'de vektörel analiz grafiklerini inceleyin.
+      </div>
+    </div>
+    <div class="card tab-hidden" data-tab="tab2">
+      <div class="card-title">2. İnsan Uzuvları, Başlangıç Duruşu & Gözler <span class="sub">Antropomorfik</span></div>
+      <div class="card-explain">Yetişkin/genç kol oranlarını, başlangıç duruşunu ve S0–S6 stereo kamera yerleşimini (omuz üstü/arkası) ve göz açıklığını ayarlayın.</div>
+      <div class="ctrl-group">
+        <label>İnsan Uzuv Profili</label>
+        <select id="selLimbProfile">
+          <option value="adult_avg" selected>Yetişkin Ortalama (175 cm: üst kol 31, ön kol 26, el 12 cm)</option>
+          <option value="adult_tall">Uzun Boylu (188 cm: üst kol 35, ön kol 29, el 13 cm)</option>
+          <option value="compact_youth">Kompakt / Genç (160 cm: üst kol 27, ön kol 23, el 10 cm)</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>Kolun İlk Pozisyonu</label>
+        <select id="selPosture"></select>
+      </div>
+      <div class="ctrl-group">
+        <label>Eklem Açıları — başlangıç pozu (derece)</label>
+        <div id="jointSliders" class="joint-grid"></div>
+      </div>
+      <div class="ctrl-group">
+        <label>Başlangıç El Konumu (m, mutlak) <span class="val" id="valEE">—</span></label>
+        <div class="ee-grid">
+          <input type="number" id="numEx" step="0.01" value="0.00">
+          <input type="number" id="numEy" step="0.01" value="0.00">
+          <input type="number" id="numEz" step="0.01" value="0.00">
+          <button id="btnSolveIK" class="btn" style="padding:5px 10px;">IK Çöz</button>
+        </div>
+        <div class="ik-hint" id="ikHint"></div>
+      </div>
+      <div class="ctrl-group">
+        <label>Gözler: Bakış Modu <span class="val" id="valGaze">akıllı alterasyon</span></label>
+        <select id="selGaze">
+          <option value="auto" selected>Otomatik (akıllı alterasyon) — hedef↔el arasında kontrollü değişim</option>
+          <option value="mid">Ele + hedefe birlikte — kafa ikisini de aynı yerde tutar</option>
+          <option value="target">Hedefe kilitli — göz sabit hedefe bakar</option>
+          <option value="hand">Ele odaklı — göz tutucuyu takip eder, kafa döner</option>
+        </select>
+        <div class="tier-desc" id="gazeDesc">
+          Otomatik alterasyon: kafa, kol ile hedef arasındaki açısal ayrıma göre hedefe ve ele sırayla bakar (insan sakkadları gibi); ikisi tek çerçeveye girince ikisini birlikte tutar; son 12 mm'de hedefe kenetlenir — göz önce kupayı, sonra eli, nihayet ikisini birden izler.
+        </div>
+      </div>
+      <div class="ctrl-group">
+        <label>Üst Kol (Omuz–Dirsek, L2) <span class="val" id="valL2">31 cm</span></label>
+        <input type="range" id="rngL2" min="0.22" max="0.40" step="0.01" value="0.31">
+      </div>
+      <div class="ctrl-group">
+        <label>Ön Kol (Dirsek–Bilek, L3) <span class="val" id="valL3">26 cm</span></label>
+        <input type="range" id="rngL3" min="0.18" max="0.34" step="0.01" value="0.26">
+      </div>
+      <div class="ctrl-group">
+        <label>Gözler: Omuz Gerisi (X_cam) <span class="val" id="valCamX">-10 cm</span></label>
+        <input type="range" id="rngCamX" min="-0.30" max="0.05" step="0.01" value="-0.10">
+      </div>
+      <div class="ctrl-group">
+        <label>Gözler: Omuz Üstü Yükseklik (ΔZ_cam) <span class="val" id="valCamZ">22 cm</span></label>
+        <input type="range" id="rngCamZ" min="0.10" max="0.40" step="0.01" value="0.22">
+      </div>
+      <div class="ctrl-group">
+        <label>İki Göz Arası Mesafe (Baseline B) <span class="val" id="valBaseline">65 mm</span></label>
+        <input type="range" id="rngBaseline" min="40" max="120" step="1" value="65">
+      </div>
+    </div>
+    <div class="card tab-hidden" id="cardBrakes" data-tab="tab2">
+      <div class="card-title">Tutma Frenleri &amp; Efference Copy <span class="sub">Enkodersiz Başlangıç Bilgisi</span></div>
+      <div class="card-explain">Enkodersiz mimaride darbe bittiğinde kolu eklem frenleri tutar ve efference copy başlangıç pozunu saklar. Frenler kesilirse kol yerçekimiyle sarkar ve kalibrasyon gerekir.</div>
+      <div class="ctrl-group">
+        <label>Eklem Frenleri</label>
+        <div class="drag-plane">
+          <button class="seg active" id="btnBrakesHold" title="Darbe bitince fren devrede: kol yerçekimine karşı tutulur, sürekli akım harcanmaz">Frenler AKTİF (Tutma)</button>
+          <button class="seg" id="btnBrakesRelease" title="Enerji kesilir: kol yerçekimiyle sarkar, başlangıç tahmini geçersiz olur">SERBEST (Enerji Kesintisi)</button>
+        </div>
+        <div style="font-size:9.5px;color:var(--ink-soft);margin-top:4px;line-height:1.35" id="brakeHint">Frenler devrede — kol son duruşunda bekliyor. Başlangıç bilgisi efference copy + fren ile korunuyor; robot eline bakmadan hedefe kilitlenebilir.</div>
+      </div>
+      <div class="ctrl-group">
+        <label>Fren Torku Eklem Başına &tau;_b <span class="sub">Nm</span></label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:10px;margin:0 0 4px 0;font-weight:400;">
+          <input type="checkbox" id="chkBrakeAuto" checked> Otomatik — 1.5&times; statik yerçekimi torku (<code>scripts/compute_brake_torques.py</code>)
+        </label>
+        <div id="brakeTorqueGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;"></div>
+        <div style="font-size:9.5px;color:var(--ink-soft);margin-top:4px;line-height:1.35">Frenler SERBEST iken <b>Simülasyonu Başlat</b> devre dışıdır; <b>İlk Uyanış (Kalibrasyon)</b> tamamlanınca frenler kendiliğinden yeniden devreye girer. &tau;_b, distal zincirin en kötü yerçekimi yüküne göre boyutlandırılır; j1 ve j6 dikey eksenler için küçük alt sınır uygulanır.</div>
+      </div>
+    </div>
+    <div class="card tab-hidden" data-tab="tab3">
+      <div class="card-title">2b. Eklem Seçimi, Kilitleme &amp; Düzlem Hizalama <span class="sub">Editör</span></div>
+      <div class="ctrl-group">
+        <label>Eklem Snap &amp; Kilitle</label>
+        <div class="lock-grid" id="lockGrid"></div>
+        <div class="ik-hint" id="selInfo">3B sahnede ekleme tıklayarak seçin (snap) — boşluğa tıklayınca seçim temizlenir.</div>
+      </div>
+      <div class="ctrl-group">
+        <label>Eklem Referans Ekseni (F_i) Hareket Modu</label>
+        <div class="drag-plane" id="gizmoModeGroup">
+          <button class="seg active" id="gizmoTranslate">&#8596; Eksende Ötele</button>
+          <button class="seg" id="gizmoRotate">&#10227; Eksen Etrafında Döndür</button>
+        </div>
+        <div class="ik-hint" id="gizmoModeHint">Ötele: eksen okunu tut, kol yalnızca o dünya ekseninde kayar.
+          Döndür: seçili eklemin lokal ekseni etrafında kolu döndürür (eklem limitlerine uyulur).</div>
+      </div>
+      <div class="ctrl-group">
+        <label>Hizalanacak Referans Düzlem</label>
+        <div class="drag-plane" id="alignPlaneGroup">
+          <button class="seg active" id="planeXY">XY</button>
+          <button class="seg" id="planeXZ">XZ</button>
+          <button class="seg" id="planeYZ">YZ</button>
+        </div>
+      </div>
+      <div class="ctrl-group">
+        <button class="btn btn-primary" id="btnAlignPlane" style="width:100%;">Seçili Düzlemde Jointleri Hizala</button>
+        <div class="ik-hint" id="alignHint">Seçili eklemin ilgili düzlem üzerinde hizalanmasını sağlar.</div>
+      </div>
+      <div class="ctrl-group">
+        <button class="btn" id="btnClearSelection" style="width:100%;">Seçimi Temizle</button>
+      </div>
+    </div>
+    <div class="card tab-hidden" data-tab="tab3">
+      <div class="card-title">2c. Eklem Sınırlarını Düzenle <span class="sub">Yeni Sınır Profili</span></div>
+      <div class="ik-hint" style="margin-bottom:6px;">Her eklem için alt/üst sınırı (derece) değiştirin. <b>Uygula</b> sınırları anında simülasyona işler; <b>Kaydet</b> yenisine isim verir; <b>JSON İndir</b> ile gerçek bir yeni model dosyası alır (CLI: <code>--model dosya.json</code>).</div>
+      <div class="limit-table" id="limitTable"></div>
+      <div class="ctrl-group" style="margin-top:8px;display:flex;gap:6px;">
+        <button class="btn btn-primary" id="btnApplyLimits" style="flex:1;">Sınırları Uygula</button>
+        <button class="btn" id="btnResetLimits" title="Yerleşik anatomik sınırlara dön">Varsayılan</button>
+      </div>
+      <div class="ctrl-group" style="display:flex;gap:6px;align-items:center;">
+        <input type="text" id="limitProfileName" placeholder="Yeni profil ismi..." style="flex:1;font-size:10.5px;padding:4px 6px;border:1px solid var(--border-strong);border-radius:4px;">
+        <button class="btn" id="btnSaveLimitProfile">Kaydet</button>
+      </div>
+      <div class="ctrl-group" style="display:flex;gap:6px;align-items:center;">
+        <select id="limitProfileList" style="flex:1;font-size:10.5px;padding:4px 6px;border:1px solid var(--border-strong);border-radius:4px;"></select>
+        <button class="btn" id="btnLoadLimitProfile" title="Seçili profili yükle">Yükle</button>
+        <button class="btn" id="btnDeleteLimitProfile" title="Seçili profili sil">&times;</button>
+      </div>
+      <div class="ctrl-group">
+        <button class="btn" id="btnDownloadModel" style="width:100%;">JSON İndir (yeni model kaydı)</button>
+      </div>
+      <div class="ik-hint" id="limitHint">&nbsp;</div>
+    </div>
+    <div class="card fs-basic tab-hidden" data-tab="tab4">
+      <div class="card-title">3. Hedef Konumu &amp; Algı Gecikmesi <span class="sub">Gözlem Uzayı</span></div>
+      <div class="card-explain">3B sahneden de sürükleyebileceğiniz hedef konumunu, görsel algı gecikmesini (&delta;), kamera gürültüsünü ve el yükünü belirleyin; isterseniz özel kontrol yasası yazın.</div>
+      <div class="ctrl-group">
+        <label>Hedef İleri Uzaklığı (X_hedef) <span class="val" id="valTx">45 cm</span></label>
+        <input type="range" id="rngTx" min="0.10" max="0.85" step="0.01" value="0.45">
+      </div>
+      <div class="ctrl-group">
+        <label>Hedef Yanal Konumu (Y_hedef) <span class="val" id="valTy">10 cm</span></label>
+        <input type="range" id="rngTy" min="-0.50" max="0.50" step="0.01" value="0.10">
+      </div>
+      <div class="ctrl-group">
+        <label>Hedef Yüksekliği (Z_hedef) <span class="val" id="valTz">85 cm</span></label>
+        <input type="range" id="rngTz" min="0.30" max="1.40" step="0.01" value="0.85">
+      </div>
+      <div class="ctrl-group">
+        <label>3B Yönelim Roll (φ_x) <span class="val" id="valTargetRoll">0°</span></label>
+        <input type="range" id="rngTargetRoll" min="-90" max="90" step="1" value="0">
+      </div>
+      <div class="ctrl-group">
+        <label>3B Yönelim Pitch (θ_y) <span class="val" id="valTargetPitch">0°</span></label>
+        <input type="range" id="rngTargetPitch" min="-45" max="45" step="1" value="0">
+      </div>
+      <div class="ctrl-group">
+        <label>3B Yönelim Yaw (ψ_z) <span class="val" id="valTargetYaw">0°</span></label>
+        <input type="range" id="rngTargetYaw" min="-60" max="60" step="1" value="0">
+      </div>
+      <div class="ctrl-group">
+        <label>Görsel Algı Gecikmesi (δ) <span class="val" id="valDelay">60 ms</span></label>
+        <input type="range" id="rngDelay" min="20" max="180" step="10" value="60">
+      </div>
+      <div class="ctrl-group">
+        <label>Kamera Kare Hızı (f_v) & Gürültü <span class="val" id="valFps">100 Hz / 0.35 px</span></label>
+        <input type="range" id="rngNoise" min="0.0" max="1.2" step="0.05" value="0.35">
+      </div>
+      <div class="ctrl-group">
+        <label>Uçtaki Yük (Payload) <span class="val" id="valPayload">0.0 kg</span></label>
+        <input type="range" id="rngPayload" min="0.0" max="4.0" step="0.5" value="0.0">
+      </div>
+      <details>
+        <summary>Gelişmiş: Özel Kontrol Kodu & Manuel Eklem Açıları</summary>
+        <p style="font-size:11px;color:var(--ink-soft);margin:4px 0;">
+          Kontrol yasası olarak "Özel Matematiksel Formül" seçtiğinizde aşağıdaki JavaScript fonksiyonu her karede çalışır:
+        </p>
+        <textarea class="code-box" id="txtCustomCode">// e: stereo+perspektif 3B bağıl hata [ex, ey, ez] (m)
+// p: kalan mesafe oranı (1=başlangıç, 0=hedef)
+// k: gecikmeden türetilen güvenli kazanç (1 / (e * delta_eff))
+const r = Math.hypot(e[0], e[1], e[2]);
+if (r <= eps) return [0, 0, 0];
+const bellRamp = Math.max(0.28, Math.min(1.0, Math.pow((1.18 - p) / 0.65, 0.55)));
+const vMag = Math.min(vmax, bellRamp * k * (eps + r));
+return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
+      </details>
+    </div>
+    <div class="card fs-table tab-hidden" data-tab="tab5">
+      <div class="card-title">Kontrol Modelleri Karşılaştırma Tablosu <span class="sub">Aynı Koşullarda (4-Eksen Değerlendirme)</span></div>
+      <table class="comp-table" id="tblCompare">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Süre (s)</th>
+            <th>Aşma (%)</th>
+            <th>İlk İvme</th>
+            <th>Min w(q)</th>
+            <th>Tork (Nm)</th>
+            <th>E_init (mm)</th>
+            <th>T_comp (%)</th>
+            <th>L_vis (Hz)</th>
+            <th>&eta;_pulse (%)</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyCompare">
+          <tr><td colspan="10" style="text-align:center;color:var(--ink-muted);">Karşılaştırma için “Modelleri Karşılaştır”a basın veya simülasyonu çalıştırın</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card fs-academic tab-hidden" data-tab="tab5">
+      <div class="card-title">Akademik Performans Özeti <span class="sub" id="lblActiveCtrl">İnsan-HDA</span></div>
+      <div class="kpi-grid">
+        <div class="kpi">
+          <div class="k-lbl">Yerleşme Süresi</div>
+          <div class="k-val" id="kpiMT">-- s</div>
+        </div>
+        <div class="kpi">
+          <div class="k-lbl">Hedefi Aşma (Overshoot)</div>
+          <div class="k-val" id="kpiOS">-- %</div>
+        </div>
+        <div class="kpi">
+          <div class="k-lbl">Başlangıç İvmesi (Sarsıntı)</div>
+          <div class="k-val" id="kpiJerk">-- m/s²</div>
+        </div>
+        <div class="kpi">
+          <div class="k-lbl">El Perspektif Boyu (Baş→Son)</div>
+          <div class="k-val" id="kpiLoom">-- px</div>
+        </div>
+        <div class="kpi">
+          <div class="k-lbl">Min Singularity w(q)</div>
+          <div class="k-val" id="kpiManip">--</div>
+        </div>
+        <div class="kpi">
+          <div class="k-lbl">Tepe Tork / Enerji</div>
+          <div class="k-val" id="kpiTorque">-- Nm</div>
+        </div>
+        <div class="kpi">
+          <div class="k-lbl">İlk Yaklaşım Hatası E_init</div>
+          <div class="k-val" id="kpiEInit">-- mm</div>
+        </div>
+        <div class="kpi">
+          <div class="k-lbl">Kompanzasyon T_comp / %T_comp</div>
+          <div class="k-val" id="kpiTComp">-- / -- %</div>
+        </div>
+        <div class="kpi">
+          <div class="k-lbl">Görsel Yük L_vis</div>
+          <div class="k-val" id="kpiLVis">-- Hz</div>
+        </div>
+        <div class="kpi">
+          <div class="k-lbl">Darbe Verimi &eta;_pulse</div>
+          <div class="k-val" id="kpiEtaPulse">-- %</div>
+        </div>
+      </div>
+      <div class="academic-plots-row fs-plot">
+        <div>
+          <div style="font-size:11px;font-weight:600;margin:0 0 3px 0;color:var(--ink);">
+            A. İnsansı Çan-Eğrisi Hız Rampası |v(t)| ve Kalan Mesafe |e(t)|
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="cvPlotVel" width="390" height="145"></canvas>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;margin:0 0 3px 0;color:var(--ink);">
+            B. Kamerada Elin Perspektif Küçülmesi s_g(t) ve &rho;_s(t) &rarr; 1.0
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="cvPlotLoom" width="390" height="145"></canvas>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;margin:0 0 3px 0;color:var(--ink);">
+            C. Singularity Güvenlik İndeksi w(q) ve Eklem Torkları &tau;_1..&tau;_6
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="cvPlotSing" width="390" height="145"></canvas>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
+        <button class="btn btn-accent" id="btnCompareAll" style="flex:1 1 150px;font-size:11px;">Modelleri Karşılaştır</button>
+        <button class="btn" id="btnExportMd" style="flex:1 1 120px;font-size:11px;">Rapor (.md)</button>
+        <button class="btn" id="btnExportCsv" style="flex:1 1 120px;font-size:11px;">Veri (.csv)</button>
+      </div>
+    </div>
+
+    <div class="card tab-hidden" id="benchMethodCard" data-tab="tab5">
+      <div class="card-title">Benchmark Metodolojisi ve Bilimsel Gerekçesi <span class="sub">Her metriğin neden o olduğu — kaynaklarıyla</span></div>
+      <div class="card-explain">
+        5 senaryo × 6 kontrolcü + 2 ablasyon tasarımı keyfi değildir; her bir kısıt aşağıdaki yerleşik ölçütün gerekliliğini sınar. Tam liste, tohumlar ve kabul kriterleri <code>reports/academic_benchmark.md</code>'dedir.
+      </div>
+      <div class="method-grid">
+        <div class="method-item">
+          <b>$e_f$ — Kalıcı konum hatası (mm)</b>
+          <p>İnsan-makine etkileşiminde hedef başarısızlığı nihai isabetle ölçülür; Fitts ve Peterson'ın hız-doğruluk yasası ve ISO 9241-9 hedefleme performansı bu iki değişkeni kullanır [<a href="#ref-fitts54">Fitts 1954</a>, <a href="#ref-iso9241">ISO 9241-9</a>, <a href="#ref-mackenzie92">MacKenzie 1992</a>].</p>
+        </div>
+        <div class="method-item">
+          <b>TP — Fitts bilgi işleme hızı (bit/s), $ID_e = \log_2(D/W_e+1)$</b>
+          <p>ISO 9241-9 / MacKenzie tanımı: $W_e = \max(W_t, 4.133\,\sigma_e)$, $W_t=40$ mm. TP tüm gecikme/gezegen koşullarında adil tek sayısal karşılaştırma sağlar [<a href="#ref-mac92">MacKenzie 1992</a>, <a href="#ref-iso9241">ISO 9241-9</a>, <a href="#ref-crossman83">Crossman &amp; Goodeve 1983</a>].</p>
+        </div>
+        <div class="method-item">
+          <b>$T_s$ — 5 mm banda yerleşme süresi</b>
+          <p>Salınımlı sistemlerde 2% kriterini 5 mm (hedef genişliğiyle uyumlu) olarak uygularız; yerleşmeyenler süre tavanında skorlanır. Buna gereksinim duyan jerk-minimized kontrolcülerde tercih edilmez — uyumsuzdur [<a href="#ref-flash85">Flash &amp; Hogan 1985</a>].</p>
+        </div>
+        <div class="method-item">
+          <b>Aşma % ve κ ≤ 1/e taşmama kuralı</b>
+          <p>Gecikmeli geri beslemede $k\delta \le 1/e$ kararlılık sınırı Corless–Lambert W kök bölgesidir; aşmasız monoton yaklaşımın zorunlu koşulu budur (bu makalede Önerme 1) [<a href="#ref-corless96">Corless et al. 1996</a>].</p>
+        </div>
+        <div class="method-item">
+          <b>$E_{init}$ ve %$T_{comp}$ — balistik/kompanzasyon ayrımı</b>
+          <p>İnsan ulaşmasının iki fazlı yapısı (ilk balistik darbe + düzeltici alt-hareketler) Woodworth'tan bu yana tartışmasızdır; olayı ayıran metrik takip eder [<a href="#ref-woodworth99">Woodworth 1899</a>, <a href="#ref-crossman83">Crossman &amp; Goodeve 1983</a>].</p>
+        </div>
+        <div class="method-item">
+          <b>$w_{min}$ ve τ_max — tekillik &amp; tork marjı</b>
+          <p>Tam uzanma sınırında Jacobian rank kaybını ve motor koruyucu yükü gösterir; Yoshikawa manipülabilitesi ve DLS sönümlemesi bu ölçüte dayanır [<a href="#ref-yoshikawa85">Yoshikawa 1985</a>, <a href="#ref-nakamura86">Nakamura &amp; Hanafusa 1986</a>, <a href="#ref-wampler86">Wampler 1986</a>, <a href="#ref-khatib86">Khatib 1986</a>].</p>
+        </div>
+        <div class="method-item">
+          <b>Tohumlar, bootstrap GA, permütasyon + Holm</b>
+          <p>n=10 eşleşik tohum; hücre başına %95 bootstrap GA (10 000 tekrar, seed=42); 25 eşleşik karşılaştırma için log-ortalama <a href="#ref-good05">permütasyon testi</a>; çoklu karşılaştırmalarda Holm step-down düzeltmesi [<a href="#ref-efron79">Efron 1979</a>, <a href="#ref-holm79">Holm 1979</a>, <a href="#ref-wilson27">Wilson 1927</a>].</p>
+        </div>
+        <div class="method-item">
+          <b>Senaryo gerekçeleri</b>
+          <p>S1 nominal kontrol; S2 120 ms stres (yeniden ayarsız); S3 tekillik sınırı; S4 monoküler boyut yanılsaması (aktif boyun paralaksı); S5 küre-dışı yanal (gövde dönüşü). Her tohum HDA/HLSL/Governor/PID/LQR/Sabit'e aynı şekilde uygulanır — eşleşik tasarım.</p>
+        </div>
+      </div>
+      <div class="method-refs">
+        <b>Kaynaklar:</b>
+        <ol class="ref-list-inline">
+          <li id="ref-fitts54">Fitts, P. M. (1954). The information capacity of the human motor system in controlling the amplitude of movement. <i>J. Exp. Psychol.</i> <b>47</b>, 381–391.</li>
+          <li id="ref-mac92">MacKenzie, I. S. (1992). Fitts' law as a research and design tool in human–computer interaction. <i>Hum.–Comput. Interact.</i> <b>7</b>, 91–139.</li>
+          <li id="ref-iso9241">ISO 9241-9:2000. Ergonomic requirements for office work with visual display terminals — Part 9: Requirements for non-keyboard input devices. ISO, Geneva.</li>
+          <li id="ref-crossman83">Crossman, E. R. F. W., Goodeve, P. J. (1983). Feedback control of hand-movement and Fitts' law. <i>Q. J. Exp. Psychol. A</i> <b>35</b>, 251–278.</li>
+          <li id="ref-flash85">Flash, T., Hogan, N. (1985). The coordination of arm movements: an experimentally confirmed mathematical model. <i>J. Neurosci.</i> <b>5</b>, 1688–1703.</li>
+          <li id="ref-corless96">Corless, R. M., Gonnet, G. H., Hare, D. E. G., Jeffrey, D. J., Knuth, D. E. (1996). On the Lambert W function. <i>Adv. Comput. Math.</i> <b>5</b>, 329–359.</li>
+          <li id="ref-yoshi85">Yoshikawa, T. (1985). Manipulability of robotic mechanisms. <i>Int. J. Robot. Res.</i> <b>4</b>, 3–9.</li>
+          <li id="ref-nakamura86">Nakamura, Y., Hanafusa, H. (1986). Inverse kinematic solutions with singularity robustness for robot manipulator control. <i>J. Dyn. Syst. Meas. Control</i> <b>108</b>, 163–171.</li>
+          <li id="ref-wampler86">Wampler, C. W. (1986). Manipulator inverse kinematic solutions based on vector formulations and damped least-squares methods. <i>IEEE Trans. Syst. Man Cybern.</i> <b>16</b>, 93–101.</li>
+          <li id="ref-khatib86">Khatib, O. (1986). Real-time obstacle avoidance for manipulators and mobile robots. <i>Int. J. Robot. Res.</i> <b>5</b>, 90–98.</li>
+          <li id="ref-efron79">Efron, B. (1979). Bootstrap methods: another look at the jackknife. <i>Ann. Statist.</i> <b>7</b>, 1–26.</li>
+          <li id="ref-holm79">Holm, S. (1979). A simple sequentially rejective multiple test procedure. <i>Scand. J. Statist.</i> <b>6</b>, 65–70.</li>
+          <li id="ref-wilson27">Wilson, E. B. (1927). Probable inference, the law of succession, and statistical inference. <i>J. Am. Stat. Assoc.</i> <b>22</b>, 209–212.</li>
+          <li id="ref-good05">Good, P. I. (2005). <i>Permutation, parametric, and bootstrap tests of hypotheses</i> (3rd ed.). Springer.</li>
+          <li id="ref-woodworth99">Woodworth, R. S. (1899). The accuracy of voluntary movement. <i>Psychol. Rev.</i> <b>3</b> (Suppl.), 1–119.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card dash-card tab-hidden" id="dashCard" data-tab="tab5">
+      <div class="card-title">Vektörel Analitik Dashboard <span class="sub">XYZ'siz Balistik / Kompanzasyon ve Gecikme Dayanımı Analizi (SVG)</span></div>
+      <div class="dash-toolbar">
+        <button class="btn btn-accent" id="btnDashRefresh" style="font-size:11px;">Grafikleri Yenile</button>
+        <button class="btn" id="btnDashSvg" style="font-size:11px;">Vektörel SVG İndir</button>
+        <button class="btn" id="btnDashPng" style="font-size:11px;">Yüksek Çöz. PNG İndir</button>
+        <button class="btn" id="btnDashCsv" style="font-size:11px;">CSV İndir</button>
+        <span class="dash-status" id="dashStatus">Hazır — Sekme açıldığında otomatik güncellenir</span>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-cell">
+          <div class="dash-label">A. Zaman–Hata Yakınsaması ve Faz Ayrımı — Önerilen (HDA/HLSL) vs Klasik PID</div>
+          <svg id="svgDashPhase" class="dash-svg" viewBox="0 0 580 275" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="chart-explain-note"><b>Ne İşe Yarar?</b> İlk balistik enerji darbesinin (bordo bölge) eli hedefe ne kadar hızla yaklaştırdığını ve ince görsel kompanzasyonla (lacivert bölge) PID gibi sıçrama/aşma yapmadan nasıl kilitlendiğini gösterir.</div>
+        </div>
+        <div class="dash-cell">
+          <div class="dash-label">B. Balistik İlk Yaklaşım Hatası E_init — Model Karşılaştırması (ort ± 1σ, mm)</div>
+          <svg id="svgDashEInit" class="dash-svg" viewBox="0 0 580 275" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="chart-explain-note"><b>Ne İşe Yarar?</b> Kapalı-çevrim ince ayar devralmadan önceki balistik isabet kalitesini kıyaslar; düşük <b>E_init</b>, görsel gecikme altında bile az düzeltme gereksinimi ve yüksek enerji verimi demektir.</div>
+        </div>
+        <div class="dash-cell">
+          <div class="dash-label">C. Erişim Mesafesine Göre Balistik İtki vs Görsel Kompanzasyon Süre Payı (%T_ballistic / %T_comp)</div>
+          <svg id="svgDashComp" class="dash-svg" viewBox="0 0 580 275" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="chart-explain-note"><b>Ne İşe Yarar?</b> Yakından erişim sınırına kadar farklı mesafelerde hareketin yüzde kaçının enkodersiz balistik itkiyle, yüzde kaçının görsel düzeltmeyle tamamlandığını ölçer.</div>
+        </div>
+        <div class="dash-cell">
+          <div class="dash-label">D. Görsel Gecikme Dayanımı (τ_d = 20–120 ms) — Hedefi Aşma (% Overshoot)</div>
+          <svg id="svgDashPulse" class="dash-svg" viewBox="0 0 580 275" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="chart-explain-note"><b>Ne İşe Yarar?</b> Kamera/işleme gecikmesi arttıkça klasik PID ve sabit kazanç (P) nasıl kararsızlığa/aşmaya sürüklenirken HDA ve HLSL modellerinin <b>g ≤ 1/(e·δ_eff)</b> sınırı sayesinde aşmasız kaldığını kanıtlar.</div>
+        </div>
+      </div>
+    </div>
+    <div class="card dash-card tab-hidden" id="benchSuiteCard" data-tab="tab5">
+      <div class="card-title">Standart Akademik Benchmark Paketi <span class="sub">ISO 9241-9 Fitts TP + Lambert-W + Tek-Göz Paralaks + Senkron Bel (5 Senaryo × 6 Kontrolcü)</span></div>
+      <div class="card-explain">
+        Makaledeki (§3.7, Tablo 5) standart doğrulama protokolüdür. Herhangi bir kazanç ayarı (tuning) değiştirmeden <b>İnsan-HDA</b> ve <b>HLSL</b> yasalarını klasik <b>PID</b>, <b>LQR</b>, <b>Sabit (P)</b> ve <b>Governor</b> ile 5 bilimsel senaryoda kıyaslar; okurlar tarayıcıda tek tıkla veya GitHub CLI komutuyla aynı sonuçları doğrulayabilir.
+      </div>
+      <div class="dash-toolbar">
+        <button class="btn btn-accent" id="btnRunAcademicBenchmark" style="font-size:11px;">&#9654; Standart 5-Senaryo Akademik Benchmark Testini Çalıştır</button>
+        <select id="selBenchScenarioFilter" style="width:auto;min-width:220px;font-size:11px;padding:4px 8px;">
+          <option value="all" selected>Tüm Senaryolar (S1–S5 Tam Tablo)</option>
+          <option value="S1">S1: Nominal Binoküler Stereo (60 ms)</option>
+          <option value="S2">S2: Yüksek Gecikme Stresi (120 ms — Lambert-W)</option>
+          <option value="S3">S3: Sınır / Tekillik Yakını (human_wdls vs plain_dls)</option>
+          <option value="S4">S4: Tek Göz Boyun Paralaksı vs Sabit (+%28 Ölçek)</option>
+          <option value="S5">S5: Yanal Küre-Dışı Senkron Bel + Kol ([0.42, -0.42, 0.86])</option>
+        </select>
+        <button class="btn" id="btnExportBenchMd" style="font-size:11px;">Makale Tablosu (.md)</button>
+        <button class="btn" id="btnExportBenchCsv" style="font-size:11px;">Veri (.csv)</button>
+        <span class="dash-status" id="benchStatus">Hazır — Sekme açılınca otomatik hesaplanır</span>
+      </div>
+      <div class="bench-kpis" id="benchKpiRow">
+        <div class="bench-kpi-box">
+          <div class="bk-lbl">S2 (120 ms) Aşma Koruması</div>
+          <div class="bk-val" id="bkS2Os">--</div>
+          <div class="bk-sub" id="bkS2OsSub">HDA / HLSL vs klasik PID gecikme aşımı</div>
+        </div>
+        <div class="bench-kpi-box">
+          <div class="bk-lbl">ISO 9241-9 Fitts Verimi (TP)</div>
+          <div class="bk-val" id="bkS1Tp">--</div>
+          <div class="bk-sub" id="bkS1TpSub">TP = ID_e / T_s (bit/s, nominal W_t=40 mm)</div>
+        </div>
+        <div class="bench-kpi-box">
+          <div class="bk-lbl">S4 Tek-Göz Boyun Paralaksı</div>
+          <div class="bk-val" id="bkS4Mono">--</div>
+          <div class="bk-sub" id="bkS4MonoSub">Aktif boyun kalibrasyonu vs sabit tek göz</div>
+        </div>
+        <div class="bench-kpi-box">
+          <div class="bk-lbl">S5 Senkron Bel + Kol Kazancı</div>
+          <div class="bk-val" id="bkS5Waist">--</div>
+          <div class="bk-sub" id="bkS5WaistSub">Küre dışı yanal hedefte bel dönüşlü vs sabit</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="comp-table" id="tblAcademicBenchmark">
+          <thead>
+            <tr>
+              <th>Senaryo</th>
+              <th>Kontrol Modeli</th>
+              <th>Son Hata e_f (mm)</th>
+              <th>Aşma (%)</th>
+              <th>Yerleşme T_s (s)</th>
+              <th>Fitts TP (bit/s)</th>
+              <th>E_init (mm)</th>
+              <th>%T_comp</th>
+              <th>Min w(q)</th>
+              <th>Tepe Tork (Nm)</th>
+              <th>Bel &theta;_bel / B_boy</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyAcademicBenchmark">
+            <tr><td colspan="11" style="text-align:center;color:var(--ink-muted);">Benchmark sonuçlarını görmek için &#9654; Standart 5-Senaryo Akademik Benchmark Testini Çalıştır düğmesine basın</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="bench-repro" id="benchReproBox">
+        <b>GitHub &amp; Makale Okuru İçin Doğrulanabilir Tekrar Çalıştırma Protokolü:</b><br>
+        1) <b>Tarayıcıda sıfır kurulumla test:</b> Bu HTML dosyası (<code>figures/human_arm_workbench.html</code>) açıldığında yukarıdaki düğmeye basarak tüm senaryoları gerçek-zamanlı fizik motorunda çalıştırabilir ve <b>.md/.csv</b> indirebilirsiniz.<br>
+        2) <b>Python CLI çok-tohumlu Monte Carlo doğrulama (GitHub deposu):</b>
+        <code>python -m robosimu.cli benchmark models/human_arm.json --out reports --seeds 3</code> &middot;
+        Birim testleri: <code>python -m unittest discover -s tests -v</code>
+      </div>
+    </div>
+    </div>
+  </section>
+</div>
+<!-- Floating limb editor panel (opened by clicking a limb in the 3D view) -->
+<div class="limb-panel" id="limbPanel" style="display:none;">
+  <button class="close-x" id="limbPanelClose" title="Kapat">&times;</button>
+  <h4>Uzuv: <span id="limbPanelName">—</span></h4>
+  <div class="jp-sub" id="limbPanelSub">Biyomekanik segment boyu ve bağlı eklem açıları</div>
+  <div style="display:flex;justify-content:space-between;align-items:baseline;">
+    <span>Uzunluk</span>
+    <span class="limb-val" id="limbPanelVal">-- cm</span>
+  </div>
+  <input type="range" id="limbPanelSlider" min="0.05" max="0.60" step="0.005" value="0.31">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+    <input type="number" id="limbPanelNum" step="0.005" min="0.05" max="0.60" style="width:74px;font-family:var(--font-mono);font-size:11px;padding:3px 5px;border:1px solid var(--border-strong);border-radius:3px;">
+    <span style="font-size:10px;color:var(--ink-soft);">metre (m)</span>
+  </div>
+  <div class="limb-presets">
+    <button class="btn" data-anthro="child">Çocuk</button>
+    <button class="btn" data-anthro="teen">Ergen</button>
+    <button class="btn" data-anthro="adult">Yetişkin</button>
+  </div>
+  <div class="jp-sec">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:600;">Bağlı Eklem &amp; X-Ekseni Rotasyon</span>
+      <button class="btn" id="limbOpenJointBtn" style="font-size:10px;padding:2px 6px;">Eklem Kontrollerini Aç</button>
+    </div>
+    <div id="limbJointSliders"></div>
+  </div>
+  <div class="limb-custom">
+    <input type="text" id="limbCustomName" placeholder="Özel profil ismi...">
+    <button class="btn" id="limbSaveCustom">Kaydet</button>
+  </div>
+  <div class="limb-custom">
+    <select id="limbCustomList" style="flex:1;font-size:10.5px;padding:3px 5px;border:1px solid var(--border-strong);border-radius:4px;"></select>
+    <button class="btn" id="limbLoadCustom" title="Seçili profili yükle">Yükle</button>
+    <button class="btn" id="limbDeleteCustom" title="Seçili profili sil">&times;</button>
+  </div>
+</div>
+<!-- Floating joint inspector panel (opened by clicking a joint in the 3D view) -->
+<div class="joint-panel" id="jointPanel" style="display:none;">
+  <button class="close-x" id="jointPanelClose" title="Kapat">&times;</button>
+  <h4>Eklem: <span id="jointPanelTitle">—</span></h4>
+  <div class="jp-sub" id="jointPanelSub">Yuvarlak topu sürükleyin (bileşik) veya X/Y/Z okunu tutun.</div>
+  <div class="drag-plane" id="jpModeGroup" style="margin-bottom:4px;">
+    <button class="seg active" id="jpModeTranslate">&#8596; XYZ Oklar (Ötele)</button>
+    <button class="seg" id="jpModeRotate">&#10227; X-Y-Z Halka (Döndür)</button>
+  </div>
+  <div class="jp-sec" id="jointPanelSliders"></div>
+  <div class="jp-sec">
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;font-weight:600;">
+      <input type="checkbox" id="jpLockChk"> Bu eklemi kilitle (sabit tut)
+    </label>
+    <div style="font-size:10px;color:var(--ink-soft);margin-top:5px;">Eklem Hareket Sınırları (derece °)</div>
+    <div class="jp-limits">
+      <input type="number" id="jpLimMin" step="1" min="-360" max="360" title="Alt sınır (°)">
+      <input type="number" id="jpLimMax" step="1" min="-360" max="360" title="Üst sınır (°)">
+      <button class="btn btn-primary" id="jpApplyLim" style="font-size:10px;padding:3px 7px;">Uygula</button>
+    </div>
+  </div>
+</div>
+<!-- Sahne Tam Ekran overlay: 3B kart + gözler + temel ayarlar (JS ile taşınır) -->
+<div class="scene-overlay so-enter" id="sceneOverlay" style="display:none;" role="dialog" aria-label="3B İnsansı Robot Kol — Tam Ekran">
+  <div class="so-top">
+    <span class="so-title">3B İnsansı Robot Kol &mdash; Omuz Üstü Stereo Gözler ve Singularity</span>
+    <button class="btn" id="soStartBtn" title="Simülasyonu ilk pozisyondan hedefe çalıştır">&#9654; Simülasyonu Başlat</button>
+    <button class="btn" id="soCloseBtn" title="Tam ekrandan çık (Esc)">&#10005; Kapat</button>
+  </div>
+  <div class="so-body">
+    <div class="so-eyesrow" id="soEyesSlot"></div>
+    <div class="so-mainrow">
+      <aside class="so-col so-left" id="soLeftSlot"></aside>
+      <main class="so-col so-center" id="soCenterSlot"></main>
+      <aside class="so-col so-right" id="soRightSlot"></aside>
+    </div>
+  </div>
+</div>
+<script>
+const INITIAL_DATA = /*__DATA__*/;
+// Base DH & Motor Model (link lengths overridden by human limb profiles)
+const BASE_LINKS = INITIAL_DATA.links.map(l => Object.assign({}, l));
+const DEG = Math.PI / 180;
+const LIMB_PROFILES = {
+  adult_avg:     { d1: 0.90, L2: 0.31, L3: 0.26, d4: 0.00, d5: 0.00, d6: 0.12, camX: -0.10, camDZ: 0.22, B: 65 },
+  adult_tall:    { d1: 0.98, L2: 0.35, L3: 0.29, d4: 0.00, d5: 0.00, d6: 0.13, camX: -0.11, camDZ: 0.24, B: 66 },
+  compact_youth: { d1: 0.82, L2: 0.27, L3: 0.23, d4: 0.00, d5: 0.00, d6: 0.10, camX: -0.09, camDZ: 0.20, B: 60 }
+};
+// Seed the 'adult_avg' profile from the MODEL this page was generated from.
+// Without this, opening the page for an industrial arm (six_axis_arm.json)
+// silently overrode the model's own pole height, limb lengths and wrist
+// offsets with the hardcoded human-adult constants above — producing an
+// impossible hybrid (human-sized pole + industrial links + industrial,
+// non-anatomical "hanging" preset). The model always wins on first load.
+(function seedProfileFromModel() {
+  try {
+    const L = (INITIAL_DATA && INITIAL_DATA.links) ? INITIAL_DATA.links : null;
+    if (!L) return;
+    LIMB_PROFILES.adult_avg = {
+      d1: L[0].d, L2: L[1].a, L3: L[2].a,
+      d4: L[3].d, d5: L[4].d, d6: L[5].d,
+      camX: LIMB_PROFILES.adult_avg.camX,
+      camDZ: LIMB_PROFILES.adult_avg.camDZ,
+      B: LIMB_PROFILES.adult_avg.B
+    };
+    const isHuman = (L[3].d === 0 && L[4].d === 0);
+    if (!isHuman) {
+      LIMB_PROFILES.adult_tall.d4 = L[3].d; LIMB_PROFILES.adult_tall.d5 = L[4].d; LIMB_PROFILES.adult_tall.d6 = L[5].d;
+      LIMB_PROFILES.compact_youth.d4 = L[3].d; LIMB_PROFILES.compact_youth.d5 = L[4].d; LIMB_PROFILES.compact_youth.d6 = L[5].d;
+    }
+    const l2 = document.getElementById('rngL2');
+    const l3 = document.getElementById('rngL3');
+    if (l2) l2.value = String(L[1].a);
+    if (l3) l3.value = String(L[2].a);
+  } catch (err) { /* keep hardcoded adult_avg as a safe fallback */ }
+})();
+const POSTURES = (INITIAL_DATA.postures && Object.keys(INITIAL_DATA.postures).length)
+  ? INITIAL_DATA.postures
+  : {
+      hanging_natural:       [-4, 10, 14, 0, 4, 0],
+      hanging_vertical:      [0, 0, 0, 0, 0, 0],
+      ready_desk:            [18, -32, 68, 12, -16, 0],
+      reach_high:            [12, -88, 26, 6, 18, 0],
+      side_guard:            [32, 40, 85, -15, 5, 12],
+      low_table_pick:        [-18, 28, 72, -25, 0, -18],
+      shelf_pre_reach:       [12, 95, 45, -10, 8, 15],
+      cross_body_rest:       [-35, 35, 95, 0, -10, -20],
+      retracted_compact:     [0, -15, 125, -30, 0, 10],
+      axial_pronation_reach: [14, 48, 64, -18, 10, 26],
+      axial_supination_grasp:[-16, 38, 78, 22, -12, -26]
+    };
+const POSTURE_LABELS = {
+  hanging_natural: 'Aşağı Sarkan Kol (Doğal, dirsek hafif bükük)',
+  hanging_vertical: 'Tam Dikey Sarkan Kol',
+  ready_desk: 'Masa Başı Hazır Duruş',
+  reach_high: 'Yukarı Uzanma (Raf / Üst Düzlem)',
+  side_guard: 'Yan Koruma / Hazır Bekleme (Dirsek ~85°, Roll +12°)',
+  low_table_pick: 'Alçak Masa Kavrama Hazırlığı (Bilek Eğik, Roll -18°)',
+  shelf_pre_reach: 'Üst Raf Ön Uzatma (Yüksek Omuz, Roll +15°)',
+  cross_body_rest: 'Gövde Önü Çapraz Dinlenme (Roll -20°)',
+  retracted_compact: 'Geri Çekili Kompakt Duruş (Maksimum Bükülme)',
+  axial_pronation_reach: 'X-Ekseni Rotasyon: İçe Çevrilmiş Uzanma (j6 +26°)',
+  axial_supination_grasp: 'X-Ekseni Rotasyon: Dışa Çevrilmiş Kavrama (j6 -26°)',
+  neutral_extended: 'Nötr (Kol İleri Uzatılmış)',
+  elbow_bent: 'Dirsek Bükülü (90°)',
+  wrist_down: 'Bilek Aşağı Eğik'
+};
+{
+  const sel = document.getElementById('selPosture');
+  Object.keys(POSTURES).forEach((k, i) => {
+    const o = document.createElement('option');
+    o.value = k;
+    o.textContent = POSTURE_LABELS[k] || k;
+    if (i === 0) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+// Human speed / urgency tiers and their realistic biomechanical task sub-contexts
+const SPEED_TIERS = {
+  reflex: {
+    base: { vmax: 1.15, maxQd: 3.0, kScale: 1.18, eps: 8.0, phiMin: 0.68, gamma: 0.35, termP: 0.28, dur: 1.6 },
+    desc: 'Tehlike/korunma anında omurilik-beyin sapı düzeyinde tetiklenen balistik hareket. Görsel düzeltme neredeyse yok; doğruluk yerine hız. κ > 1/e olduğundan küçük aşma kabul edilir.',
+    subs: {
+      catch_falling: {
+        label: 'Masa kenarından düşen bardağı yakalama',
+        mod: { vmax: 1.0, eps: 1.0 },
+        ctx: { posture: 'ready_desk', target: [0.44, 0.14, 0.74], payload: 0.0, delay: 0.04, note: 'Masa kenarında düşüş yakalama: düşük görsel gecikme, hızlı ön kol ivmelenmesi.' }
+      },
+      threat_grab: {
+        label: 'Çarpışma riskini önlemek için el çekme / itme',
+        mod: { vmax: 1.12, eps: 1.4, phiMin: 1.15 },
+        ctx: { posture: 'side_guard', target: [0.38, -0.12, 0.88], payload: 0.0, delay: 0.04, note: 'Savunma refleksi: yan koruma duruşundan anlık koruyucu tepki.' }
+      },
+      hot_surface: {
+        label: 'Sıcak yüzeye temasta ani refleks geri çekme',
+        mod: { vmax: 1.08, eps: 1.25, termP: 0.75 },
+        ctx: { posture: 'low_table_pick', target: [0.32, 0.06, 0.92], payload: 0.0, delay: 0.03, note: 'Koruyucu çekilme: alçak yüzeyden üst güvenli bölgeye hızlı geri çekilme.' }
+      }
+    }
+  },
+  fast: {
+    base: { vmax: 0.80, maxQd: 2.2, kScale: 1.05, eps: 5.0, phiMin: 0.45, gamma: 0.45, termP: 0.38, dur: 2.0 },
+    desc: 'Günlük tempolu hareket: erken ve güçlü ivmelenme, gecikmeye bağlı kararlı frenleme. Hafif aşma riski kabul edilebilir.',
+    subs: {
+      quick_pick: {
+        label: 'Masadan anahtar / telefon gibi hafif nesne alma',
+        mod: {},
+        ctx: { posture: 'ready_desk', target: [0.46, 0.10, 0.76], payload: 0.2, delay: 0.06, note: 'Hafif günlük nesneye tempolu, akıcı ve kararlı kavrama yaklaşımı.' }
+      },
+      shelf_grab: {
+        label: 'Üst raftan hafif kutu alma',
+        mod: { vmax: 0.95, phiMin: 1.1 },
+        ctx: { posture: 'shelf_pre_reach', target: [0.42, 0.12, 1.06], payload: 0.5, delay: 0.06, note: 'Omuz hizası üzerindeki rafa dinamik erişim (0.5 kg yük).' }
+      },
+      repetitive: {
+        label: 'Montaj / ayıklama bandında seri parça seçimi',
+        mod: { vmax: 0.92, eps: 0.8 },
+        ctx: { posture: 'side_guard', target: [0.48, -0.08, 0.84], payload: 0.3, delay: 0.06, note: 'Tekrarlı endüstriyel/günlük yan tarama ve seri alma ritmi.' }
+      }
+    }
+  },
+  normal: {
+    base: { vmax: 0.50, maxQd: 1.4, kScale: 1.00, eps: 4.0, phiMin: 0.28, gamma: 0.55, termP: 0.45, dur: 2.8 },
+    desc: 'Konforlu doğal ulaşma: klasik çan-eğrisi hız profili (Flash & Hogan 1985) ve tam k = 1/(e·δ_eff) ile aşmasız varış.',
+    subs: {
+      comfort: {
+        label: 'Doğal günlük uzanma (su bardağı, kupa)',
+        mod: {},
+        ctx: { posture: 'hanging_natural', target: [0.45, 0.10, 0.85], payload: 0.3, delay: 0.06, visionMode: 'binocular', goalRollDeg: 8, note: 'Flash & Hogan (1985) uyumlu doğal çan-eğrisi hız profili ve k = 1/(e·δ).' }
+      },
+      axial_x_rotate: {
+        label: 'X-ekseni bilek/el rotasyonlu kavrama (kapı kolu / anahtar çevirme)',
+        mod: { vmax: 0.90, kScale: 0.95 },
+        ctx: { posture: 'axial_supination_grasp', target: [0.46, 0.12, 0.86], payload: 0.2, delay: 0.06, visionMode: 'binocular', goalRollDeg: 24, note: 'X-ekseni rotasyon senaryosu: önkol/el -26° → +24° eksenel dönüşü ulaşma sırasında koordineli tamamlanır.' }
+      },
+      mono_reach: {
+        label: 'Tek gözle ulaşma (yavaş boyun–göz senkronu ile 3B derinlik)',
+        mod: { vmax: 0.92, kScale: 0.95 },
+        ctx: { posture: 'ready_desk', target: [0.44, 0.08, 0.88], payload: 0.2, delay: 0.06, visionMode: 'mono_left', goalRollDeg: 12, note: 'Sol tek göz açık; başlangıç görüş duruşundan hedef yönüne yavaş, akıcı boyun–göz senkronu ile metrik 3B derinlik kurar.' }
+      },
+      heavy_load: {
+        label: 'Ağır nesne taşıma (2.5 kg su şişesi / alet)',
+        mod: { vmax: 0.75, maxQd: 0.75, phiMin: 0.8 },
+        ctx: { posture: 'hanging_natural', target: [0.40, 0.08, 0.82], payload: 2.5, delay: 0.06, note: 'Yüksek kütle yükünde omuz/dirsek tork bütçesi korunarak ivmelenme sınırlanır.' }
+      },
+      delayed_visual: {
+        label: 'Yüksek görsel gecikme altı uzanma (120 ms)',
+        mod: { vmax: 0.88, phiMin: 1.15 },
+        ctx: { posture: 'ready_desk', target: [0.43, 0.10, 0.86], payload: 0.0, delay: 0.12, note: '120 ms sinirsel gecikmede k* = 1/(e·δ) teoremi ile aşmasız varış korunur.' }
+      }
+    }
+  },
+  careful: {
+    base: { vmax: 0.30, maxQd: 0.9, kScale: 0.78, eps: 3.0, phiMin: 0.18, gamma: 0.72, termP: 0.60, dur: 3.8 },
+    desc: 'Sarsıntısız, düşük ivmeli hareket: dolu bardak taşıma, kırılgan nesne. Uzun ve erken frenleme bölgesi.',
+    subs: {
+      full_glass: {
+        label: 'Dolu sıcak kahve / su bardağı taşıma',
+        mod: {},
+        ctx: { posture: 'ready_desk', target: [0.42, 0.06, 0.84], payload: 0.4, delay: 0.06, goalRollDeg: 0, note: 'Sıvı çalkalanmasını önleyen yumuşak kalkış ve erken görsel frenleme.' }
+      },
+      pour_axial_rot: {
+        label: 'X-ekseni kontrollü eksenel döndürme / sıvı dökme (-26° → +22°)',
+        mod: { vmax: 0.82, gamma: 1.05 },
+        ctx: { posture: 'axial_supination_grasp', target: [0.43, 0.04, 0.88], payload: 0.35, delay: 0.06, goalRollDeg: 22, note: 'Dökülme/savrulma olmadan son hedef üzerinde +22° kontrollü el X-ekseni rotasyonu.' }
+      },
+      fragile: {
+        label: 'Kırılgan nesne yerleştirme (cam kap / yumurta)',
+        mod: { vmax: 0.85, eps: 0.8 },
+        ctx: { posture: 'low_table_pick', target: [0.44, 0.08, 0.76], payload: 0.2, delay: 0.06, note: 'Temas anı çarpma hızını sıfırlamak için geniş terminal yavaşlama bölgesi.' }
+      },
+      human_contact: {
+        label: 'İnsana yakın güvenli erişim (bakım / yardım teması)',
+        mod: { vmax: 0.72, kScale: 0.9, termP: 1.15 },
+        ctx: { posture: 'cross_body_rest', target: [0.36, 0.14, 0.90], payload: 0.0, delay: 0.07, note: 'İnsanla güvenli temas için maksimum terminal görsel hizalama süresi.' }
+      }
+    }
+  },
+  precision: {
+    base: { vmax: 0.16, maxQd: 0.55, kScale: 0.55, eps: 1.5, phiMin: 0.12, gamma: 0.88, termP: 0.75, dur: 5.0 },
+    desc: 'Milimetrik tolerans: kalkış çok yumuşak, yolun büyük kısmı görsel geri beslemeli frenleme bölgesinde geçer.',
+    subs: {
+      connector_insert: {
+        label: 'İnce montaj / USB veya soket hizalama',
+        mod: { vmax: 0.9, eps: 0.75 },
+        ctx: { posture: 'ready_desk', target: [0.42, 0.04, 0.84], payload: 0.1, delay: 0.05, note: 'Hedef ekseni ile bilek hizalamasında alt-milimetrik son kapanış.' }
+      },
+      surgical: {
+        label: 'Cerrahi veya mikro-lehim aracı ucu konumlandırma',
+        mod: {},
+        ctx: { posture: 'retracted_compact', target: [0.38, 0.05, 0.88], payload: 0.1, delay: 0.04, note: 'Kompakt dirsek duruşundan düşük eklem hızı ile hassas mikro-ulaşma.' }
+      },
+      lab: {
+        label: 'Laboratuvar pipeti / tüp ağzına bırakma',
+        mod: { vmax: 1.15, eps: 1.1 },
+        ctx: { posture: 'shelf_pre_reach', target: [0.40, 0.06, 0.94], payload: 0.1, delay: 0.05, note: 'Üstten kontrollü yaklaşımla sarsıntısız tüp içi hizalama.' }
+      }
+    }
+  }
+};
+const GHOST_MODELS = [
+  { id: 'pid',      short: 'PID',       label: 'Klasik PID',             color: '#b91c1c', rgba: 'rgba(185, 28, 28, 0.50)',  dash: [5, 4] },
+  { id: 'hdap',     short: 'İnsan-HDA', label: 'İnsan-HDA (Dinamik)',    color: '#0f766e', rgba: 'rgba(15, 118, 110, 0.52)', dash: [6, 3] },
+  { id: 'hlsl',     short: 'HLSL',      label: 'HLSL (Bizim Modelimiz)', color: '#1d4ed8', rgba: 'rgba(29, 78, 216, 0.52)',  dash: [5, 3] },
+  { id: 'governor', short: 'Governor',  label: 'Iskender Governor',      color: '#b45309', rgba: 'rgba(180, 83, 9, 0.55)',   dash: [6, 4] },
+  { id: 'lqr',      short: 'LQR',       label: 'LQR Durum Geri Besleme', color: '#6d28d9', rgba: 'rgba(109, 40, 217, 0.50)', dash: [4, 3] },
+  { id: 'fixed',    short: 'Sabit (P)', label: 'Sabit Kazanç (P)',       color: '#475569', rgba: 'rgba(71, 85, 105, 0.52)',  dash: [3, 3] },
+  { id: 'bio',      short: 'Biyo-Pulse',label: 'Biyomimetik Pulse',      color: '#be185d', rgba: 'rgba(190, 24, 93, 0.50)',  dash: [6, 2, 2, 2] }
+];
+const GHOST_MODEL_MAP = {};
+GHOST_MODELS.forEach(m => { GHOST_MODEL_MAP[m.id] = m; });
+let Q0 = POSTURES[Object.keys(POSTURES)[0]].map(d => d * DEG);
+let state = {
+  links: BASE_LINKS.map(l => Object.assign({}, l)),
+  camPos: [-0.10, 0.0, 1.12],     // Head above & slightly behind shoulder
+  lookAt: [0.30, 0.0, 0.65],
+  baseline: 0.065,
+  focalPx: 580.0,
+  imgW: 640,
+  imgH: 480,
+  gripperRealM: 0.085,            // human palm width ~8.5 cm
+  targetRealM: 0.070,             // cup diameter ~7 cm
+  target: [0.45, 0.10, 0.85],
+  delay: 0.060,
+  noisePx: 0.35,
+  payload: 0.0,
+  controller: 'hdap',
+  singMode: 'human_wdls',
+  visionMode: 'binocular',
+  neckParallaxAmp: 0.038,
+  neckParallaxFreq: 2.2,
+  speed: { vmax: 0.50, maxQd: 1.4, kScale: 1.0, eps: 0.004, phiMin: 0.28, gamma: 0.55, termP: 0.45, dur: 2.8 },
+  headSwayOffset: 0.0,
+  headSwayZ: 0.0,
+  traj: null,
+  ghostTraj: null,
+  ghostTrajs: {},
+  ghostModels: ['pid'],
+  compareResults: {},
+  theoremMode: false,
+  showGhost: true,
+  showDepthCones: true,
+  showReachSphere: true,
+  camView: 'persp',
+  activeTab: 'tab1',
+  frameIdx: 0,
+  playing: false,
+  timer: null,
+  camYaw: 34 * Math.PI / 180,
+  camPitch: 18 * Math.PI / 180,
+  camPan: { x: 0, y: 0 },
+  camZoom: 1.0,
+  selectedJoint: -1,
+  hoverJoint: -1,
+  dragAxis: null,
+  dragAxisMode: 'translate',
+  gizmoMode: 'translate',
+  axisDragTip: null,
+  axisScreenLen: 0,
+  axisFacing: 0,
+  axisIKQ: null,
+  axisAngleTotal: 0,
+  axisAnglePrev: 0,
+  axisCenterScreen: null,
+  axisSign: 1,
+  locked: [false, false, false, false, false, false],
+  alignPlane: 'xz',
+  limbPanelLink: -1,
+  limbPanelOpen: false,
+  activeAnthro: 'adult',
+  goalRollDeg: null,
+  targetRollDeg: 0.0,
+  targetPitchDeg: 0.0,
+  targetYawDeg: 0.0,
+  jointPanelOpen: false,
+  jointPanelIdx: -1,
+  jointDragIdx: -1,
+  jointStartFocus: null,
+  jointIKQ: null,
+  jointDragStartScreen: null,
+  jointScreen: [],
+  gizmoScreen: null,
+  pxPerUnit: 270,
+  speedTierName: 'normal',
+  bioTwitch: 0,
+  bioPulsePhase: 0,
+  gazeAuto: { mode: 'target', holdUntil: 0, currentLook: null },
+  gazeMode: 'auto',
+  dragPlane: 'XZ',
+  dragInfo: null,
+  screenTarget: null,
+  screenGripper: null,
+  ikQ: null,
+  eeFieldsTouched: false,
+  gazeYaw: 0.0,
+  gazePitch: 0.0,
+  visualHeadYaw: 0.0,
+  visualHeadPitch: 0.0,
+  headAnimFrame: null,
+  waistYaw: 0.0,
+  goalWaistYaw: 0.0,
+  baseGaze: null,
+  timeScale: 1.0,
+  playAccum: 0,
+  brakesEngaged: true,
+  brakeAuto: true,
+  benchData: null
+};
+// ---------------- Linear Algebra & Kinematics Helpers ----------------
+function dhMatrix(a, alphaRad, d, thetaRad) {
+  const ct = Math.cos(thetaRad), st = Math.sin(thetaRad);
+  const ca = Math.cos(alphaRad), sa = Math.sin(alphaRad);
+  return [
+    [ct, -st * ca,  st * sa, a * ct],
+    [st,  ct * ca, -ct * sa, a * st],
+    [0,        sa,       ca,      d],
+    [0,         0,        0,      1]
+  ];
+}
+function matMul4(A, B) {
+  const C = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 4; j++) {
+      let s = 0;
+      for (let k = 0; k < 4; k++) s += A[i][k] * B[k][j];
+      C[i][j] = s;
+    }
+  }
+  return C;
+}
+function getWaistTransform(waistYawOverride) {
+  const wy = (waistYawOverride !== undefined && waistYawOverride !== null && isFinite(waistYawOverride))
+    ? waistYawOverride
+    : (state.waistYaw || 0);
+  const cw = Math.cos(wy), sw = Math.sin(wy);
+  const baseO = (INITIAL_DATA && INITIAL_DATA.base_origin) ? INITIAL_DATA.base_origin : [0, 0, 0];
+  return {
+    wy, cw, sw,
+    bx: cw * baseO[0] - sw * baseO[1],
+    by: sw * baseO[0] + cw * baseO[1],
+    bz: baseO[2]
+  };
+}
+function forwardKinematics(q, links, waistYawOverride) {
+  const wt = getWaistTransform(waistYawOverride);
+  let T = [
+    [wt.cw, -wt.sw, 0, wt.bx],
+    [wt.sw,  wt.cw, 0, wt.by],
+    [    0,      0, 1, wt.bz],
+    [    0,      0, 0,     1]
+  ];
+  const origins = [[wt.bx, wt.by, wt.bz]];
+  const xAxes = [[wt.cw, wt.sw, 0]];
+  const yAxes = [[-wt.sw, wt.cw, 0]];
+  const zAxes = [[0, 0, 1]];
+  for (let i = 0; i < links.length; i++) {
+    const L = links[i];
+    const th = q[i] + (L.theta_offset_deg || 0) * Math.PI / 180;
+    const al = (L.alpha_deg || 0) * Math.PI / 180;
+    T = matMul4(T, dhMatrix(L.a, al, L.d, th));
+    origins.push([T[0][3], T[1][3], T[2][3]]);
+    xAxes.push([T[0][0], T[1][0], T[2][0]]);
+    yAxes.push([T[0][1], T[1][1], T[2][1]]);
+    zAxes.push([T[0][2], T[1][2], T[2][2]]);
+  }
+  return { origins, xAxes, yAxes, zAxes, ee: origins[origins.length - 1] };
+}
+function computeTargetWaistYaw(targetPt, links) {
+  const tgt = targetPt || state.target;
+  const lks = links || state.links;
+  const baseO = (INITIAL_DATA && INITIAL_DATA.base_origin) ? INITIAL_DATA.base_origin : [0, 0, 0];
+  const shZ = (lks && lks[0]) ? lks[0].d : 0.90;
+  const sh0 = [baseO[0], baseO[1], shZ];
+  let totalArmLen = 0;
+  for (let i = 1; i < lks.length; i++) {
+    totalArmLen += Math.abs(lks[i].a) + Math.abs(lks[i].d);
+  }
+  const dx0 = tgt[0] - sh0[0];
+  const dy0 = tgt[1] - sh0[1];
+  const dz0 = tgt[2] - sh0[2];
+  const dist0 = Math.hypot(dx0, dy0, dz0);
+  // Lateral yaw: turns torso when target sits far left or far right beyond ±16° deadzone
+  const azSh = Math.atan2(dy0, Math.max(0.06, dx0));
+  const dead = 16 * DEG;
+  let yawLat = 0.0;
+  if (Math.abs(azSh) > dead) {
+    yawLat = 0.70 * (azSh - Math.sign(azSh) * dead);
+  }
+  // Extension yaw: recruits column twist when reaching beyond 78% of max arm length
+  let yawExt = 0.0;
+  const thresh = 0.78 * totalArmLen;
+  if (dist0 > thresh) {
+    const def = Math.min(1.0, (dist0 - thresh) / Math.max(0.16 * totalArmLen, 0.05));
+    const sDef = def * def * (3 - 2 * def);
+    // Turning CW (wy < 0) swings left shoulder (y0 > 0) forward toward +X and right (-Y)
+    const dirRight = Math.atan2(-tgt[0], Math.max(0.05, baseO[1])) * 0.75;
+    yawExt = (dy0 > 0.08 ? 0.45 : dirRight) * sDef;
+  }
+  let yawGoal = yawLat + yawExt;
+  // Cap positive (left) rotation on forward targets so the shoulder doesn't pull away from the target
+  if (yawGoal > 0 && tgt[0] > 0.15) {
+    const maxSafeDist = Math.max(dist0, 0.85 * totalArmLen);
+    let testY = yawGoal;
+    for (let k = 0; k < 6; k++) {
+      const wt = getWaistTransform(testY);
+      const dRot = Math.hypot(tgt[0] - wt.bx, tgt[1] - wt.by, dz0);
+      if (dRot <= maxSafeDist + 1e-3) break;
+      testY *= 0.65;
+    }
+    yawGoal = testY;
+  }
+  const maxWaist = 58 * DEG;
+  return Math.max(-maxWaist, Math.min(maxWaist, yawGoal));
+}
+function cross3(a, b) {
+  return [
+    a[1]*b[2] - a[2]*b[1],
+    a[2]*b[0] - a[0]*b[2],
+    a[0]*b[1] - a[1]*b[0]
+  ];
+}
+function sub3(a, b) { return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; }
+function add3(a, b) { return [a[0]+b[0], a[1]+b[1], a[2]+b[2]]; }
+function scale3(a, s) { return [a[0]*s, a[1]*s, a[2]*s]; }
+function norm3(a) { return Math.hypot(a[0], a[1], a[2]); }
+function dot3(a, b) { return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]; }
+function computeJacobianAndManip(q, links, waistYawOverride) {
+  const fk = forwardKinematics(q, links, waistYawOverride);
+  const p_e = fk.ee;
+  const n = links.length;
+  const Jv = [[], [], []];
+  const Jw = [[], [], []];
+  for (let i = 0; i < n; i++) {
+    const z = fk.zAxes[i];
+    const r = sub3(p_e, fk.origins[i]);
+    const c = cross3(z, r);
+    Jv[0].push(c[0]); Jv[1].push(c[1]); Jv[2].push(c[2]);
+    Jw[0].push(z[0]); Jw[1].push(z[1]); Jw[2].push(z[2]);
+  }
+  const J = [Jv[0], Jv[1], Jv[2], Jw[0], Jw[1], Jw[2]];
+  // Jv Jv^T (3x3) and Jw Jw^T (3x3)
+  const JJT = [[0,0,0],[0,0,0],[0,0,0]];
+  const JwJwT = [[0,0,0],[0,0,0],[0,0,0]];
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < 3; c++) {
+      let s = 0, sw = 0;
+      for (let k = 0; k < n; k++) {
+        s += Jv[r][k] * Jv[c][k];
+        sw += Jw[r][k] * Jw[c][k];
+      }
+      JJT[r][c] = s;
+      JwJwT[r][c] = sw;
+    }
+  }
+  const det3 = (M) =>
+    M[0][0]*(M[1][1]*M[2][2] - M[1][2]*M[2][1]) -
+    M[0][1]*(M[1][0]*M[2][2] - M[1][2]*M[2][0]) +
+    M[0][2]*(M[1][0]*M[2][1] - M[1][1]*M[2][0]);
+  const w = Math.sqrt(Math.max(0, det3(JJT)));
+  const wRot = Math.sqrt(Math.max(0, det3(JwJwT)));
+  return { Jv, Jw, J, JJT, JwJwT, w, wRot, fk };
+}
+function getEndEffectorRotation(fk) {
+  const n = fk.xAxes.length - 1;
+  const x = fk.xAxes[n], y = fk.yAxes[n], z = fk.zAxes[n];
+  return [
+    [x[0], y[0], z[0]],
+    [x[1], y[1], z[1]],
+    [x[2], y[2], z[2]]
+  ];
+}
+function buildTargetRotationSO3(rollDeg, pitchDeg, yawDeg) {
+  const rl = (rollDeg || 0) * DEG;
+  const el = (pitchDeg || 0) * DEG;
+  const az = (yawDeg || 0) * DEG;
+  const zd = [Math.cos(el) * Math.cos(az), Math.cos(el) * Math.sin(az), Math.sin(el)];
+  const x0 = [Math.sin(az), -Math.cos(az), 0.0];
+  let y0 = cross3(zd, x0);
+  const ny = norm3(y0);
+  if (ny > 1e-9) y0 = scale3(y0, 1.0 / ny);
+  else y0 = [0.0, 1.0, 0.0];
+  const cr = Math.cos(rl), sr = Math.sin(rl);
+  const xd = add3(scale3(x0, cr), scale3(y0, sr));
+  const yd = add3(scale3(x0, -sr), scale3(y0, cr));
+  return [
+    [xd[0], yd[0], zd[0]],
+    [xd[1], yd[1], zd[1]],
+    [xd[2], yd[2], zd[2]]
+  ];
+}
+function extractHandRPYDeg(R) {
+  const zd = [R[0][2], R[1][2], R[2][2]];
+  const az = Math.atan2(zd[1], zd[0]);
+  const el = Math.atan2(zd[2], Math.hypot(zd[0], zd[1]));
+  const x0 = [Math.sin(az), -Math.cos(az), 0.0];
+  let y0 = cross3(zd, x0);
+  const ny = norm3(y0);
+  if (ny > 1e-9) y0 = scale3(y0, 1.0 / ny);
+  else y0 = [0.0, 1.0, 0.0];
+  const xCol = [R[0][0], R[1][0], R[2][0]];
+  const rl = Math.atan2(dot3(xCol, y0), dot3(xCol, x0));
+  return [rl / DEG, el / DEG, az / DEG];
+}
+function computeOrientationErrorSO3(Rc, Rd) {
+  const c0 = [Rc[0][0], Rc[1][0], Rc[2][0]];
+  const c1 = [Rc[0][1], Rc[1][1], Rc[2][1]];
+  const c2 = [Rc[0][2], Rc[1][2], Rc[2][2]];
+  const d0 = [Rd[0][0], Rd[1][0], Rd[2][0]];
+  const d1 = [Rd[0][1], Rd[1][1], Rd[2][1]];
+  const d2 = [Rd[0][2], Rd[1][2], Rd[2][2]];
+  const eVec = scale3(add3(add3(cross3(c0, d0), cross3(c1, d1)), cross3(c2, d2)), 0.5);
+  const tr = dot3(c0, d0) + dot3(c1, d1) + dot3(c2, d2);
+  const cosAng = Math.max(-1.0, Math.min(1.0, (tr - 1.0) * 0.5));
+  const errDeg = Math.acos(cosAng) / DEG;
+  return { eVec, errDeg };
+}
+function getDesiredTargetRPYDeg(targetPt, waistYawRad) {
+  const tR = state.targetRollDeg || 0;
+  const tP = state.targetPitchDeg || 0;
+  const tY = state.targetYawDeg || 0;
+  const hasCustomOri = (Math.abs(tR) > 0.1 || Math.abs(tP) > 0.1 || Math.abs(tY) > 0.1);
+  const hasExplicitRoll = (state.goalRollDeg !== null && state.goalRollDeg !== undefined && isFinite(state.goalRollDeg));
+  if (hasCustomOri) return [tR, tP, tY];
+  const wyDeg = (waistYawRad !== undefined && waistYawRad !== null ? waistYawRad : (state.waistYaw || 0)) / DEG;
+  if (hasExplicitRoll) return [state.goalRollDeg, 0.0, wyDeg];
+  const ty = (targetPt && targetPt[1] !== undefined) ? targetPt[1] : state.target[1];
+  const natRollDeg = Math.max(-0.45, Math.min(0.45, (ty - 0.10) * 1.2)) / DEG;
+  return [natRollDeg, 0.0, wyDeg];
+}
+function focusJacobian(q, links, pointWorld, maxJointIdx) {
+  // Geometric Jacobian (3 x n) for an arbitrary world point, optionally restricted to upstream joints [0..maxJointIdx-1].
+  const fk = forwardKinematics(q, links);
+  const Jv = [[], [], []];
+  const lim = (maxJointIdx === undefined || maxJointIdx === null) ? links.length : maxJointIdx;
+  for (let i = 0; i < links.length; i++) {
+    if (i >= lim) {
+      Jv[0].push(0); Jv[1].push(0); Jv[2].push(0);
+      continue;
+    }
+    const z = fk.zAxes[i];
+    const r = sub3(pointWorld, fk.origins[i]);
+    const c = cross3(z, r);
+    Jv[0].push(c[0]); Jv[1].push(c[1]); Jv[2].push(c[2]);
+  }
+  return Jv;
+}
+function effectiveFocusOriginIdx(jointIdx) {
+  // j1 (trunk) & j2 (shoulder) sit at fixed shoulder origin fk.origins[1], so dragging them swings the elbow (origins[2]).
+  if (jointIdx <= 1) return 2;
+  if (jointIdx === 2) return 2;
+  if (jointIdx === 3) return 3;
+  return 6;
+}
+function getJointWorldPositions(fk) {
+  const sh = fk.origins[1];
+  const wrist = fk.origins[3];
+  const ee = fk.ee || fk.origins[6];
+  const d4 = norm3(sub3(fk.origins[4], wrist));
+  const d5 = norm3(sub3(fk.origins[5], wrist));
+  return [
+    [0, 0, sh[2]],                                                   // j1 trunk-clavicle pivot (center of chest at shoulder Z)
+    fk.origins[1].slice(),                                           // j2 shoulder
+    fk.origins[2].slice(),                                           // j3 elbow
+    fk.origins[3].slice(),                                           // j4 wrist flexion
+    d4 > 0.015 ? fk.origins[4].slice() : add3(scale3(wrist, 0.68), scale3(ee, 0.32)), // j5 wrist deviation
+    d5 > 0.015 ? fk.origins[5].slice() : add3(scale3(wrist, 0.34), scale3(ee, 0.66))  // j6 hand axial X-rotation
+  ];
+}
+function solveDense(A, b) {
+  // Gaussian elimination with partial pivoting, n <= 8
+  const n = b.length;
+  const M = A.map((row, i) => row.slice().concat([b[i]]));
+  for (let col = 0; col < n; col++) {
+    let piv = col;
+    for (let r = col + 1; r < n; r++) {
+      if (Math.abs(M[r][col]) > Math.abs(M[piv][col])) piv = r;
+    }
+    if (Math.abs(M[piv][col]) < 1e-12) return null;
+    const tmp = M[col]; M[col] = M[piv]; M[piv] = tmp;
+    for (let r = 0; r < n; r++) {
+      if (r === col) continue;
+      const f = M[r][col] / M[col][col];
+      for (let c = col; c <= n; c++) M[r][c] -= f * M[col][c];
+    }
+  }
+  return M.map(row => row[n] / row[row.length - 1]);
+}
+// Lock-aware IK for a selected joint-as-handle: drives the effective downstream link
+// origin toward targetPos using only upstream joints [0..upstreamLimit-1], respecting locked joints.
+function solveIKFocus(focusIdx, targetPos, maxIter, initQ) {
+  maxIter = maxIter || 80;
+  let q = (initQ && initQ.length === 6) ? initQ.slice() : Q0.slice();
+  const originIdx = effectiveFocusOriginIdx(focusIdx);
+  const upstreamLim = originIdx;
+  for (let it = 0; it < maxIter; it++) {
+    const fk = forwardKinematics(q, state.links);
+    const focus = fk.origins[originIdx];
+    const e = sub3(targetPos, focus);
+    if (norm3(e) < 1e-4) break;
+    const J = focusJacobian(q, state.links, focus, upstreamLim);
+    for (let j = 0; j < 6; j++) {
+      if (state.locked[j] || j >= upstreamLim) {
+        for (let r = 0; r < 3; r++) J[r][j] = 0.0;
+      }
+    }
+    const JJT = [[0,0,0],[0,0,0],[0,0,0]];
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+      let s = 0; for (let k = 0; k < 6; k++) s += J[r][k] * J[c][k];
+      JJT[r][c] = s + (r === c ? 0.02 : 0.0);
+    }
+    const y = solve3x3(JJT, e);
+    for (let j = 0; j < 6; j++) {
+      if (state.locked[j] || j >= upstreamLim) continue;
+      q[j] += J[0][j] * y[0] + J[1][j] * y[1] + J[2][j] * y[2];
+      const L = state.links[j].limits_deg;
+      const lo = L[0] * Math.PI / 180, hi = L[1] * Math.PI / 180;
+      if (q[j] < lo) q[j] = lo; else if (q[j] > hi) q[j] = hi;
+    }
+  }
+  return q;
+}
+function solve3x3(A, b) {
+  const det =
+    A[0][0]*(A[1][1]*A[2][2] - A[1][2]*A[2][1]) -
+    A[0][1]*(A[1][0]*A[2][2] - A[1][2]*A[2][0]) +
+    A[0][2]*(A[1][0]*A[2][1] - A[1][1]*A[2][0]);
+  if (Math.abs(det) < 1e-12) return [0, 0, 0];
+  const invDet = 1.0 / det;
+  const x0 = ((A[1][1]*A[2][2] - A[1][2]*A[2][1])*b[0] + (A[0][2]*A[2][1] - A[0][1]*A[2][2])*b[1] + (A[0][1]*A[1][2] - A[0][2]*A[1][1])*b[2]) * invDet;
+  const x1 = ((A[1][2]*A[2][0] - A[1][0]*A[2][2])*b[0] + (A[0][0]*A[2][2] - A[0][2]*A[2][0])*b[1] + (A[0][2]*A[1][0] - A[0][0]*A[1][2])*b[2]) * invDet;
+  const x2 = ((A[1][0]*A[2][1] - A[1][1]*A[2][0])*b[0] + (A[0][1]*A[2][0] - A[0][0]*A[2][1])*b[1] + (A[0][0]*A[1][1] - A[0][1]*A[1][0])*b[2]) * invDet;
+  return [x0, x1, x2];
+}
+// ---------------- Shoulder-Mounted Stereo + Perspective Looming Camera ----------------
+function getCameraBasis(swayY, swayZ, waistYawOverride) {
+  const wy = (waistYawOverride !== undefined && waistYawOverride !== null && isFinite(waistYawOverride))
+    ? waistYawOverride
+    : (state.waistYaw || 0);
+  const cw = Math.cos(wy), sw = Math.sin(wy);
+  const cx0 = state.camPos[0], cy0 = state.camPos[1];
+  const origin = [
+    cw * cx0 - sw * cy0,
+    sw * cx0 + cw * cy0 + (swayY || 0),
+    state.camPos[2] + (swayZ || 0)
+  ];
+  // Gaze fixed between the initial hand and the target (set during setup)
+  const lookAt = state.lookAt;
+  let forward = sub3(lookAt, origin);
+  const fn = norm3(forward);
+  forward = fn < 1e-6 ? [cw, sw, 0] : scale3(forward, 1 / fn);
+  const upWorld = [0, 0, 1];
+  let right = cross3(forward, upWorld);
+  const rn = norm3(right);
+  right = rn < 1e-6 ? [sw, -cw, 0] : scale3(right, 1 / rn);
+  const down = cross3(forward, right);
+  const halfB = 0.5 * state.baseline;
+  const leftEye = sub3(origin, scale3(right, halfB));
+  const rightEye = add3(origin, scale3(right, halfB));
+  return { origin, right, down, forward, leftEye, rightEye };
+}
+// Gaze / head tracking: the head turns smoothly toward the fixation point.
+// Two modes: the eyes lock onto the TARGET (the reach goal, like a human
+// presetting gaze on the object) or onto the HAND (smooth pursuit while the
+// reach is in flight). Rate-limited to adult-human head motion (yaw ±70°,
+// pitch -55° to +49°, ~150 °/s). Feedback for the reach still comes
+// exclusively from the two eyes.
+function clampN(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+function rotVec(v, axis, ang) {
+  const c = Math.cos(ang), s = Math.sin(ang);
+  const cv = cross3(axis, v);
+  const kv = dot3(axis, v);
+  return [
+    v[0] * c + cv[0] * s + axis[0] * kv * (1 - c),
+    v[1] * c + cv[1] * s + axis[1] * kv * (1 - c),
+    v[2] * c + cv[2] * s + axis[2] * kv * (1 - c)
+  ];
+}
+function gazeLookPoint(q) {
+  if (state.gazeMode === 'auto' && state.gazeAuto && state.gazeAuto.currentLook) {
+    return state.gazeAuto.currentLook;
+  }
+  const ee = forwardKinematics(q || Q0, state.links).ee;
+  if (state.gazeMode === 'mid') {
+    // El ile hedefin orta noktası — ikisi de kadrajda, hedefe ulaşınca üst üste biner
+    return scale3(add3(ee, state.target), 0.5);
+  }
+  if (state.gazeMode === 'hand') return ee;
+  return state.target;
+}
+function computeBaseHeadDir(waistYawOverride) {
+  // Neutral forward direction of the rotating trunk/column
+  const wy = (waistYawOverride !== undefined && waistYawOverride !== null && isFinite(waistYawOverride))
+    ? waistYawOverride
+    : (state.waistYaw || 0);
+  return [Math.cos(wy), Math.sin(wy), 0];
+}
+function gazeDirFor(p, waistYawOverride) {
+  const wy = (waistYawOverride !== undefined && waistYawOverride !== null && isFinite(waistYawOverride))
+    ? waistYawOverride
+    : (state.waistYaw || 0);
+  const cw = Math.cos(wy), sw = Math.sin(wy);
+  const origin = [cw * state.camPos[0] - sw * state.camPos[1], sw * state.camPos[0] + cw * state.camPos[1], state.camPos[2]];
+  const d = sub3(p, origin);
+  const n = norm3(d);
+  return n < 1e-6 ? [cw, sw, 0] : scale3(d, 1 / n);
+}
+function gazeBasis(waistYawOverride) {
+  const base = computeBaseHeadDir(waistYawOverride);
+  state.baseGaze = base;
+  const upWorld = [0, 0, 1];
+  let right = cross3(base, upWorld);
+  const rn = norm3(right);
+  right = rn < 1e-6 ? [0, -1, 0] : scale3(right, 1 / rn);
+  const down = cross3(base, right);
+  return { base, upWorld, right, down };
+}
+function desiredGazeAngles(look, waistYawOverride) {
+  const { base, right, down } = gazeBasis(waistYawOverride);
+  const up = scale3(down, -1);
+  const des = gazeDirFor(look, waistYawOverride);
+  const dF = dot3(des, base);
+  const dR = dot3(des, right);
+  const dU = dot3(des, up);
+  return {
+    yaw: Math.atan2(dR, dF),
+    pitch: Math.atan2(dU, Math.hypot(dF, dR))
+  };
+}
+function applyGazeLookAt(look, waistYawOverride) {
+  const wy = (waistYawOverride !== undefined && waistYawOverride !== null && isFinite(waistYawOverride))
+    ? waistYawOverride
+    : (state.waistYaw || 0);
+  const cw = Math.cos(wy), sw = Math.sin(wy);
+  const origin = [cw * state.camPos[0] - sw * state.camPos[1], sw * state.camPos[0] + cw * state.camPos[1], state.camPos[2]];
+  const { base, right, down } = gazeBasis(wy);
+  const up = scale3(down, -1);
+  const cy = Math.cos(state.gazePitch), sy = Math.sin(state.gazePitch);
+  const cx = Math.cos(state.gazeYaw), sx = Math.sin(state.gazeYaw);
+  const lookDir = add3(
+    add3(scale3(base, cy * cx), scale3(right, cy * sx)),
+    scale3(up, sy)
+  );
+  const d = sub3(look, origin);
+  const dist = Math.max(norm3(d), 0.28);
+  state.lookAt = add3(origin, scale3(lookDir, dist));
+}
+function resetGazeToTarget(look, waistYawOverride) {
+  if (state.gazeMode === 'auto' && state.gazeAuto) {
+    state.gazeAuto.mode = 'target';
+    state.gazeAuto.holdUntil = 0;
+    state.gazeAuto.currentLook = state.target.slice();
+  }
+  const lp = look || gazeLookPoint();
+  const { yaw, pitch } = desiredGazeAngles(lp, waistYawOverride);
+  state.gazeYaw = clampN(yaw, -1.22, 1.22);
+  state.gazePitch = clampN(pitch, -0.96, 0.85);
+  applyGazeLookAt(lp, waistYawOverride);
+}
+function updateGazeState(dt, look, waistYawOverride) {
+  const lp = look || gazeLookPoint();
+  const { yaw, pitch } = desiredGazeAngles(lp, waistYawOverride);
+  const desYaw = clampN(yaw, -1.22, 1.22);
+  const desPitch = clampN(pitch, -0.96, 0.85);
+  const rate = 2.6 * dt;   // ~150 deg/s: rate-limited smooth pursuit
+  if (Math.abs(desYaw - state.gazeYaw) > 0.004) {
+    state.gazeYaw += clampN(desYaw - state.gazeYaw, -rate, rate);
+  } else {
+    state.gazeYaw = desYaw;
+  }
+  if (Math.abs(desPitch - state.gazePitch) > 0.004) {
+    state.gazePitch += clampN(desPitch - state.gazePitch, -rate, rate);
+  } else {
+    state.gazePitch = desPitch;
+  }
+  applyGazeLookAt(lp, waistYawOverride);
+}
+function animateSetupHeadToTarget() {
+  if (state.headAnimFrame) {
+    cancelAnimationFrame(state.headAnimFrame);
+    state.headAnimFrame = null;
+  }
+  const wy = state.waistYaw || 0;
+  const { yaw, pitch } = desiredGazeAngles(state.target, wy);
+  const desYaw = clampN(yaw, -1.22, 1.22);
+  const desPitch = clampN(pitch, -0.96, 0.85);
+  state.gazeYaw = desYaw;
+  state.gazePitch = desPitch;
+  applyGazeLookAt(state.target, wy);
+  if (state.visualHeadYaw === undefined || !isFinite(state.visualHeadYaw)) state.visualHeadYaw = desYaw;
+  if (state.visualHeadPitch === undefined || !isFinite(state.visualHeadPitch)) state.visualHeadPitch = desPitch;
+  // Advance immediately partway for responsive slider/drag feel, then glide smoothly over ~6 frames
+  state.visualHeadYaw += 0.55 * (desYaw - state.visualHeadYaw);
+  state.visualHeadPitch += 0.55 * (desPitch - state.visualHeadPitch);
+  let framesLeft = 6;
+  const step = () => {
+    state.headAnimFrame = null;
+    if (state.traj) return;
+    framesLeft--;
+    if (framesLeft <= 0 || (Math.abs(desYaw - state.visualHeadYaw) < 0.006 && Math.abs(desPitch - state.visualHeadPitch) < 0.006)) {
+      state.visualHeadYaw = desYaw;
+      state.visualHeadPitch = desPitch;
+    } else {
+      state.visualHeadYaw += 0.38 * (desYaw - state.visualHeadYaw);
+      state.visualHeadPitch += 0.38 * (desPitch - state.visualHeadPitch);
+      state.headAnimFrame = requestAnimationFrame(step);
+    }
+    draw3DScene(0);
+    drawEyeViewport('cvLeftEye', true, 0);
+    drawEyeViewport('cvRightEye', false, 0);
+    drawStereoTopView(0);
+  };
+  if (Math.abs(desYaw - state.visualHeadYaw) >= 0.006 || Math.abs(desPitch - state.visualHeadPitch) >= 0.006) {
+    state.headAnimFrame = requestAnimationFrame(step);
+  }
+}
+function projectStereoAndLooming(pWorld, realDiameterM, noiseStdPx, swayY, swayZ, waistYawOverride) {
+  const cam = getCameraBasis(swayY || 0, swayZ || 0, waistYawOverride);
+  const rel = sub3(pWorld, cam.origin);
+  const xCam = dot3(rel, cam.right);
+  const yCam = dot3(rel, cam.down);
+  const zCam = Math.max(0.14, dot3(rel, cam.forward));
+  const f = state.focalPx;
+  const B = state.baseline;
+  const cx = 0.5 * state.imgW;
+  const cy = 0.5 * state.imgH;
+  let uL = cx + f * ((xCam + 0.5 * B) / zCam);
+  let vL = cy + f * (yCam / zCam);
+  let uR = cx + f * ((xCam - 0.5 * B) / zCam);
+  let vR = cy + f * (yCam / zCam);
+  let sizePx = f * realDiameterM / zCam;
+  if (noiseStdPx > 0) {
+    const n1 = (Math.random() - 0.5) * 2.0 * noiseStdPx;
+    const n2 = (Math.random() - 0.5) * 2.0 * noiseStdPx;
+    const nd = (Math.random() - 0.5) * 2.0 * noiseStdPx;
+    uL += n1 + 0.5 * nd;
+    uR += n1 - 0.5 * nd;
+    vL += n2;
+    vR += n2;
+    sizePx = Math.max(3.0, sizePx + 0.35 * nd);
+  }
+  const disp = Math.max(1.5, uL - uR);
+  const uC = 0.5 * (uL + uR);
+  const vC = 0.5 * (vL + vR);
+  // Triangulate depth by fusing stereo disparity and perspective apparent size
+  const zDisp = (f * B) / disp;
+  const zLoom = (f * realDiameterM) / Math.max(2.0, sizePx);
+  const zFused = 0.72 * zDisp + 0.28 * zLoom;
+  const xRec = (uC - cx) * zFused / f;
+  const yRec = (vC - cy) * zFused / f;
+  const pWorldEst = add3(
+    cam.origin,
+    add3(scale3(cam.right, xRec), add3(scale3(cam.down, yRec), scale3(cam.forward, zFused)))
+  );
+  return {
+    uL, vL, uR, vR, uC, vC, disp, sizePx,
+    zCam, zDisp, zLoom, zFused, pWorldEst,
+    leftEyeWorld: cam.leftEye.slice(),
+    rightEyeWorld: cam.rightEye.slice(),
+    cam
+  };
+}
+function neckParallaxOffsetAt(tSec, visionMode, distHint) {
+  const vm = visionMode || state.visionMode || 'binocular';
+  if (vm !== 'mono_left' && vm !== 'mono_right') return [0, 0];
+  const ampY = state.neckParallaxAmp || 0.038;
+  const freqHz = state.neckParallaxFreq || 2.2;
+  const sideSign = vm === 'mono_right' ? -1.0 : 1.0;
+  // Başlangıç görüş-açıcı duruştan hareket boyunca tek, akıcı minimum-jerk boyun–göz senkronu (salınımsız VOR/COR telafisi)
+  const tGlide = Math.max(0.85, 2.6 / Math.max(0.5, freqHz));
+  const u = Math.max(0.0, Math.min(1.0, tSec / tGlide));
+  const s = u * u * (3.0 - 2.0 * u);
+  return [
+    sideSign * ampY * (-0.65 + 1.50 * s),
+    0.012 * (-0.45 + 1.15 * s)
+  ];
+}
+function pixelToWorldRay(u, v, cam) {
+  const f = state.focalPx;
+  const cx = 0.5 * state.imgW;
+  const cy = 0.5 * state.imgH;
+  const dir = add3(
+    cam.forward,
+    add3(scale3(cam.right, (u - cx) / f), scale3(cam.down, (v - cy) / f))
+  );
+  const n = Math.max(1e-9, norm3(dir));
+  return scale3(dir, 1.0 / n);
+}
+function triangulateTwoRays(E1, r1, E2, r2) {
+  const w0 = sub3(E1, E2);
+  const b = dot3(r1, r2);
+  const denom = 1.0 - b * b;
+  if (denom < 1e-7) return null;
+  const d = dot3(r1, w0);
+  const e = dot3(r2, w0);
+  const s = (b * e - d) / denom;
+  const t = (e - b * d) / denom;
+  if (s <= 0.10 || t <= 0.10 || s > 4.0 || t > 4.0) return null;
+  const p1 = add3(E1, scale3(r1, s));
+  const p2 = add3(E2, scale3(r2, t));
+  return scale3(add3(p1, p2), 0.5);
+}
+// Pre-reach reachability & singularity prediction from camera parallax + perspective size
+function computePreReachAssessment() {
+  const fk0 = forwardKinematics(Q0, state.links, 0.0);
+  const projG0 = projectStereoAndLooming(fk0.ee, state.gripperRealM, 0, 0);
+  const projT1 = projectStereoAndLooming(state.target, state.targetRealM, 0, 0);
+  const projT2 = projectStereoAndLooming(state.target, state.targetRealM, 0, 0.018); // 18mm micro-sway
+  const parallaxPx = Math.hypot(projT2.uC - projT1.uC, projT2.vC - projT1.vC);
+  const baseOJS = (INITIAL_DATA && INITIAL_DATA.base_origin) ? INITIAL_DATA.base_origin : [0, 0, 0];
+  const shoulderPos = [baseOJS[0], baseOJS[1], state.links[0].d];
+  const distFromShoulder = norm3(sub3(projT1.pWorldEst, shoulderPos));
+  let totalArmLen = 0;
+  for (let i = 1; i < state.links.length; i++) {
+    totalArmLen += Math.abs(state.links[i].a) + Math.abs(state.links[i].d);
+  }
+  const maxSafeReach = 0.88 * totalArmLen;
+  const ratio = distFromShoulder / Math.max(maxSafeReach, 1e-4);
+  const m0 = computeJacobianAndManip(Q0, state.links, 0.0).w;
+  const predMinW = Math.max(0.004, m0 * Math.max(0.08, 1.0 - 0.88 * Math.max(0, ratio - 0.52) / 0.48));
+  const reachable = (ratio <= 1.0) && (predMinW >= 0.015);
+  const goalWaistYaw = computeTargetWaistYaw(state.target, state.links);
+  const goalWaistDeg = goalWaistYaw / DEG;
+  const wtRot = getWaistTransform(goalWaistYaw);
+  const shRot = [wtRot.bx, wtRot.by, state.links[0].d];
+  const distAfterWaist = norm3(sub3(state.target, shRot));
+  const ratioWaist = distAfterWaist / Math.max(maxSafeReach, 1e-4);
+  const predMinWWaist = Math.max(0.004, m0 * Math.max(0.08, 1.0 - 0.88 * Math.max(0, ratioWaist - 0.52) / 0.48));
+  const waistReachable = (ratioWaist <= 1.0) && (predMinWWaist >= 0.015);
+  return {
+    distCm: distFromShoulder * 100,
+    maxSafeCm: maxSafeReach * 100,
+    totalArmCm: totalArmLen * 100,
+    ratio,
+    predMinW,
+    reachable,
+    goalWaistYaw,
+    goalWaistDeg,
+    shRot,
+    distAfterWaistCm: distAfterWaist * 100,
+    waistReachable,
+    needsWaist: Math.abs(goalWaistDeg) >= 1.5,
+    parallaxPx,
+    sg0Px: projG0.sizePx,
+    stPx: projT1.sizePx
+  };
+}
+// ---------------- Closed-Loop Reaching Simulator (In-Browser) ----------------
+// Triphasic joint sequencing anchors (phase = remaining-error fraction).
+// Proximal-dominant power early → distal precision late → global co-contraction
+// near the capture point. Multiplies per-joint velocity caps (j1..j6).
+const _hdapAnchors = [
+  [1.00, [1.00, 1.00, 0.85, 0.60, 0.60, 0.50]],
+  [0.60, [0.90, 1.00, 0.90, 0.75, 0.75, 0.65]],
+  [0.25, [0.60, 0.70, 0.85, 1.00, 1.00, 0.85]],
+  [0.06, [0.55, 0.65, 0.80, 0.90, 0.90, 0.75]]
+];
+function triphasicWeights(p) {
+  if (p >= _hdapAnchors[0][0]) return _hdapAnchors[0][1].slice();
+  if (p <= _hdapAnchors[3][0]) return _hdapAnchors[3][1].slice();
+  for (let i = 0; i < 3; i++) {
+    const hp = _hdapAnchors[i][0], hw = _hdapAnchors[i][1];
+    const lp = _hdapAnchors[i + 1][0], lw = _hdapAnchors[i + 1][1];
+    if (p <= hp && p >= lp) {
+      const f = (p - lp) / (hp - lp);
+      return lw.map((v, k) => v * (1 - f) + hw[k] * f);
+    }
+  }
+  return _hdapAnchors[3][1].slice();
+}
+
+const ORDINAL_PROX_CLASSES = ['ÇOK UZAK', 'UZAK', 'YAKIN', 'TEMAS ÖNCESİ', 'TEMAS'];
+const ORDINAL_PROX_THRESHOLDS = [0.45, 0.78, 0.94, 0.985];
+function computeOrdinalPerceptionJS(obsG, obsT, scaleRatio, prevClass, prevProxRatio, effNoisePx) {
+  const rho = Math.max(scaleRatio || 1e-6, 1e-6);
+  const prox = Math.min(rho, 1.0 / rho);
+  let idx = 0;
+  for (let i = 0; i < ORDINAL_PROX_THRESHOLDS.length; i++) {
+    if (prox >= ORDINAL_PROX_THRESHOLDS[i]) idx++;
+  }
+  const prevIdx = ORDINAL_PROX_CLASSES.indexOf(prevClass || 'UZAK');
+  const halfH = 0.015;
+  if (prevIdx >= 0) {
+    while (idx > prevIdx) {
+      const m = (idx === 4) ? Math.min(halfH, 0.004) : halfH;
+      if (prox < ORDINAL_PROX_THRESHOLDS[idx - 1] + m) idx--;
+      else break;
+    }
+    while (idx < prevIdx) {
+      const m = (idx === 3) ? Math.min(halfH, 0.004) : halfH;
+      if (prox >= ORDINAL_PROX_THRESHOLDS[idx] - m) idx++;
+      else break;
+    }
+  }
+  const proximityClass = ORDINAL_PROX_CLASSES[idx];
+  const du = (obsT.uC !== undefined && obsG.uC !== undefined)
+    ? (obsT.uC - obsG.uC)
+    : 0.5 * (((obsT.uL - obsG.uL) || 0) + ((obsT.uR - obsG.uR) || 0));
+  const dv = (obsT.vC !== undefined && obsG.vC !== undefined)
+    ? (obsT.vC - obsG.vC)
+    : 0.5 * (((obsT.vL - obsG.vL) || 0) + ((obsT.vR - obsG.vR) || 0));
+  const dd = (obsG.disp || 0) - (obsT.disp || 0);
+  const horiz = du < -8 ? 'SOL' : (du > 8 ? 'SAĞ' : 'ORTA');
+  const vert = dv < -8 ? 'ÜST' : (dv > 8 ? 'ALT' : 'ORTA');
+  const depth = dd < -2 ? 'GERİDE' : (dd > 2 ? 'ÖNDE' : 'HİZADA');
+  let looming = 'SABİT';
+  if (prevProxRatio !== null && prevProxRatio !== undefined) {
+    const dp = prox - prevProxRatio;
+    if (dp > 0.002) looming = 'YAKLAŞIYOR';
+    else if (dp < -0.002) looming = 'UZAKLAŞIYOR';
+  }
+  const conf = Math.min(obsG.sizePx || 10, obsT.sizePx || 10) < 4
+    ? 'DÜŞÜK'
+    : ((effNoisePx || 0) > 0.8 ? 'ORTA' : 'YÜKSEK');
+  return {
+    proximityClass, horiz, vert, depth, looming, conf, proxRatio: prox,
+    summary: `${proximityClass} · ${horiz} · ${vert} (${depth})`
+  };
+}
+
+function runSimulationForController(ctrlName, singMode, opts) {
+  const isGhost = !!(opts && opts.isGhost);
+  const savedGazeSnap = isGhost ? {
+    gazeAuto: state.gazeAuto ? Object.assign({}, state.gazeAuto, { currentLook: state.gazeAuto.currentLook ? state.gazeAuto.currentLook.slice() : null }) : null,
+    gazeYaw: state.gazeYaw,
+    gazePitch: state.gazePitch,
+    visualHeadYaw: state.visualHeadYaw,
+    visualHeadPitch: state.visualHeadPitch,
+    waistYaw: state.waistYaw,
+    goalWaistYaw: state.goalWaistYaw,
+    baseGaze: state.baseGaze ? state.baseGaze.slice() : null,
+    lookAt: state.lookAt ? state.lookAt.slice() : null,
+    bioTwitch: state.bioTwitch,
+    bioPulsePhase: state.bioPulsePhase
+  } : null;
+  try {
+  const dt = 0.01;
+  const sp = state.speed;
+  const duration = sp.dur;
+  const N = Math.round(duration / dt);
+  // Reflex tier runs on a faster (spinal) pathway; the visual delay slider
+  // is the cortical pipeline and is bypassed for reflex-class reactions.
+  // Kortikal gecikme ~20-50 ms'ye düşürülür (insan refleks arkı seviyesi).
+  const retroDelay = state.speedTierName === 'reflex'
+    ? Math.max(0.020, Math.min(0.050, state.delay * 0.35))
+    : state.delay;
+  const lagSteps = Math.max(1, Math.round(retroDelay / dt));
+  const eps = sp.eps;
+  const vmax = sp.vmax;
+  const kappa = Math.min(1.25, sp.kScale) / Math.E;
+  let q = Q0.slice();
+  let qd = [0, 0, 0, 0, 0, 0];
+  let tauPrev = [0, 0, 0, 0, 0, 0];
+  const target = state.target.slice();
+  const waistYaw0 = 0.0;
+  const goalWaistYaw = (opts && opts.disableWaistSync) ? 0.0 : computeTargetWaistYaw(target, state.links);
+  let waistYaw = waistYaw0;
+  let waistYawVel = 0.0;
+  const fkInit = forwardKinematics(q, state.links, waistYaw);
+  const p0 = fkInit.ee.slice();
+  const e0Norm = Math.max(norm3(sub3(target, p0)), 1e-4);
+  const posBuffer = [];
+  for (let i = 0; i <= lagSteps + 2; i++) posBuffer.push(p0.slice());
+  // Stereo noise budget for Governor / HLSL
+  const zMean = 0.72;
+  const s_xy = Math.SQRT2 * (zMean / state.focalPx) * Math.max(state.noisePx * 0.7, 1e-4);
+  const s_z = 0.75 * Math.SQRT2 * ((zMean * zMean) / (state.focalPx * state.baseline)) * Math.max(state.noisePx, 1e-4);
+  const nMax = Math.max(1, Math.floor(2.0 * state.delay / dt));
+  const nReqZ = Math.ceil(Math.pow(2.0 * s_z / eps, 2));
+  const nFilter = Math.max(1, Math.min(nReqZ, nMax));
+  const deltaEff = state.delay + 0.5 * nFilter * dt;
+  const kGov = kappa / deltaEff;
+  const errBuf = [];
+  let pidInt = [0, 0, 0];
+  let prevErr = null;
+  let lqrVel = [0, 0, 0];
+  let customFn = null;
+  if (ctrlName === 'custom') {
+    try {
+      customFn = new Function('e', 'p', 'k', 'eps', 'vmax', document.getElementById('txtCustomCode').value);
+    } catch (err) {
+      customFn = null;
+    }
+  }
+  resetGazeToTarget(target, waistYaw);
+  const vMode = state.visionMode || 'binocular';
+  const isMono = (vMode === 'mono_left' || vMode === 'mono_right' || vMode === 'mono_static');
+  const monoUseLeft = (vMode !== 'mono_right');
+  const monoPriorBias = 0.28;
+  let monoWtSum = 0.0;
+  let monoWtWeight = 0.0;
+  const rec = {
+    t: [], q: [], p: [], err: [], vel: [], acc: [],
+    w: [], wRot: [], lam: [], tau: [], energy: 0, wMech: 0,
+    sgPx: [], stPx: [], scaleRatio: [], dispG: [], dispT: [],
+    eyeLeftG: [], eyeRightG: [], eyeLeftT: [], eyeRightT: [],
+    gaze: [], gazePhase: [], sampleAgeMs: [], ordinal: [],
+    activePulse: [], effSigmaDeg: [], isVisualSample: [],
+    visionMode: vMode,
+    headSwayY: [], headSwayZ: [], neckBaseMm: [], motionParallaxPx: [],
+    scaleBiasPct: [],
+    prevEyeWorld: [], prevEyeRetG: [], prevEyeRetT: [],
+    waistYaw: [], gazeYaw: [], gazePitch: [], lookAt: [], goalWaistYaw,
+    handRPY: [], targetRPY: [], oriErrDeg: []
+  };
+  const neckBuffer = [];
+  const eyePoseHist = [];
+  let prevSpeed = 0;
+  let prevOrdClass = 'UZAK';
+  let prevProxRatio = null;
+  let lastSampleStep = 0;
+  let heldEMeas = null;
+  let sampledVisualFrames = 0;
+  let effSigmaDeg = 0.0;
+  const intermittentEligible = (ctrlName === 'hdap' || ctrlName === 'hlsl' || ctrlName === 'bio')
+    && (state.gazeMode === 'auto' || state.gazeMode === 'mid');
+  for (let step = 0; step < N; step++) {
+    const t = step * dt;
+    const fkNow = forwardKinematics(q, state.links, waistYaw);
+    const pNow = fkNow.ee;
+    posBuffer.push(pNow.slice());
+    let gazeLabel = 'target';
+    let prevGazeModeSnap = state.gazeAuto ? state.gazeAuto.mode : 'target';
+    const rTrueNow = norm3(sub3(target, pNow));
+    const pRemTrue = Math.min(1.0, rTrueNow / e0Norm);
+    const neckOff = neckParallaxOffsetAt(t, vMode, rTrueNow);
+    const neckY = neckOff[0], neckZ = neckOff[1];
+    neckBuffer.push([neckY, neckZ, waistYaw]);
+    const neckDel = neckBuffer[Math.max(0, neckBuffer.length - 1 - lagSteps)];
+    const neckYDel = neckDel[0], neckZDel = neckDel[1], waistDel = neckDel[2];
+    if (state.gazeMode === 'auto') {
+      const camB = getCameraBasis(state.headSwayOffset + neckY, neckZ, waistYaw);
+      const o = camB.origin;
+      const dH = sub3(pNow, o), dT = sub3(target, o);
+      const nH = norm3(dH), nT = norm3(dT);
+      const rNow = rTrueNow;
+      const cosA = Math.max(-1, Math.min(1, (dH[0] * dT[0] + dH[1] * dT[1] + dH[2] * dT[2]) / Math.max(nH * nT, 1e-9)));
+      const angSep = Math.acos(cosA) * 180 / Math.PI;
+      let lookPt;
+      if (angSep < 8 || rNow < 0.012) {
+        // Both fit in the fovea (or we are at the capture point)
+        lookPt = (rNow < 0.012) ? target.slice() : scale3(add3(pNow, target), 0.5);
+        state.gazeAuto.holdUntil = t;
+        gazeLabel = (rNow < 0.012) ? 'target' : 'mid';
+      } else {
+        const hold = angSep > 20 ? 0.26 : 0.42;
+        if (t >= state.gazeAuto.holdUntil) {
+          state.gazeAuto.mode = (state.gazeAuto.mode === 'target') ? 'hand' : 'target';
+          state.gazeAuto.holdUntil = t + hold;
+        }
+        lookPt = state.gazeAuto.mode === 'target' ? target.slice() : pNow.slice();
+        gazeLabel = state.gazeAuto.mode;
+      }
+      state.gazeAuto.currentLook = lookPt.slice();
+      updateGazeState(dt, lookPt, waistYaw);
+    } else {
+      const lookPt = state.gazeMode === 'hand' ? pNow
+        : state.gazeMode === 'mid' ? scale3(add3(pNow, target), 0.5)
+        : target;
+      gazeLabel = state.gazeMode;
+      state.gazeAuto.currentLook = lookPt.slice();
+      updateGazeState(dt, lookPt, waistYaw);
+    }
+    const pDelayed = posBuffer[posBuffer.length - 1 - lagSteps];
+    // Observe delayed gripper and target in Left & Right eyes + perspective size
+    const obsG = projectStereoAndLooming(pDelayed, state.gripperRealM, state.noisePx, neckYDel, neckZDel, waistDel);
+    const obsT = projectStereoAndLooming(target, state.targetRealM, state.noisePx, neckYDel, neckZDel, waistDel);
+    // Live (undelayed) projection for viewport rendering
+    const liveG = projectStereoAndLooming(pNow, state.gripperRealM, 0, neckY + state.headSwayOffset, neckZ, waistYaw);
+    const liveT = projectStereoAndLooming(target, state.targetRealM, 0, neckY + state.headSwayOffset, neckZ, waistYaw);
+    let neckBaseM = 0.0;
+    let mpPxStep = 0.0;
+    let monoBiasStepPct = 0.0;
+    let prevEyeWorldStep = null;
+    let prevRetGStep = null;
+    let prevRetTStep = null;
+    if (isMono) {
+      const obsEye = monoUseLeft ? obsG.leftEyeWorld : obsG.rightEyeWorld;
+      const liveEye = monoUseLeft ? liveG.leftEyeWorld : liveG.rightEyeWorld;
+      const uGo = monoUseLeft ? obsG.uL : obsG.uR, vGo = monoUseLeft ? obsG.vL : obsG.vR;
+      const uTo = monoUseLeft ? obsT.uL : obsT.uR, vTo = monoUseLeft ? obsT.vL : obsT.vR;
+      const uGl = monoUseLeft ? liveG.uL : liveG.uR, vGl = monoUseLeft ? liveG.vL : liveG.vR;
+      const uTl = monoUseLeft ? liveT.uL : liveT.uR, vTl = monoUseLeft ? liveT.vL : liveT.vR;
+      const rGo = pixelToWorldRay(uGo, vGo, obsG.cam);
+      const rTo = pixelToWorldRay(uTo, vTo, obsT.cam);
+      const f = state.focalPx, cx = 0.5 * state.imgW, cy = 0.5 * state.imgH;
+      const wtTrue = Math.max(1e-4, state.targetRealM);
+      const wtPrior = wtTrue * (1.0 + monoPriorBias);
+      const zLoomTRaw = (f * wtPrior) / Math.max(2.0, obsT.sizePx);
+      const reconstructMono = (eyeW, u, v, cam, zD) => add3(
+        eyeW,
+        add3(scale3(cam.right, (u - cx) * zD / f), add3(scale3(cam.down, (v - cy) * zD / f), scale3(cam.forward, zD)))
+      );
+      let bestPrev = null;
+      let bestLiveBase = 0.0;
+      let bestObsBase = 0.0;
+      const rayCands = [];
+      if (vMode !== 'mono_static' && eyePoseHist.length > 0) {
+        const seenIdx = new Set();
+        const addCand = (hi) => {
+          if (hi >= 0 && hi < eyePoseHist.length && !seenIdx.has(hi)) {
+            seenIdx.add(hi);
+            const cand = eyePoseHist[hi];
+            if (!cand) return;
+            const bObs = norm3(sub3(obsEye, cand.obsEye));
+            const bLive = norm3(sub3(liveEye, cand.liveEye));
+            rayCands.push({ cand, bObs, bLive });
+            if (bLive > bestLiveBase) {
+              bestPrev = cand;
+              bestLiveBase = bLive;
+              bestObsBase = bObs;
+            }
+          }
+        };
+        const earlyCount = Math.min(12, eyePoseHist.length);
+        for (let ei = 0; ei < earlyCount; ei++) addCand(ei);
+        const tailStart = Math.max(12, eyePoseHist.length - 36);
+        for (let ti = tailStart; ti < eyePoseHist.length; ti++) addCand(ti);
+        if (!bestPrev) addCand(0);
+      }
+      neckBaseM = (vMode === 'mono_static') ? 0.0 : bestLiveBase;
+      // Multi-ray triangulation across up to 12 baselines weighted by b_c^2 (mirrors stereo.py)
+      let zMp = null;
+      if (vMode !== 'mono_static' && bestObsBase >= 0.006 && rayCands.length > 0) {
+        rayCands.sort((a, b) => b.bObs - a.bObs);
+        let zMpNum = 0.0, zMpDen = 0.0, usedRays = 0;
+        for (let ri = 0; ri < rayCands.length && usedRays < 12; ri++) {
+          const rc = rayCands[ri];
+          if (rc.bObs < 0.006) break;
+          const pC = triangulateTwoRays(rc.cand.obsEye, rc.cand.rTo, obsEye, rTo);
+          if (pC) {
+            const zC = dot3(sub3(pC, obsT.cam.origin), obsT.cam.forward);
+            if (zC >= 0.14 && zC <= 4.0) {
+              const wC = rc.bObs * rc.bObs;
+              zMpNum += wC * zC;
+              zMpDen += wC;
+              usedRays++;
+            }
+          }
+        }
+        if (zMpDen > 1e-10) zMp = zMpNum / zMpDen;
+      }
+      let wtEst = wtPrior;
+      let zT_est = zLoomTRaw;
+      if (vMode !== 'mono_static' && zMp !== null) {
+        const wtSample = Math.max(0.005, Math.min(0.25, (obsT.sizePx * zMp) / Math.max(f, 1.0)));
+        const wStep = bestObsBase * bestObsBase;
+        monoWtSum += wStep * wtSample;
+        monoWtWeight += wStep;
+        const wtMpAvg = monoWtSum / Math.max(monoWtWeight, 1e-12);
+        const alphaMp = Math.min(0.995, monoWtWeight / (monoWtWeight + 0.008 * 0.008));
+        wtEst = (1.0 - alphaMp) * wtPrior + alphaMp * wtMpAvg;
+        const zLoomCal = (f * wtEst) / Math.max(2.0, obsT.sizePx);
+        zT_est = 0.35 * zMp + 0.65 * zLoomCal;
+      } else if (vMode !== 'mono_static' && monoWtWeight > 0) {
+        const wtMpAvg = monoWtSum / Math.max(monoWtWeight, 1e-12);
+        const alphaMp = Math.min(0.995, monoWtWeight / (monoWtWeight + 0.008 * 0.008));
+        wtEst = (1.0 - alphaMp) * wtPrior + alphaMp * wtMpAvg;
+        zT_est = (f * wtEst) / Math.max(2.0, obsT.sizePx);
+      }
+      monoBiasStepPct = 100.0 * Math.abs(wtEst - wtTrue) / wtTrue;
+      obsT.zDisp = zT_est;
+      obsT.zFused = zT_est;
+      obsT.disp = Math.max(1.5, f * state.baseline / Math.max(zT_est, 0.14));
+      obsT.pWorldEst = reconstructMono(obsEye, uTo, vTo, obsT.cam, zT_est);
+      // Hand metric reconstruction: known hand size + scale-ratio link using estimated target scale Wt_est
+      const srObs = (obsG.sizePx / Math.max(state.gripperRealM, 1e-4)) / Math.max(obsT.sizePx / Math.max(wtEst, 1e-4), 1e-4);
+      const zG_rel = zT_est / Math.max(srObs, 0.05);
+      const zG_est = 0.60 * obsG.zLoom + 0.40 * zG_rel;
+      obsG.zDisp = zG_est;
+      obsG.zFused = zG_est;
+      obsG.disp = Math.max(1.5, f * state.baseline / Math.max(zG_est, 0.14));
+      obsG.pWorldEst = reconstructMono(obsEye, uGo, vGo, obsG.cam, zG_est);
+      if (bestPrev && vMode !== 'mono_static') {
+        prevEyeWorldStep = bestPrev.liveEye.slice();
+        prevRetGStep = [bestPrev.uGl, bestPrev.vGl];
+        prevRetTStep = [bestPrev.uTl, bestPrev.vTl];
+        mpPxStep = Math.hypot(uTl - bestPrev.uTl, vTl - bestPrev.vTl);
+        if (bestLiveBase > 0.005) {
+          liveG.disp = Math.max(1.5, f * bestLiveBase / Math.max(liveG.zCam, 0.14));
+          liveT.disp = Math.max(1.5, f * bestLiveBase / Math.max(liveT.zCam, 0.14));
+        }
+      }
+      liveG.uC = uGl; liveG.vC = vGl;
+      liveT.uC = uTl; liveT.vC = vTl;
+      if (vMode !== 'mono_static') {
+        eyePoseHist.push({ obsEye, liveEye, rGo, rTo, uGo, vGo, uTo, vTo, uGl, vGl, uTl, vTl });
+      }
+    }
+    // S0..S6 intermittent visual sample-and-hold schedule
+    const switchedSaccade = state.gazeMode === 'auto' && state.gazeAuto.mode !== prevGazeModeSnap;
+    let isSample = true;
+    if (intermittentEligible && step > 2 && pRemTrue > 0.22 && pRemTrue < 0.92 && rTrueNow > 0.032) {
+      // Sample every 5 steps (20 Hz) or on saccade / proximity change; blind-hold in between (S3)
+      isSample = switchedSaccade || ((step - lastSampleStep) >= 5);
+    }
+    if (isSample || heldEMeas === null) {
+      heldEMeas = sub3(obsT.pWorldEst, obsG.pWorldEst);
+      lastSampleStep = step;
+      sampledVisualFrames++;
+    }
+    const sampleAgeMs = Math.round((step - lastSampleStep) * dt * 1000);
+    const eMeas = heldEMeas.slice();
+    errBuf.push(eMeas);
+    if (errBuf.length > nFilter) errBuf.shift();
+    const eFilt = [0, 0, 0];
+    for (let k = 0; k < errBuf.length; k++) {
+      eFilt[0] += errBuf[k][0] / errBuf.length;
+      eFilt[1] += errBuf[k][1] / errBuf.length;
+      eFilt[2] += errBuf[k][2] / errBuf.length;
+    }
+    const r = norm3(eFilt);
+    const pRem = Math.min(1.0, r / e0Norm);
+    let vCmd = [0, 0, 0];
+    if (r > eps) {
+      if (ctrlName === 'hlsl') {
+        const timeRamp = Math.min(1.0, ((step + 1) * dt) / Math.max(1.1 * deltaEff, 0.04));
+        const progRamp = Math.min(1.0, Math.pow((1.0 - pRem + 0.18) / 0.55, sp.gamma));
+        const phi = pRem < sp.termP ? 1.0 : Math.max(sp.phiMin, Math.min(1.0, 0.5 * (timeRamp + progRamp)));
+        const vMag = Math.min(vmax, phi * Math.min(40.0 * r, kGov * (eps + r)));
+        vCmd = scale3(eFilt, vMag / r);
+      } else if (ctrlName === 'hdap') {
+        // İnsan-HDA: mesafe+aciliyet uyarlamalı dinamik zarf, asimetrik çan
+        // şekli ve sinyal-bağımlı komut gürültüsü (Harris & Wolpert 1998).
+        const vCapDyn = Math.min(vmax, vmax * Math.min(1, Math.max(0.35, Math.sqrt(e0Norm / 0.30))));
+        const timeRamp = Math.min(1.0, ((step + 1) * dt) / Math.max(1.1 * deltaEff, 0.04));
+        const progRamp = Math.min(1.0, Math.pow((1.0 - pRem + 0.18) / 0.55, sp.gamma));
+        const phi = pRem < sp.termP ? 1.0 : Math.max(sp.phiMin, Math.min(1.0, 0.5 * (timeRamp + progRamp)));
+        const n0 = (Math.random() + Math.random() + Math.random()) / 1.5 - 1.0;
+        const sigCmd = 0.025 + 0.075 * Math.min(1, Math.max(0, phi));
+        const vMagBase = Math.min(vCapDyn, phi * Math.min(40.0 * r, kGov * (eps + r)));
+        const vMag = Math.max(0, vMagBase * (1.0 + sigCmd * n0));
+        vCmd = scale3(eFilt, vMag / Math.max(r, 1e-6));
+      } else if (ctrlName === 'governor') {
+        const vMag = Math.min(vmax, Math.min(40.0 * r, kGov * (eps + r)));
+        vCmd = scale3(eFilt, vMag / r);
+      } else if (ctrlName === 'pid') {
+        const de = prevErr ? scale3(sub3(eMeas, prevErr), 1 / dt) : [0, 0, 0];
+        pidInt = add3(pidInt, scale3(eMeas, dt));
+        vCmd = add3(scale3(eMeas, 10.5), add3(scale3(pidInt, 0.8), scale3(de, 0.03)));
+        const vn = norm3(vCmd);
+        if (vn > vmax) vCmd = scale3(vCmd, vmax / vn);
+      } else if (ctrlName === 'lqr') {
+        const de = prevErr ? scale3(sub3(eMeas, prevErr), 1 / dt) : [0, 0, 0];
+        const accCmd = add3(scale3(eMeas, 28.0), scale3(de, 8.5));
+        lqrVel = add3(lqrVel, scale3(accCmd, dt));
+        const vn = norm3(lqrVel);
+        if (vn > vmax) lqrVel = scale3(lqrVel, vmax / vn);
+        vCmd = lqrVel.slice();
+      } else if (ctrlName === 'fixed') {
+        vCmd = scale3(eMeas, 10.5);
+        const vn = norm3(vCmd);
+        if (vn > vmax) vCmd = scale3(vCmd, vmax / vn);
+      } else if (ctrlName === 'bio') {
+        // Muscle-twitch energy-duration model: the actuator follows a pulse
+        // train, not a smooth velocity. Duty cycle ∝ desired speed; muscle
+        // twitch envelope smooths the bursts; signal-dependent noise makes the
+        // reach imperfect (Harris & Wolpert 1998).
+        const vGoal = Math.min(vmax, Math.max(0, Math.min(40.0 * r, kGov * (eps + r))));
+        state.bioPulsePhase = (state.bioPulsePhase + dt / 0.095) % 1.0;
+        const duty = Math.min(0.95, Math.max(0.06, vGoal / vmax));
+        const gate = state.bioPulsePhase < duty ? 1.0 : 0.0;
+        state.bioTwitch = state.bioTwitch * Math.exp(-dt / 0.055) + (gate ? dt / 0.045 : 0);
+        const twitch = Math.min(1.7, state.bioTwitch / 0.05);
+        const noiseAmp = 0.05 * vGoal + 0.008;
+        const n = (Math.random() + Math.random() + Math.random()) / 1.5 - 1.0;
+        const rawSpeed = vGoal * (0.55 + 0.9 * twitch) + n * noiseAmp;
+        const vMag = Math.max(0, rawSpeed);
+        vCmd = scale3(eFilt, vMag / Math.max(r, 1e-6));
+      } else if (ctrlName === 'custom' && customFn) {
+        try {
+          vCmd = customFn(eFilt, pRem, kGov, eps, vmax) || [0, 0, 0];
+        } catch (e) { vCmd = [0, 0, 0]; }
+      }
+    }
+    prevErr = eMeas.slice();
+    // Synchronized waist (central column) rotation coupled with arm transport speed & progress
+    const waistYawStep = waistYaw;
+    if (Math.abs(goalWaistYaw - waistYaw0) > 1e-4 && r > eps) {
+      const uProg = clampN(1.0 - (r / e0Norm), 0.0, 1.0);
+      const uTime = clampN((step + 1) * dt / Math.max(0.42, 0.65 * duration), 0.0, 1.0);
+      const uSync = clampN(0.55 * uProg + 0.45 * uTime, 0.0, 1.0);
+      const sSync = uSync * uSync * (3.0 - 2.0 * uSync);
+      const desWaist = waistYaw0 + (goalWaistYaw - waistYaw0) * sSync;
+      const vRatio = clampN(norm3(vCmd) / Math.max(vmax * 0.45, 0.08), 0.0, 1.25);
+      const maxRate = 1.65 * (0.15 + 0.85 * vRatio);
+      waistYawVel = clampN((desWaist - waistYaw) / Math.max(dt * 4.0, 0.04), -maxRate, maxRate);
+      waistYaw = clampN(waistYaw + waistYawVel * dt, -58 * DEG, 58 * DEG);
+    } else {
+      waistYawVel = 0.0;
+    }
+    const vWaistEE = [-waistYawVel * pNow[1], waistYawVel * pNow[0], 0.0];
+    const vArmCmd = sub3(vCmd, scale3(vWaistEE, 0.85));
+    // Singularity-aware vs plain inverse kinematics
+    const jm = computeJacobianAndManip(q, state.links, waistYawStep);
+    const w = jm.w;
+    const wThresh = 0.042;
+    let lam = 0.015;
+    if (singMode === 'human_wdls') {
+      if (w < wThresh) {
+        const ratioW = 1.0 - Math.pow(w / wThresh, 2);
+        lam = Math.sqrt(0.015*0.015 + 0.085*0.085 * ratioW);
+      }
+    } else {
+      lam = 0.012;
+    }
+    // Joint weights (human proximal-to-distal synergy + torque headroom).
+    // No rest-pose attractor: once the hand is up, it stays where the task
+    // puts it — the natural-pose pull was dragging the arm back off the
+    // target after initial convergence.
+    const baseWeights = singMode === 'human_wdls'
+      ? [1.0, 1.0, 0.95, 0.72, 0.72, 0.50]
+      : [1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
+    const JWJ = [[0,0,0],[0,0,0],[0,0,0]];
+    for (let rIdx = 0; rIdx < 3; rIdx++) {
+      for (let cIdx = 0; cIdx < 3; cIdx++) {
+        let s = 0;
+        for (let j = 0; j < 6; j++) {
+          s += jm.Jv[rIdx][j] * baseWeights[j] * jm.Jv[cIdx][j];
+        }
+        JWJ[rIdx][cIdx] = s + (rIdx === cIdx ? lam * lam : 0);
+      }
+    }
+    const ySol = solve3x3(JWJ, vArmCmd);
+    const seqW = ctrlName === 'hdap' ? triphasicWeights(pRem) : null;
+    const qdCmd = [0, 0, 0, 0, 0, 0];
+    for (let j = 0; j < 6; j++) {
+      if (state.locked[j]) {
+        qd[j] = 0;   // locked joints: fixed pivot
+        qdCmd[j] = 0;
+        continue;
+      }
+      let s = 0;
+      for (let rIdx = 0; rIdx < 3; rIdx++) s += jm.Jv[rIdx][j] * ySol[rIdx];
+      qdCmd[j] = baseWeights[j] * s;
+      const qdCap = sp.maxQd * (seqW ? seqW[j] : 1.0);
+      qdCmd[j] = Math.max(-qdCap, Math.min(qdCap, qdCmd[j]));
+    }
+    // 6-DOF Null-space SO(3) 3-axis wrist orientation control (j4, j5, j6 + minor shoulder help in N(Jv))
+    const hasExplicitRoll = (state.goalRollDeg !== null && state.goalRollDeg !== undefined && isFinite(state.goalRollDeg));
+    const desRPY = getDesiredTargetRPYDeg(target, waistYawStep);
+    const R_des = buildTargetRotationSO3(desRPY[0], desRPY[1], desRPY[2]);
+    const R_eeNow = getEndEffectorRotation(fkNow);
+    const oriNow = computeOrientationErrorSO3(R_eeNow, R_des);
+    const oriGate = Math.max(0.0, Math.min(1.0, (w - 0.015) / 0.020));
+    if (oriGate > 0.02 && oriNow.errDeg > 0.15) {
+      const wAct = baseWeights.map((bv, j) => (state.locked[j] ? 0.0 : bv));
+      const A_nv = [[1e-5, 0, 0], [0, 1e-5, 0], [0, 0, 1e-5]];
+      for (let rIdx = 0; rIdx < 3; rIdx++) {
+        for (let cIdx = 0; cIdx < 3; cIdx++) {
+          let s = 0;
+          for (let j = 0; j < 6; j++) s += jm.Jv[rIdx][j] * wAct[j] * jm.Jv[cIdx][j];
+          A_nv[rIdx][cIdx] += s;
+        }
+      }
+      const N_v = [];
+      for (let j = 0; j < 6; j++) N_v.push([0, 0, 0, 0, 0, 0]);
+      for (let k = 0; k < 6; k++) {
+        const colSol = solve3x3(A_nv, [jm.Jv[0][k], jm.Jv[1][k], jm.Jv[2][k]]);
+        for (let j = 0; j < 6; j++) {
+          if (state.locked[j]) { N_v[j][k] = 0.0; continue; }
+          const proj = wAct[j] * (jm.Jv[0][j] * colSol[0] + jm.Jv[1][j] * colSol[1] + jm.Jv[2][j] * colSol[2]);
+          N_v[j][k] = (j === k ? 1.0 : 0.0) - proj;
+        }
+      }
+      const wOriBase = [0.08, 0.12, 0.20, 1.0, 1.0, hasExplicitRoll ? 0.0 : 1.0];
+      const wOri = wOriBase.map((v, j) => (state.locked[j] ? 0.0 : v));
+      const JwN = [[], [], []];
+      for (let rIdx = 0; rIdx < 3; rIdx++) {
+        for (let k = 0; k < 6; k++) {
+          let s = 0;
+          for (let m = 0; m < 6; m++) s += jm.Jw[rIdx][m] * N_v[m][k];
+          JwN[rIdx].push(s);
+        }
+      }
+      const Ao = [[0.025, 0, 0], [0, 0.025, 0], [0, 0, 0.025]];
+      for (let rIdx = 0; rIdx < 3; rIdx++) {
+        for (let cIdx = 0; cIdx < 3; cIdx++) {
+          let s = 0;
+          for (let k = 0; k < 6; k++) s += JwN[rIdx][k] * wOri[k] * JwN[cIdx][k];
+          Ao[rIdx][cIdx] += s;
+        }
+      }
+      const jwQd = [0, 0, 0];
+      for (let rIdx = 0; rIdx < 3; rIdx++) {
+        for (let j = 0; j < 6; j++) jwQd[rIdx] += jm.Jw[rIdx][j] * qdCmd[j];
+      }
+      const kOri = 4.2;
+      const wRes = [
+        kOri * oriNow.eVec[0] - jwQd[0],
+        kOri * oriNow.eVec[1] - jwQd[1],
+        kOri * oriNow.eVec[2] - jwQd[2]
+      ];
+      const uOri = solve3x3(Ao, wRes);
+      const preW = [0, 0, 0, 0, 0, 0];
+      for (let k = 0; k < 6; k++) {
+        let s = 0;
+        for (let rIdx = 0; rIdx < 3; rIdx++) s += JwN[rIdx][k] * uOri[rIdx];
+        preW[k] = wOri[k] * s;
+      }
+      const qdOriVec = [0, 0, 0, 0, 0, 0];
+      let alphaScale = 1.0;
+      for (let j = 0; j < 6; j++) {
+        if (state.locked[j] || (hasExplicitRoll && j === 5)) continue;
+        let qdOriJ = 0;
+        for (let k = 0; k < 6; k++) qdOriJ += N_v[j][k] * preW[k];
+        qdOriJ *= oriGate;
+        qdOriVec[j] = qdOriJ;
+        const qdCap = sp.maxQd * (seqW ? seqW[j] : 1.0);
+        const headroom = Math.max(0.0, qdCap - Math.abs(qdCmd[j]));
+        const aj = Math.abs(qdOriJ);
+        if (aj > 1e-9 && headroom < aj) {
+          alphaScale = Math.min(alphaScale, headroom / aj);
+        }
+      }
+      for (let j = 0; j < 6; j++) {
+        qdCmd[j] += alphaScale * qdOriVec[j];
+      }
+    }
+    // Preserve explicit axial X-axis roll goal mode (axial_x_rotate submode)
+    if (!state.locked[5] && hasExplicitRoll) {
+      const rollGoalRad = state.goalRollDeg * DEG;
+      const eRoll = rollGoalRad - q[5];
+      if (Math.abs(eRoll) > 1e-3 && norm3(sub3(target, pNow)) > eps * 0.5) {
+        const qdCap5 = sp.maxQd * (seqW ? seqW[5] : 1.0);
+        qdCmd[5] = Math.max(-qdCap5, Math.min(qdCap5, 2.8 * eRoll));
+      } else if (Math.abs(eRoll) > 1e-3) {
+        const qdCap5 = sp.maxQd * (seqW ? seqW[5] : 1.0);
+        qdCmd[5] = Math.max(-qdCap5, Math.min(qdCap5, 2.2 * eRoll));
+      }
+    }
+    // Update joint angles & approximate joint torques (gravity + dynamic acceleration + payload)
+    const taus = [0, 0, 0, 0, 0, 0];
+    const payFactor = 1.0 + 0.35 * state.payload;
+    let stepPower = 0;
+    for (let j = 0; j < 6; j++) {
+      const qdd = (qdCmd[j] - qd[j]) / dt;
+      qd[j] = qdCmd[j];
+      q[j] += qd[j] * dt;
+      // Human anatomical joint limits (same values as models/human_arm.json)
+      const lims = state.links[j].limits_deg;
+      const lo = lims[0] * (Math.PI / 180), hi = lims[1] * (Math.PI / 180);
+      if (q[j] < lo) { q[j] = lo; qd[j] = 0; }
+      else if (q[j] > hi) { q[j] = hi; qd[j] = 0; }
+      const grav = (j === 1 ? 18.0 * Math.cos(q[1]) : (j === 2 ? 9.5 * Math.cos(q[1] + q[2]) : 1.5 * Math.sin(q[j]))) * payFactor;
+      const dyn = (3.2 - 0.4 * j) * qdd * payFactor + 1.8 * qd[j];
+      const singPenalty = (singMode === 'plain_dls' && w < 0.03) ? (0.035 / Math.max(w, 0.004)) : 1.0;
+      const tLim = (state.links[j].stall_torque && state.links[j].gear_ratio)
+        ? state.links[j].stall_torque * state.links[j].gear_ratio * 0.80
+        : (state.links[j].stall_torque || 40.0);
+      taus[j] = Math.max(-tLim, Math.min(tLim, (grav + dyn) * singPenalty));
+      stepPower += Math.abs(taus[j] * qd[j]) + 0.12 * taus[j] * taus[j];
+      rec.wMech += Math.abs(taus[j] * qd[j]) * dt;
+    }
+    const fkPost = forwardKinematics(q, state.links, waistYawStep);
+    const R_eePost = getEndEffectorRotation(fkPost);
+    const handRPYStep = extractHandRPYDeg(R_eePost);
+    const oriPost = computeOrientationErrorSO3(R_eePost, R_des);
+    tauPrev = taus;
+    rec.energy += stepPower * dt;
+    const trueErr = norm3(sub3(target, pNow));
+    const speed = norm3(vCmd);
+    const accel = Math.abs(speed - prevSpeed) / dt;
+    prevSpeed = speed;
+    const normSg = liveG.sizePx / state.gripperRealM;
+    const normSt = liveT.sizePx / state.targetRealM;
+    const scaleRatio = normSg / Math.max(normSt, 1e-4);
+    const ord = computeOrdinalPerceptionJS(liveG, liveT, scaleRatio, prevOrdClass, prevProxRatio, state.noisePx);
+    prevOrdClass = ord.proximityClass;
+    prevProxRatio = ord.proxRatio;
+    const qdMag = Math.hypot(qd[0], qd[1], qd[2], qd[3], qd[4], qd[5]);
+    if (!isSample) {
+      effSigmaDeg = Math.min(18.0, effSigmaDeg + 0.18 * qdMag * dt * (180 / Math.PI));
+    } else {
+      effSigmaDeg = Math.max(0.2, effSigmaDeg * 0.35);
+    }
+    if (trueErr <= eps && speed < 0.01) effSigmaDeg = 0.0;
+    let gazePhase = 'S0 HEDEF KİLİT';
+    if (trueErr <= Math.max(0.008, 2.0 * eps)) gazePhase = 'S6 KİLİTLENME';
+    else if (ord.proximityClass === 'TEMAS ÖNCESİ' || ord.proximityClass === 'TEMAS') gazePhase = 'S5 TEMAS ÖNCESİ';
+    else if (!isSample) gazePhase = 'S3 KÖR UÇUŞ (HOLD)';
+    else if (step <= 2) gazePhase = 'S0 HEDEF KİLİT';
+    else if (gazeLabel === 'hand') gazePhase = 'S2 ELE SACCADE';
+    else if (gazeLabel === 'mid') gazePhase = 'S1 ÇİFT ÖRNEK';
+    else if (pRemTrue < 0.35) gazePhase = 'S4 YAKIN DÜZELTME';
+    let activePulse = 'OMUZ İTİŞ (J1–J2)';
+    if (speed < 0.008 && trueErr <= eps) activePulse = 'FREN KİLİTLİ';
+    else if (pRemTrue <= 0.22) activePulse = 'BİLEK İNCE AYAR (J4–J6)';
+    else if (pRemTrue <= 0.55) activePulse = 'DİRSEK UZAMA (J2–J4)';
+    rec.t.push(t);
+    rec.q.push(q.slice());
+    rec.p.push(pNow.slice());
+    rec.err.push(trueErr);
+    rec.vel.push(speed);
+    rec.acc.push(accel);
+    rec.w.push(w);
+    rec.wRot.push(jm.wRot);
+    rec.lam.push(lam);
+    rec.tau.push(taus);
+    rec.sgPx.push(liveG.sizePx);
+    rec.stPx.push(liveT.sizePx);
+    rec.scaleRatio.push(scaleRatio);
+    rec.dispG.push(liveG.disp);
+    rec.dispT.push(liveT.disp);
+    rec.eyeLeftG.push([liveG.uL, liveG.vL]);
+    rec.eyeRightG.push([liveG.uR, liveG.vR]);
+    rec.eyeLeftT.push([liveT.uL, liveT.vL]);
+    rec.eyeRightT.push([liveT.uR, liveT.vR]);
+    rec.gaze.push(gazeLabel);
+    rec.gazePhase.push(gazePhase);
+    rec.sampleAgeMs.push(sampleAgeMs);
+    rec.ordinal.push(ord);
+    rec.activePulse.push(activePulse);
+    rec.effSigmaDeg.push(trueErr <= eps ? 0.0 : effSigmaDeg);
+    rec.isVisualSample.push(isSample);
+    rec.headSwayY.push(neckY);
+    rec.headSwayZ.push(neckZ);
+    rec.neckBaseMm.push(neckBaseM * 1000.0);
+    rec.motionParallaxPx.push(mpPxStep);
+    rec.scaleBiasPct.push(monoBiasStepPct);
+    rec.prevEyeWorld.push(prevEyeWorldStep);
+    rec.prevEyeRetG.push(prevRetGStep);
+    rec.prevEyeRetT.push(prevRetTStep);
+    rec.waistYaw.push(waistYawStep);
+    rec.gazeYaw.push(state.gazeYaw);
+    rec.gazePitch.push(state.gazePitch);
+    rec.lookAt.push(state.lookAt ? state.lookAt.slice() : target.slice());
+    rec.handRPY.push(handRPYStep);
+    rec.targetRPY.push(desRPY);
+    rec.oriErrDeg.push(oriPost.errDeg);
+  }
+  // Compute summary metrics
+  const uVec = sub3(target, p0);
+  const dTotal = Math.max(norm3(uVec), 1e-6);
+  const uUnit = scale3(uVec, 1 / dTotal);
+  let maxProj = 0;
+  for (let i = 0; i < rec.p.length; i++) {
+    const s = dot3(sub3(rec.p[i], p0), uUnit);
+    if (s > maxProj) maxProj = s;
+  }
+  const overshootPct = Math.max(0, 100.0 * (maxProj - dTotal) / dTotal);
+  let settleTime = duration;
+  for (let i = rec.err.length - 1; i >= 0; i--) {
+    if (rec.err[i] > Math.max(0.006, 2.0 * eps)) {
+      settleTime = i < rec.err.length - 1 ? rec.t[i + 1] : duration;
+      break;
+    }
+    if (i === 0) settleTime = 0.0;
+  }
+  const onsetAcc = Math.max(rec.acc[0] || 0, rec.acc[1] || 0, rec.acc[2] || 0);
+  const minW = Math.min.apply(null, rec.w);
+  let peakTau = 0;
+  for (let i = 0; i < rec.tau.length; i++) {
+    for (let j = 0; j < 6; j++) {
+      if (Math.abs(rec.tau[i][j]) > peakTau) peakTau = Math.abs(rec.tau[i][j]);
+    }
+  }
+  // --- Yeni metrikler: İlk Yaklaşım Hatası (E_init) ve Kompanzasyon Süresi (T_comp) ---
+  // Balistik faz sonu = hız tepesi veya ilk açık-çevrim transport darbesi penceresi (~0.34 s).
+  // E_init = bu andaki hedefe olan öklid mesafesidir; sonraki görsel düzeltme dahil değildir.
+  // T_comp = max(0, settleTime - t_ballistic); %T_comp = 100 * T_comp / settleTime.
+  const dtRec = rec.t.length > 1 ? Math.max(1e-4, rec.t[1] - rec.t[0]) : 0.02;
+  const tol = Math.max(0.006, 2.0 * eps);
+  let peakIdx = 0, peakSpd = 0;
+  for (let i = 0; i < rec.vel.length; i++) {
+    if (rec.vel[i] > peakSpd) { peakSpd = rec.vel[i]; peakIdx = i; }
+  }
+  const tTotal = rec.t.length ? rec.t[rec.t.length - 1] : duration;
+  const minBalIdx = Math.min(rec.t.length - 1, Math.max(peakIdx, Math.round(0.32 / dtRec)));
+  const maxBalT = Math.min(0.38, Math.max(0.16, tTotal * 0.42));
+  let balIdx = peakIdx;
+  while (balIdx < minBalIdx && rec.t[balIdx] < maxBalT && rec.err[balIdx] > tol) {
+    balIdx++;
+  }
+  const tBallistic = rec.t[balIdx] !== undefined ? rec.t[balIdx] : 0;
+  const eInit = rec.err[balIdx] !== undefined ? rec.err[balIdx] : norm3(sub3(target, rec.p[balIdx] || p0));
+  const tSettleEff = Math.max(settleTime, dtRec);
+  const tComp = Math.max(0, settleTime - tBallistic);
+  const tCompPct = Math.min(100.0, Math.max(0.0, 100.0 * tComp / tSettleEff));
+  const visualLoadHz = sampledVisualFrames / Math.max(duration, 1e-9);
+  const pulseEffPct = 100.0 * Math.min(1.0, Math.max(0.0, rec.wMech / Math.max(rec.energy, 1e-9)));
+  const finalErrM = rec.err.length ? rec.err[rec.err.length - 1] : 0.0;
+  const weFittsM = Math.max(state.targetRealM || 0.04, 4.133 * finalErrM);
+  const fittsIdeBits = Math.log2(dTotal / Math.max(weFittsM, 1e-4) + 1.0);
+  const settledWithin = (rec.err.length && finalErrM <= Math.max(0.006, 2.0 * eps));
+  const fittsTeff = (settledWithin && settleTime > 0.05) ? settleTime : duration;
+  const fittsTpBps = fittsIdeBits / Math.max(fittsTeff, 0.1);
+  const maxNeckMm = rec.neckBaseMm.length ? Math.max.apply(null, rec.neckBaseMm) : 0.0;
+  const minWRot = rec.wRot.length ? Math.min.apply(null, rec.wRot) : 0.0;
+  const finalOriErrDeg = rec.oriErrDeg.length ? rec.oriErrDeg[rec.oriErrDeg.length - 1] : 0.0;
+  const finalHandRPY = rec.handRPY.length ? rec.handRPY[rec.handRPY.length - 1] : [0, 0, 0];
+
+  rec.metrics = {
+    mt: settleTime,
+    settledWithin,
+    overshootPct,
+    onsetAcc,
+    minW,
+    minWRot,
+    peakTau,
+    energy: rec.energy,
+    wMech: rec.wMech,
+    sgStart: rec.sgPx[0],
+    sgEnd: rec.sgPx[rec.sgPx.length - 1],
+    stEnd: rec.stPx[rec.stPx.length - 1],
+    finalScale: rec.scaleRatio[rec.scaleRatio.length - 1],
+    eInitMm: eInit * 1000,
+    finalErrMm: finalErrM * 1000,
+    finalOriErrDeg,
+    finalHandRPY,
+    reachDistM: dTotal,
+    fittsIdeBits,
+    fittsTpBps,
+    maxNeckMm,
+    tBallistic,
+    tComp,
+    tCompPct,
+    ballisticIdx: balIdx,
+    visualLoadHz,
+    pulseEffPct,
+    finalScaleBiasPct: rec.scaleBiasPct.length ? rec.scaleBiasPct[rec.scaleBiasPct.length - 1] : 0,
+    maxWaistDeg: rec.waistYaw.reduce((best, wv) => Math.abs(wv / DEG) > Math.abs(best) ? (wv / DEG) : best, 0)
+  };
+  return rec;
+  } finally {
+    if (savedGazeSnap) {
+      if (savedGazeSnap.gazeAuto) state.gazeAuto = savedGazeSnap.gazeAuto;
+      state.gazeYaw = savedGazeSnap.gazeYaw;
+      state.gazePitch = savedGazeSnap.gazePitch;
+      state.visualHeadYaw = savedGazeSnap.visualHeadYaw;
+      state.visualHeadPitch = savedGazeSnap.visualHeadPitch;
+      state.waistYaw = savedGazeSnap.waistYaw;
+      state.goalWaistYaw = savedGazeSnap.goalWaistYaw;
+      state.baseGaze = savedGazeSnap.baseGaze;
+      state.lookAt = savedGazeSnap.lookAt;
+      state.bioTwitch = savedGazeSnap.bioTwitch;
+      state.bioPulsePhase = savedGazeSnap.bioPulsePhase;
+    }
+  }
+}
+// ---------------- Rendering: 3D Scene, Left/Right Eyes, and Plots ----------------
+function project3D(pt, W, H) {
+  const cy = Math.cos(state.camYaw), sy = Math.sin(state.camYaw);
+  const cp = Math.cos(state.camPitch), sp = Math.sin(state.camPitch);
+  const x = pt[0] - 0.22, y = pt[1], z = pt[2] - 0.62;
+  const xr = cy * x - sy * y;
+  const yr = sy * x + cy * y;
+  const zr = cp * z - sp * yr;
+  const scale = Math.min(H * 0.55, W * 0.48) * state.camZoom;
+  state.pxPerUnit = scale;
+  return [W * 0.50 + scale * xr + state.camPan.x, H * 0.47 - scale * zr + state.camPan.y];
+}
+function drawBaseFrameTriad(ctx, W, H) {
+  const ox = 92, oy = H - 96;
+  const cy = Math.cos(state.camYaw), sy = Math.sin(state.camYaw);
+  const cp = Math.cos(state.camPitch), sp = Math.sin(state.camPitch);
+  const proj = (v) => {
+    const x = v[0], y = v[1], z = v[2];
+    const xr = cy * x - sy * y;
+    const yr = sy * x + cy * y;
+    const zr = cp * z - sp * yr;
+    const L = 30;
+    return [ox + L * xr, oy - L * zr];
+  };
+  const axes = [
+    { v: [1, 0, 0], label: '+X₀', color: '#c2410c' },
+    { v: [0, 1, 0], label: '+Y₀', color: '#15803d' },
+    { v: [0, 0, 1], label: '+Z₀', color: '#1d4ed8' }
+  ];
+  ctx.save();
+  ctx.lineWidth = 2.4;
+  for (const a of axes) {
+    const p = proj(a.v);
+    ctx.strokeStyle = a.color;
+    ctx.beginPath();
+    ctx.moveTo(ox, oy);
+    ctx.lineTo(p[0], p[1]);
+    ctx.stroke();
+    ctx.fillStyle = a.color;
+    ctx.font = '700 11px "Source Sans 3", system-ui, sans-serif';
+    ctx.fillText(a.label, p[0] + (p[0] >= ox ? 4 : -22), p[1] + 4);
+  }
+  // Origin marker O₀
+  ctx.fillStyle = '#0f172a';
+  ctx.beginPath();
+  ctx.arc(ox, oy, 3.0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.font = '700 9.5px Consolas, monospace';
+  ctx.fillStyle = '#334155';
+  ctx.fillText('O₀', ox - 15, oy - 5);
+  // Technical robotics base frame label pill positioned cleanly above lower-left controller dropdown
+  const cap = 'Sabit Taban Ekseni F₀ (O₀-XYZ)';
+  ctx.font = '600 9px "Source Sans 3", Consolas, sans-serif';
+  const cw = ctx.measureText(cap).width;
+  const pillX = Math.max(8, ox - cw / 2 - 5);
+  const pillY = oy + 24;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.70)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(pillX, pillY, cw + 10, 15, 3);
+  else ctx.rect(pillX, pillY, cw + 10, 15);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#0f172a';
+  ctx.fillText(cap, pillX + 5, pillY + 10.5);
+  ctx.restore();
+}
+function drawJointGizmo(ctx, W, H, jointIdx, fk) {
+  // Interactive 3D joint gizmo:
+  //  - translate: World X/Y/Z axis arrows starting at 14px + central round composite sphere
+  //  - rotate:    concentric X/Y/Z rotation rings about the local/joint axes
+  const jPosWorld = getJointWorldPositions(fk)[jointIdx] || fk.origins[jointIdx];
+  const base = project3D(jPosWorld, W, H);
+  // ---------- ROTATE mode: concentric rotation rings ----------
+  if (state.gizmoMode === 'rotate') {
+    const rotAxes = [
+      { v: fk.xAxes[jointIdx], label: 'X', color: '#c2410c' },
+      { v: fk.yAxes[jointIdx], label: 'Y', color: '#15803d' },
+      { v: fk.zAxes[jointIdx], label: 'Z', color: '#1d4ed8' }
+    ];
+    const RING_R = { x: 30, y: 44, z: 58 };
+    const GAP0 = 0.35;
+    const tips = [];
+    for (const a of rotAxes) {
+      const L = a.label.toLowerCase();
+      const R = RING_R[L];
+      const active = (state.gizmoMode === 'rotate' && state.dragAxis === L && (typeof dragMode !== 'undefined' && dragMode === 'axis-rotate'));
+      ctx.save();
+      ctx.lineWidth = active ? 6 : 4;
+      ctx.strokeStyle = a.color;
+      ctx.globalAlpha = active ? 1.0 : 0.82;
+      ctx.setLineDash([7, 5]);
+      ctx.beginPath();
+      ctx.arc(base[0], base[1], R, GAP0 + Math.PI * 0.18, Math.PI * 2 - GAP0 * 0.35);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+      const endA = Math.PI * 2 - GAP0 * 0.35;
+      const ex = base[0] + R * Math.cos(endA), ey = base[1] + R * Math.sin(endA);
+      const tang = endA + Math.PI / 2;
+      const tx = Math.cos(tang), ty = Math.sin(tang);
+      const nx = -ty, ny = tx;
+      ctx.fillStyle = a.color;
+      ctx.beginPath();
+      ctx.moveTo(ex + 6 * tx, ey + 6 * ty);
+      ctx.lineTo(ex - 8 * tx + 5 * nx, ey - 8 * ty + 5 * ny);
+      ctx.lineTo(ex - 8 * tx - 5 * nx, ey - 8 * ty - 5 * ny);
+      ctx.closePath();
+      ctx.fill();
+      ctx.font = '700 12px "Source Sans 3", system-ui, sans-serif';
+      ctx.fillStyle = a.color;
+      const labelA = endA - 0.42;
+      ctx.fillText(a.label, base[0] + R * Math.cos(labelA) - 4, base[1] + R * Math.sin(labelA) + 4);
+      tips.push({ axis: L, worldAxis: a.v.slice(), ring: R, ringCenter: base.slice(), base: base.slice(), shaftStart: base.slice(), tip: base.slice(), color: a.color, label: a.label });
+    }
+    ctx.fillStyle = 'rgba(24,24,27,0.78)';
+    ctx.fillRect(base[0] + 14, base[1] - 28, 118, 18);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 10px Consolas, monospace';
+    ctx.fillText('j' + (jointIdx + 1) + ' — ⟲ döndür', base[0] + 18, base[1] - 15);
+    return tips;
+  }
+  // ---------- TRANSLATE mode: world X/Y/Z axis arrows + central composite sphere ----------
+  const worldAxes = [
+    { v: [1, 0, 0], label: 'X', color: '#c2410c' },
+    { v: [0, 1, 0], label: 'Y', color: '#15803d' },
+    { v: [0, 0, 1], label: 'Z', color: '#1d4ed8' }
+  ];
+  const rStart = 14;
+  const tipLen = 58;
+  const tips = [];
+  for (const a of worldAxes) {
+    const worldTip = add3(jPosWorld, scale3(a.v, 0.14));
+    const tp = project3D(worldTip, W, H);
+    const dx = tp[0] - base[0], dy = tp[1] - base[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len;
+    tips.push({
+      axis: a.label.toLowerCase(),
+      worldAxis: a.v.slice(),
+      base: [base[0], base[1]],
+      shaftStart: [base[0] + ux * rStart, base[1] + uy * rStart],
+      tip: [base[0] + ux * tipLen, base[1] + uy * tipLen],
+      color: a.color,
+      label: a.label
+    });
+  }
+  tips.forEach(t => {
+    const dx = t.tip[0] - t.shaftStart[0], dy = t.tip[1] - t.shaftStart[1];
+    const L = Math.hypot(dx, dy) || 1;
+    const ux = dx / L, uy = dy / L;
+    const nx = -uy, ny = ux;
+    ctx.lineWidth = 3.2;
+    ctx.strokeStyle = t.color;
+    ctx.beginPath(); ctx.moveTo(t.shaftStart[0], t.shaftStart[1]); ctx.lineTo(t.tip[0], t.tip[1]); ctx.stroke();
+    ctx.fillStyle = t.color;
+    ctx.beginPath();
+    ctx.moveTo(t.tip[0], t.tip[1]);
+    ctx.lineTo(t.tip[0] - 13 * ux + 6 * nx, t.tip[1] - 13 * uy + 6 * ny);
+    ctx.lineTo(t.tip[0] - 13 * ux - 6 * nx, t.tip[1] - 13 * uy - 6 * ny);
+    ctx.closePath();
+    ctx.fill();
+    ctx.font = '700 12px "Source Sans 3", system-ui, sans-serif';
+    ctx.fillText(t.label, t.tip[0] + 6 * ux - 3, t.tip[1] + 6 * uy + 4);
+  });
+  // Central composite movement sphere (grab center ball to move freely in camera plane)
+  ctx.fillStyle = 'rgba(255, 251, 235, 0.94)';
+  ctx.strokeStyle = '#0f766e';
+  ctx.lineWidth = 2.6;
+  ctx.beginPath();
+  ctx.arc(base[0], base[1], 11, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#b45309';
+  ctx.beginPath();
+  ctx.arc(base[0], base[1], 3.8, 0, Math.PI * 2);
+  ctx.fill();
+  // name tag
+  ctx.fillStyle = 'rgba(24,24,27,0.78)';
+  ctx.fillRect(base[0] + 15, base[1] - 28, 128, 18);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '600 10px Consolas, monospace';
+  ctx.fillText('j' + (jointIdx + 1) + ' (top: serbest / ok: XYZ)', base[0] + 19, base[1] - 15);
+  return tips;
+}
+// Kanvası CSS kutusuna tam oturt: gerçek en-boy oranında, boşluk bırakmadan çizim.
+// (Tam ekran overlay'de de çalışır; aksi hâlde 620x280 bitmap geniş kutuya
+//  object-fit:contain ile oturup yanlarda siyah bant bırakıyordu.)
+function fitCanvasSize(cv) {
+  if (!cv || !cv.parentElement) return;
+  const w = Math.round(cv.parentElement.clientWidth);
+  const h = Math.round(cv.parentElement.clientHeight);
+  if (w < 60 || h < 50) return;
+  if (cv.id === 'cv3d') {
+    const win = document.getElementById('pwScene');
+    if (win) win.classList.toggle('compact', w < 760 || h < 360);
+  }
+  if (cv.width !== w) cv.width = w;
+  if (cv.height !== h) cv.height = h;
+}
+let _redrawQueued = false;
+function scheduleRedraw() {
+  if (_redrawQueued) return;
+  _redrawQueued = true;
+  requestAnimationFrame(() => {
+    _redrawQueued = false;
+    if (state.traj) updateUIFrame(state.frameIdx);
+    else renderSetupPreview();
+  });
+}
+function draw3DScene(idx) {
+  const cv = document.getElementById('cv3d');
+  fitCanvasSize(cv);
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.fillStyle = '#f4f6f8';
+  ctx.fillRect(0, 0, W, H);
+  const tr = state.traj;
+  const q = tr ? tr.q[idx] : Q0;
+  const wy = (tr && tr.waistYaw && tr.waistYaw[idx] !== undefined) ? tr.waistYaw[idx] : (state.waistYaw || 0);
+  const fk = forwardKinematics(q, state.links, wy);
+  const assess = computePreReachAssessment();
+  // Floor grid
+  ctx.strokeStyle = '#dde2e8';
+  ctx.lineWidth = 1;
+  for (let g = -0.4; g <= 1.0; g += 0.2) {
+    const a = project3D([g, -0.5, 0], W, H), b = project3D([g, 0.5, 0], W, H);
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    const c = project3D([-0.4, g * 0.5, 0], W, H), d = project3D([1.0, g * 0.5, 0], W, H);
+    ctx.beginPath(); ctx.moveTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.stroke();
+  }
+  // Shoulder-centered translucent 3D reachable workspace sphere
+  const baseO = (INITIAL_DATA && INITIAL_DATA.base_origin) ? INITIAL_DATA.base_origin : [0, 0, 0];
+  const sh3d = fk.origins[1].slice();
+  const shZ = sh3d[2];
+  const rSafe = assess.maxSafeCm / 100.0;
+  const rMax = (assess.totalArmCm || 65.0) / 100.0;
+  if (state.showReachSphere !== false && rSafe > 1e-3) {
+    const dVec = [state.target[0] - sh3d[0], state.target[1] - sh3d[1], state.target[2] - sh3d[2]];
+    const dLen = Math.hypot(dVec[0], dVec[1], dVec[2]);
+    const ok = tr ? (dLen <= rSafe + 1e-4) : (assess.reachable && dLen <= rSafe + 1e-4);
+    const cy = Math.cos(state.camYaw), sy = Math.sin(state.camYaw);
+    const cp = Math.cos(state.camPitch), sp = Math.sin(state.camPitch);
+    const uAxis = [cy, -sy, 0];
+    const vAxis = [-sp * sy, -sp * cy, cp];
+    const pSh = project3D(sh3d, W, H);
+    const traceSphereRing = (rad, ax1, ax2, centerZ) => {
+      const cz = (centerZ !== undefined) ? centerZ : sh3d[2];
+      ctx.beginPath();
+      for (let i = 0; i <= 72; i++) {
+        const th = (i / 72) * Math.PI * 2;
+        const cs = Math.cos(th), sn = Math.sin(th);
+        const pt = [
+          sh3d[0] + rad * (cs * ax1[0] + sn * ax2[0]),
+          sh3d[1] + rad * (cs * ax1[1] + sn * ax2[1]),
+          cz + rad * (cs * ax1[2] + sn * ax2[2])
+        ];
+        const p2 = project3D(pt, W, H);
+        if (i === 0) ctx.moveTo(p2[0], p2[1]); else ctx.lineTo(p2[0], p2[1]);
+      }
+    };
+    const pEdge = project3D([
+      sh3d[0] + rSafe * uAxis[0],
+      sh3d[1] + rSafe * uAxis[1],
+      sh3d[2] + rSafe * uAxis[2]
+    ], W, H);
+    const rPx = Math.max(8, Math.hypot(pEdge[0] - pSh[0], pEdge[1] - pSh[1]));
+    ctx.save();
+    traceSphereRing(rSafe, uAxis, vAxis);
+    const grad = ctx.createRadialGradient(pSh[0] - rPx * 0.22, pSh[1] - rPx * 0.22, rPx * 0.08, pSh[0], pSh[1], rPx);
+    if (ok) {
+      grad.addColorStop(0, 'rgba(30, 58, 95, 0.02)');
+      grad.addColorStop(0.75, 'rgba(30, 58, 95, 0.07)');
+      grad.addColorStop(1, 'rgba(30, 58, 95, 0.16)');
+    } else {
+      grad.addColorStop(0, 'rgba(139, 38, 53, 0.02)');
+      grad.addColorStop(0.75, 'rgba(139, 38, 53, 0.09)');
+      grad.addColorStop(1, 'rgba(139, 38, 53, 0.20)');
+    }
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.strokeStyle = ok ? 'rgba(30, 58, 95, 0.42)' : 'rgba(139, 38, 53, 0.56)';
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+
+    if (rMax > rSafe + 0.01) {
+      traceSphereRing(rMax, uAxis, vAxis);
+      ctx.strokeStyle = 'rgba(100, 116, 139, 0.24)';
+      ctx.lineWidth = 1.0;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    ctx.lineWidth = 0.9;
+    ctx.strokeStyle = ok ? 'rgba(30, 58, 95, 0.20)' : 'rgba(139, 38, 53, 0.24)';
+    ctx.setLineDash([3, 3]);
+    traceSphereRing(rSafe, [1, 0, 0], [0, 1, 0]); ctx.stroke();
+    traceSphereRing(rSafe, [1, 0, 0], [0, 0, 1]); ctx.stroke();
+    traceSphereRing(rSafe, [0, 1, 0], [0, 0, 1]); ctx.stroke();
+
+    const dzT = state.target[2] - sh3d[2];
+    if (Math.abs(dzT) < rSafe) {
+      const rSlice = Math.sqrt(Math.max(0, rSafe * rSafe - dzT * dzT));
+      traceSphereRing(rSlice, [1, 0, 0], [0, 1, 0], state.target[2]);
+      ctx.strokeStyle = ok ? 'rgba(30, 58, 95, 0.48)' : 'rgba(139, 38, 53, 0.52)';
+      ctx.lineWidth = 1.25;
+      ctx.setLineDash([5, 3]);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    const pT2 = project3D(state.target, W, H);
+    if (dLen > rSafe + 1e-4) {
+      const exit3d = [
+        sh3d[0] + (dVec[0] / dLen) * rSafe,
+        sh3d[1] + (dVec[1] / dLen) * rSafe,
+        sh3d[2] + (dVec[2] / dLen) * rSafe
+      ];
+      const pEx = project3D(exit3d, W, H);
+      ctx.strokeStyle = 'rgba(30, 58, 95, 0.38)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(pSh[0], pSh[1]); ctx.lineTo(pEx[0], pEx[1]); ctx.stroke();
+      ctx.strokeStyle = '#8b2635';
+      ctx.lineWidth = 1.8;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.moveTo(pEx[0], pEx[1]); ctx.lineTo(pT2[0], pT2[1]); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.strokeStyle = '#8b2635';
+      ctx.fillStyle = '#ffffff';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.arc(pEx[0], pEx[1], 4.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      const overCm = Math.max(0.1, dLen * 100.0 - assess.maxSafeCm);
+      const waistHint = (!tr && assess.needsWaist && assess.waistReachable)
+        ? ` (Bel ${assess.goalWaistDeg.toFixed(0)}° ile erişilir)`
+        : '';
+      const outTxt = `KÜRE DIŞI +${overCm.toFixed(1)} cm${waistHint}`;
+      ctx.font = '700 9.5px "Source Sans 3", system-ui, sans-serif';
+      const tw = ctx.measureText(outTxt).width;
+      const lx = pEx[0];
+      const ly = pEx[1] - 16;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.90)';
+      ctx.strokeStyle = 'rgba(139, 38, 53, 0.45)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(lx - tw / 2 - 5, ly - 10, tw + 10, 14, 3);
+      else ctx.rect(lx - tw / 2 - 5, ly - 10, tw + 10, 14);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#8b2635';
+      ctx.textAlign = 'center';
+      ctx.fillText(outTxt, lx, ly);
+      ctx.textAlign = 'left';
+    } else {
+      ctx.strokeStyle = 'rgba(30, 58, 95, 0.28)';
+      ctx.lineWidth = 1.1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(pSh[0], pSh[1]); ctx.lineTo(pT2[0], pT2[1]); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#1e3a5f';
+      ctx.font = '600 9.5px "Source Sans 3", system-ui, sans-serif';
+      const topLbl = project3D([sh3d[0], sh3d[1], sh3d[2] + rSafe], W, H);
+      const waistActiveLbl = (Math.abs(wy) > 0.02) ? ` · Bel ${(wy * 180 / Math.PI).toFixed(0)}°` : '';
+      ctx.fillText(`Erişim Küresi R=${assess.maxSafeCm.toFixed(0)} cm (İÇERİDE${waistActiveLbl})`, topLbl[0] - 68, topLbl[1] - 6);
+    }
+    ctx.restore();
+  }
+  ctx.setLineDash([]);
+  // Draw Stereo Camera Head — a humanoid head ON the robot, centred on y = 0;
+  // the left arm hangs at y = +0.19 (base_origin), so head and arm are never
+  // in the same vertical plane. The head itself turns with the gaze (yaw/pitch),
+  // and the eyes look along the gaze direction.
+  const neckYFrame = (tr && tr.headSwayY && tr.headSwayY[idx] !== undefined) ? tr.headSwayY[idx] : 0;
+  const neckZFrame = (tr && tr.headSwayZ && tr.headSwayZ[idx] !== undefined) ? tr.headSwayZ[idx] : 0;
+  const neckTotalY = (state.headSwayOffset || 0) + neckYFrame;
+  const vMode = (tr && tr.visionMode) ? tr.visionMode : (state.visionMode || 'binocular');
+  const isMono3D = (vMode === 'mono_left' || vMode === 'mono_right' || vMode === 'mono_static');
+  const cam = getCameraBasis(neckTotalY, neckZFrame, wy);
+  const pShoulder = project3D(sh3d, W, H);
+  const pCamOrig = project3D(cam.origin, W, H);
+  const pLeftEye = project3D(cam.leftEye, W, H);
+  const pRightEye = project3D(cam.rightEye, W, H);
+  const pGripper = project3D(fk.ee, W, H);
+  const pTarget = project3D(state.target, W, H);
+
+  // ---- trunk, synchronized rotary waist column & on-column rotation gauge ----
+  const zWaist = 0.36 * shZ;
+  const pTrunkTop = project3D([0, 0, shZ], W, H);
+  const pTrunkBot = project3D([0, 0, 0.02], W, H);
+  const pWaist = project3D([0, 0, zWaist], W, H);
+  const pClavA = project3D([0, 0, shZ], W, H);
+  const pClavB = project3D(sh3d, W, H);
+  const rightCounterSh = [Math.sin(wy) * 0.14, -Math.cos(wy) * 0.14, shZ];
+  const pCounterSh = project3D(rightCounterSh, W, H);
+  const waistDeg = wy / DEG;
+  const waistActive = Math.abs(waistDeg) > 0.5;
+  ctx.lineCap = 'round';
+  // Lower fixed pedestal shaft + fixed 0° reference spline
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 17;
+  ctx.beginPath(); ctx.moveTo(pTrunkBot[0], pTrunkBot[1]); ctx.lineTo(pWaist[0], pWaist[1]); ctx.stroke();
+  {
+    const fb = project3D([0.025, 0, 0.05], W, H);
+    const ft = project3D([0.025, 0, zWaist - 0.025], W, H);
+    ctx.strokeStyle = 'rgba(226, 232, 240, 0.72)';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath(); ctx.moveTo(fb[0], fb[1]); ctx.lineTo(ft[0], ft[1]); ctx.stroke();
+  }
+  // Upper rotating waist column
+  ctx.strokeStyle = waistActive ? '#1e3a5f' : '#2b333f';
+  ctx.lineWidth = 17;
+  ctx.beginPath(); ctx.moveTo(pWaist[0], pWaist[1]); ctx.lineTo(pTrunkTop[0], pTrunkTop[1]); ctx.stroke();
+  // Rotating longitudinal index stripes on upper column (anterior + lateral ribs rotate by wy)
+  [0.0, -0.75, 0.75].forEach((rOff, ri) => {
+    const rAng = wy + rOff;
+    const rCol = 0.025;
+    const ra = project3D([Math.cos(rAng) * rCol, Math.sin(rAng) * rCol, zWaist + 0.025], W, H);
+    const rb = project3D([Math.cos(rAng) * rCol, Math.sin(rAng) * rCol, shZ - 0.025], W, H);
+    ctx.strokeStyle = ri === 0
+      ? (waistActive ? '#f59e0b' : '#cbd5e1')
+      : (waistActive ? 'rgba(251, 191, 36, 0.60)' : 'rgba(148, 163, 184, 0.42)');
+    ctx.lineWidth = ri === 0 ? 2.6 : 1.7;
+    ctx.beginPath(); ctx.moveTo(ra[0], ra[1]); ctx.lineTo(rb[0], rb[1]); ctx.stroke();
+  });
+
+  // 3D-projected horizontal Waist Protractor Dial (Bel Dönüş Açı Göstergeci) mounted at zWaist
+  const rDial = 0.16;
+  ctx.save();
+  // Full subtle rear circle (-180°..+180° dashed)
+  ctx.strokeStyle = 'rgba(100, 116, 139, 0.35)';
+  ctx.lineWidth = 1.1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  for (let k = 0; k <= 36; k++) {
+    const a = -Math.PI + (k / 36) * 2 * Math.PI;
+    const pa = project3D([Math.cos(a) * rDial, Math.sin(a) * rDial, zWaist], W, H);
+    if (k === 0) ctx.moveTo(pa[0], pa[1]); else ctx.lineTo(pa[0], pa[1]);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // Front graduated protractor arc (-90° .. +90°)
+  ctx.strokeStyle = waistActive ? '#b45309' : '#475569';
+  ctx.lineWidth = 1.9;
+  ctx.beginPath();
+  for (let k = 0; k <= 24; k++) {
+    const a = (-90 + k * 7.5) * DEG;
+    const pa = project3D([Math.cos(a) * rDial, Math.sin(a) * rDial, zWaist], W, H);
+    if (k === 0) ctx.moveTo(pa[0], pa[1]); else ctx.lineTo(pa[0], pa[1]);
+  }
+  ctx.stroke();
+  // Degree ticks every 30° (-60°, -30°, 0°, +30°, +60°) + spaced labels
+  [-60, -30, 0, 30, 60].forEach(d => {
+    const a = d * DEG;
+    const rIn = (d === 0) ? rDial * 0.78 : rDial * 0.85;
+    const rOut = rDial * 1.07;
+    const pIn = project3D([Math.cos(a) * rIn, Math.sin(a) * rIn, zWaist], W, H);
+    const pOut = project3D([Math.cos(a) * rOut, Math.sin(a) * rOut, zWaist], W, H);
+    ctx.strokeStyle = d === 0 ? '#0f172a' : '#64748b';
+    ctx.lineWidth = d === 0 ? 1.9 : 1.2;
+    ctx.beginPath(); ctx.moveTo(pIn[0], pIn[1]); ctx.lineTo(pOut[0], pOut[1]); ctx.stroke();
+    if (d === -60 || d === 0 || d === 60) {
+      const pTxt = project3D([Math.cos(a) * (rDial * 1.32), Math.sin(a) * (rDial * 1.32), zWaist], W, H);
+      ctx.fillStyle = d === 0 ? '#0f172a' : '#475569';
+      ctx.font = '700 8.5px Consolas, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(d === 0 ? '0°' : ((d > 0 ? '+' : '') + d + '°'), pTxt[0], pTxt[1] + 3);
+    }
+  });
+  ctx.textAlign = 'left';
+
+  // Fixed 0° anterior reference axis line
+  const pWaistFwd0 = project3D([rDial * 1.12, 0, zWaist], W, H);
+  ctx.strokeStyle = 'rgba(51, 65, 85, 0.58)';
+  ctx.lineWidth = 1.4;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(pWaist[0], pWaist[1]); ctx.lineTo(pWaistFwd0[0], pWaistFwd0[1]); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Filled swept angular sector (active wy OR setup preview target waist angle)
+  const sweepAng = waistActive ? wy : ((!tr && assess.needsWaist) ? (assess.goalWaistYaw || 0) : 0);
+  if (Math.abs(sweepAng) > 0.008) {
+    ctx.fillStyle = waistActive ? 'rgba(217, 119, 6, 0.28)' : 'rgba(15, 118, 110, 0.22)';
+    ctx.beginPath();
+    ctx.moveTo(pWaist[0], pWaist[1]);
+    const arcSteps = 20;
+    for (let k = 0; k <= arcSteps; k++) {
+      const a = (k / arcSteps) * sweepAng;
+      const pa = project3D([Math.cos(a) * rDial, Math.sin(a) * rDial, zWaist], W, H);
+      ctx.lineTo(pa[0], pa[1]);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = waistActive ? '#d97706' : '#0f766e';
+    ctx.lineWidth = 2.2;
+    if (!waistActive) ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    for (let k = 0; k <= arcSteps; k++) {
+      const a = (k / arcSteps) * sweepAng;
+      const pa = project3D([Math.cos(a) * rDial, Math.sin(a) * rDial, zWaist], W, H);
+      if (k === 0) ctx.moveTo(pa[0], pa[1]); else ctx.lineTo(pa[0], pa[1]);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Waist bearing collar ring
+  ctx.fillStyle = waistActive ? '#d97706' : ((!tr && assess.needsWaist) ? '#0f766e' : '#475569');
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.ellipse(pWaist[0], pWaist[1], 13, 5.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Rotating pointer needle + arrowhead along current column orientation wy
+  const pNeedleTip = project3D([Math.cos(wy) * (rDial * 1.14), Math.sin(wy) * (rDial * 1.14), zWaist], W, H);
+  ctx.strokeStyle = waistActive ? '#b45309' : '#0f172a';
+  ctx.lineWidth = waistActive ? 3.0 : 2.2;
+  ctx.beginPath(); ctx.moveTo(pWaist[0], pWaist[1]); ctx.lineTo(pNeedleTip[0], pNeedleTip[1]); ctx.stroke();
+  {
+    const nx = pNeedleTip[0] - pWaist[0], ny = pNeedleTip[1] - pWaist[1];
+    const nlen = Math.hypot(nx, ny) || 1;
+    const ux = nx / nlen, uy = ny / nlen;
+    ctx.fillStyle = waistActive ? '#b45309' : '#0f172a';
+    ctx.beginPath();
+    ctx.moveTo(pNeedleTip[0] + ux * 3, pNeedleTip[1] + uy * 3);
+    ctx.lineTo(pNeedleTip[0] - ux * 7 - uy * 4.2, pNeedleTip[1] - uy * 7 + ux * 4.2);
+    ctx.lineTo(pNeedleTip[0] - ux * 7 + uy * 4.2, pNeedleTip[1] - uy * 7 - ux * 4.2);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Always-visible On-Column Waist Status Gauge Pill
+  let gaugeTxt, gaugeBorder, gaugeTextCol;
+  if (waistActive) {
+    const dirLbl = waistDeg >= 0 ? 'SOLA DÖNÜŞ' : 'SAĞA DÖNÜŞ';
+    gaugeTxt = `BEL DÖNÜŞÜ AKTİF: θ_bel = ${(waistDeg >= 0 ? '+' : '') + waistDeg.toFixed(1)}° (${dirLbl})`;
+    gaugeBorder = '#d97706';
+    gaugeTextCol = '#92400e';
+  } else if (!tr && assess.needsWaist) {
+    const gDeg = assess.goalWaistDeg || 0;
+    const gDir = gDeg >= 0 ? 'SOLA' : 'SAĞA';
+    gaugeTxt = `HEDEF BEL DÖNÜŞÜ: θ_bel = ${(gDeg >= 0 ? '+' : '') + gDeg.toFixed(1)}° (${gDir} GEREKLİ)`;
+    gaugeBorder = '#0f766e';
+    gaugeTextCol = '#0f766e';
+  } else {
+    gaugeTxt = 'BEL GÖSTERGECİ: θ_bel = 0.0° (SABİT — DÖNÜŞ YOK)';
+    gaugeBorder = '#94a3b8';
+    gaugeTextCol = '#334155';
+  }
+  if (!tr && assess.needsWaist) {
+    const pGoalClav = project3D(assess.shRot, W, H);
+    ctx.strokeStyle = 'rgba(15, 118, 110, 0.55)';
+    ctx.lineWidth = 2.0;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(pClavA[0], pClavA[1]); ctx.lineTo(pGoalClav[0], pGoalClav[1]); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.font = '700 9.5px "Source Sans 3", system-ui, sans-serif';
+  const gw = ctx.measureText(gaugeTxt).width;
+  const gx = Math.max(8, Math.min(W - gw - 18, pWaist[0] - gw / 2 - 7));
+  const gy = pWaist[1] + 18;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+  ctx.strokeStyle = gaugeBorder;
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(gx, gy, gw + 14, 17, 4);
+  else ctx.rect(gx, gy, gw + 14, 17);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = gaugeTextCol;
+  ctx.fillText(gaugeTxt, gx + 7, gy + 12);
+  ctx.restore();
+  // zoom-aware pixel scale for every fixed-px element in this scene
+  const PU = state.pxPerUnit || 215;
+  const zs = PU / 215;
+
+  // Right counter-clavicle stub & left active clavicle bar
+  ctx.strokeStyle = '#64748b';
+  ctx.lineWidth = 10 * zs;
+  ctx.beginPath(); ctx.moveTo(pClavA[0], pClavA[1]); ctx.lineTo(pCounterSh[0], pCounterSh[1]); ctx.stroke();
+  ctx.strokeStyle = '#374151';
+  ctx.lineWidth = 13 * zs;
+  ctx.beginPath(); ctx.moveTo(pClavA[0], pClavA[1]); ctx.lineTo(pClavB[0], pClavB[1]); ctx.stroke();
+  // shoulder cap at the arm mount
+  const pShoulderCap = project3D(sh3d, W, H);
+  ctx.fillStyle = '#1f2937';
+  ctx.beginPath(); ctx.arc(pShoulderCap[0], pShoulderCap[1], 13 * zs, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#475569';
+  ctx.beginPath(); ctx.arc(pShoulderCap[0] - 3 * zs, pShoulderCap[1] - 3 * zs, 7 * zs, 0, Math.PI * 2); ctx.fill();
+
+  // ---- neck + head with eyes (rotates with waist + tracks selected target) ----
+  const gazeB = gazeBasis(wy);
+  const hYaw = (tr && tr.gazeYaw && tr.gazeYaw[idx] !== undefined)
+    ? tr.gazeYaw[idx]
+    : ((state.visualHeadYaw !== undefined && isFinite(state.visualHeadYaw)) ? state.visualHeadYaw : state.gazeYaw);
+  const hPitch = (tr && tr.gazePitch && tr.gazePitch[idx] !== undefined)
+    ? tr.gazePitch[idx]
+    : ((state.visualHeadPitch !== undefined && isFinite(state.visualHeadPitch)) ? state.visualHeadPitch : state.gazePitch);
+  const cz1 = Math.cos(hPitch), sz1 = Math.sin(hPitch);
+  const cyw = Math.cos(hYaw), syw = Math.sin(hYaw);
+  const fwdH = add3(add3(scale3(gazeB.base, cz1 * cyw), scale3(gazeB.right, cz1 * syw)), scale3(scale3(gazeB.down, -1), sz1));
+  const fnH = norm3(fwdH);
+  const fH = fnH < 1e-6 ? [Math.cos(wy), Math.sin(wy), 0] : scale3(fwdH, 1 / fnH);
+  const swayVec = [-Math.sin(wy) * neckTotalY, Math.cos(wy) * neckTotalY, neckZFrame];
+  const headC = [fH[0] * 0.03 + swayVec[0], fH[1] * 0.03 + swayVec[1], shZ + 0.245 + fH[2] * 0.02 + swayVec[2]];
+  const hRightRaw = cross3(fH, [0, 0, 1]);
+  const hRightN = norm3(hRightRaw);
+  const headRightH = hRightN < 1e-6 ? [Math.sin(wy), -Math.cos(wy), 0] : scale3(hRightRaw, 1 / hRightN);
+  const headUpH = cross3(headRightH, fH);
+  const pHeadC = project3D(headC, W, H);
+  const pNeckTop = project3D([swayVec[0] * 0.6, swayVec[1] * 0.6, shZ + 0.135 + neckZFrame * 0.5], W, H);
+  const pNeckBot = project3D([0, 0, shZ], W, H);
+  // Subtle setup sightline showing head tracking target
+  if (!tr) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(15, 118, 110, 0.22)';
+    ctx.lineWidth = 1.15;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(pCamOrig[0], pCamOrig[1]); ctx.lineTo(pTarget[0], pTarget[1]); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+  // neck
+  ctx.strokeStyle = isMono3D ? '#0f766e' : '#1f2937';
+  ctx.lineWidth = 16 * zs;
+  ctx.beginPath(); ctx.moveTo(pNeckBot[0], pNeckBot[1]); ctx.lineTo(pNeckTop[0], pNeckTop[1]); ctx.stroke();
+  // head sphere with directional shading
+  const headR = 34 * zs;
+  const hg = ctx.createRadialGradient(pHeadC[0] - headR * 0.38, pHeadC[1] - headR * 0.42, headR * 0.15, pHeadC[0], pHeadC[1], headR * 1.12);
+  hg.addColorStop(0, '#f4f2ec');
+  hg.addColorStop(0.45, '#d9d6cc');
+  hg.addColorStop(0.82, '#a9a69c');
+  hg.addColorStop(1, '#6f6c63');
+  ctx.fillStyle = hg;
+  ctx.beginPath(); ctx.arc(pHeadC[0], pHeadC[1], headR, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(25, 28, 33, 0.6)';
+  ctx.lineWidth = 1.6;
+  ctx.stroke();
+  // face features oriented along the gaze direction
+  const eyeForwardOff = 0.085;   // gözlerin kafa merkezinden ileri sapması (m)
+  const eyeUp = 0.030, eyeSide = 0.052;
+  [-1, 1].forEach(side => {
+    const eWorld = add3(add3(headC, scale3(fH, eyeForwardOff)),
+                        add3(scale3(headUpH, eyeUp), scale3(headRightH, side * eyeSide)));
+    const pe = project3D(eWorld, W, H);
+    const occluded = (vMode === 'mono_left' && side === 1) || (vMode === 'mono_static' && side === 1) || (vMode === 'mono_right' && side === -1);
+    if (occluded) {
+      // Kapalı / bantlı göz gösterimi
+      ctx.fillStyle = '#27272a';
+      ctx.beginPath(); ctx.ellipse(pe[0], pe[1], 9.2 * zs, 6.2 * zs, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.6 * zs;
+      ctx.beginPath(); ctx.moveTo(pe[0] - 8 * zs, pe[1]); ctx.lineTo(pe[0] + 8 * zs, pe[1]); ctx.stroke();
+    } else {
+      // göz çukuru (koyu yuva)
+      ctx.fillStyle = '#101418';
+      ctx.beginPath(); ctx.ellipse(pe[0], pe[1], 8.6 * zs, 9.6 * zs, 0, 0, Math.PI * 2); ctx.fill();
+      // beyaz + iris + pupil (bakış yönü kafayla birlikte hedefe döner)
+      ctx.fillStyle = '#f5f5f0';
+      ctx.beginPath(); ctx.ellipse(pe[0], pe[1], 6.9 * zs, 7.8 * zs, 0, 0, Math.PI * 2); ctx.fill();
+      const dEx = pTarget[0] - pe[0], dEy = pTarget[1] - pe[1];
+      const dEN = Math.hypot(dEx, dEy) || 1;
+      const pupX = pe[0] + clampN((dEx / dEN) * 2.2 * zs, -2.2 * zs, 2.2 * zs);
+      const pupY = pe[1] + clampN((dEy / dEN) * 1.8 * zs, -1.8 * zs, 1.8 * zs);
+      ctx.fillStyle = '#0f766e';
+      ctx.beginPath(); ctx.arc(pupX, pupY, 3.6 * zs, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#06302c';
+      ctx.beginPath(); ctx.arc(pupX, pupY, 1.9 * zs, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.beginPath(); ctx.arc(pupX - 1.4 * zs, pupY - 1.4 * zs, 0.8 * zs, 0, Math.PI * 2); ctx.fill();
+    }
+  });
+  // burun köprüsü + ağız (minimal, yön korur)
+  const noseW = add3(add3(headC, scale3(fH, eyeForwardOff + 0.012)), scale3(headUpH, 0.005));
+  const pn = project3D(noseW, W, H);
+  ctx.strokeStyle = '#8f8c82';
+  ctx.lineWidth = 1.6 * zs;
+  ctx.beginPath(); ctx.moveTo(pn[0], pn[1] - 3 * zs); ctx.lineTo(pn[0], pn[1] + 4 * zs); ctx.stroke();
+  const mouthW = add3(add3(headC, scale3(fH, eyeForwardOff + 0.015)), scale3(headUpH, -0.052));
+  const pm = project3D(mouthW, W, H);
+  ctx.strokeStyle = '#6e6b62';
+  ctx.beginPath(); ctx.moveTo(pm[0] - 7 * zs, pm[1]); ctx.lineTo(pm[0] + 7 * zs, pm[1]); ctx.stroke();
+  ctx.fillStyle = '#18181b';
+  ctx.font = `600 ${Math.max(8, Math.round(11 * zs))}px "Source Sans 3", system-ui, sans-serif`;
+  if (W >= 700) {
+    const headTag = (vMode === 'mono_static')
+      ? 'Kafa (Sol Tek Göz SABİT · Paralaks YOK)'
+      : isMono3D
+        ? `Kafa (${vMode === 'mono_right' ? 'Sağ' : 'Sol'} Tek Göz + Boyun Paralaksı)`
+        : 'Kafa (Stereo Gözler)';
+    ctx.fillText(headTag, pHeadC[0] + headR + 8, pHeadC[1] + 2);
+  }
+
+  // Göreceli Derinlik Konileri + Stereo veya Monoküler 2-Poz Paralaks Işınları
+  if (state.showDepthCones) {
+    ctx.save();
+    if (vMode === 'mono_static') {
+      // Sabit tek gözde paralaks üçgeni yok; tek ışın doğrusu üzerinde boyut belirsizliği
+      ctx.setLineDash([4, 3]);
+      ctx.strokeStyle = 'rgba(139, 38, 53, 0.55)';
+      ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.moveTo(pLeftEye[0], pLeftEye[1]); ctx.lineTo(pTarget[0], pTarget[1]); ctx.stroke();
+      ctx.strokeStyle = 'rgba(15, 118, 110, 0.45)';
+      ctx.beginPath(); ctx.moveTo(pLeftEye[0], pLeftEye[1]); ctx.lineTo(pGripper[0], pGripper[1]); ctx.stroke();
+      ctx.setLineDash([]);
+    } else if (isMono3D) {
+      const pActiveEye = (vMode === 'mono_right') ? pRightEye : pLeftEye;
+      const prevEyeW = (tr && tr.prevEyeWorld && tr.prevEyeWorld[idx])
+        ? tr.prevEyeWorld[idx]
+        : add3(vMode === 'mono_right' ? cam.rightEye : cam.leftEye, [0, -0.04, 0]);
+      const pPrevEye = project3D(prevEyeW, W, H);
+      // Sentetik boyun paralaks üçgeni (iki farklı kafa pozu arası)
+      ctx.fillStyle = 'rgba(15, 118, 110, 0.10)';
+      ctx.beginPath();
+      ctx.moveTo(pActiveEye[0], pActiveEye[1]);
+      ctx.lineTo(pGripper[0], pGripper[1]);
+      ctx.lineTo(pPrevEye[0], pPrevEye[1]);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = 'rgba(194, 65, 12, 0.08)';
+      ctx.beginPath();
+      ctx.moveTo(pActiveEye[0], pActiveEye[1]);
+      ctx.lineTo(pTarget[0], pTarget[1]);
+      ctx.lineTo(pPrevEye[0], pPrevEye[1]);
+      ctx.closePath();
+      ctx.fill();
+      // Boyun sentetik baz çizgisi ve önceki göz hayaleti
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 2.0;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.moveTo(pPrevEye[0], pPrevEye[1]); ctx.lineTo(pActiveEye[0], pActiveEye[1]); ctx.stroke();
+      ctx.fillStyle = 'rgba(217, 119, 6, 0.75)';
+      ctx.beginPath(); ctx.arc(pPrevEye[0], pPrevEye[1], 4.5, 0, Math.PI * 2); ctx.fill();
+      // Önceki pozdan ışınlar (kesikli)
+      ctx.strokeStyle = 'rgba(217, 119, 6, 0.45)';
+      ctx.lineWidth = 1.1;
+      ctx.beginPath(); ctx.moveTo(pPrevEye[0], pPrevEye[1]); ctx.lineTo(pGripper[0], pGripper[1]); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pPrevEye[0], pPrevEye[1]); ctx.lineTo(pTarget[0], pTarget[1]); ctx.stroke();
+      // Anlık açık göz ışınları (düz)
+      ctx.setLineDash([]);
+      ctx.strokeStyle = 'rgba(15, 118, 110, 0.45)';
+      ctx.beginPath(); ctx.moveTo(pActiveEye[0], pActiveEye[1]); ctx.lineTo(pGripper[0], pGripper[1]); ctx.stroke();
+      ctx.strokeStyle = 'rgba(194, 65, 12, 0.45)';
+      ctx.beginPath(); ctx.moveTo(pActiveEye[0], pActiveEye[1]); ctx.lineTo(pTarget[0], pTarget[1]); ctx.stroke();
+    } else {
+      ctx.fillStyle = 'rgba(15, 118, 110, 0.08)';
+      ctx.beginPath();
+      ctx.moveTo(pLeftEye[0], pLeftEye[1]);
+      ctx.lineTo(pGripper[0], pGripper[1]);
+      ctx.lineTo(pRightEye[0], pRightEye[1]);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = 'rgba(194, 65, 12, 0.07)';
+      ctx.beginPath();
+      ctx.moveTo(pLeftEye[0], pLeftEye[1]);
+      ctx.lineTo(pTarget[0], pTarget[1]);
+      ctx.lineTo(pRightEye[0], pRightEye[1]);
+      ctx.closePath();
+      ctx.fill();
+      [pLeftEye, pRightEye].forEach((pe) => {
+        ctx.strokeStyle = 'rgba(15, 118, 110, 0.28)';
+        ctx.lineWidth = 1.1;
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath();
+        ctx.moveTo(pe[0], pe[1]);
+        ctx.lineTo(pGripper[0], pGripper[1]);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(194, 65, 12, 0.28)';
+        ctx.beginPath();
+        ctx.moveTo(pe[0], pe[1]);
+        ctx.lineTo(pTarget[0], pTarget[1]);
+        ctx.stroke();
+      });
+      ctx.setLineDash([]);
+    }
+    ctx.restore();
+  }
+  // Trajectory path
+  if (tr && idx > 0) {
+    ctx.strokeStyle = '#0f766e';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (let k = 0; k <= idx; k++) {
+      const pt = project3D(tr.p[k], W, H);
+      if (k === 0) ctx.moveTo(pt[0], pt[1]); else ctx.lineTo(pt[0], pt[1]);
+    }
+    ctx.stroke();
+  }
+  // Çoklu Model Hayalet İkiz Robotları (seçili modeller kendi renkleriyle kesikli çizilir)
+  const activeGhostIds = (state.showGhost && state.ghostModels && state.ghostModels.length)
+    ? GHOST_MODELS.map(m => m.id).filter(id => state.ghostModels.includes(id) && id !== state.controller)
+    : [];
+  const gWidths = [9, 8, 7, 5, 4, 4];
+  let gOrder = 0;
+  activeGhostIds.forEach(gmId => {
+    const gm = GHOST_MODEL_MAP[gmId];
+    const gtr = state.ghostTrajs ? state.ghostTrajs[gmId] : null;
+    if (!gm || !gtr || !gtr.q || !gtr.q.length) return;
+    const gIdx = Math.min(idx, gtr.q.length - 1);
+    const wyG = (gtr.waistYaw && gtr.waistYaw[gIdx] !== undefined) ? gtr.waistYaw[gIdx] : 0;
+    const fkG = forwardKinematics(gtr.q[gIdx], state.links, wyG);
+    ctx.save();
+    if (gIdx > 0) {
+      ctx.strokeStyle = gm.rgba;
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash(gm.dash || [4, 4]);
+      ctx.beginPath();
+      for (let k = 0; k <= gIdx; k++) {
+        const pg = project3D(gtr.p[k], W, H);
+        if (k === 0) ctx.moveTo(pg[0], pg[1]); else ctx.lineTo(pg[0], pg[1]);
+      }
+      ctx.stroke();
+    }
+    ctx.strokeStyle = gm.rgba;
+    ctx.setLineDash(gm.dash || [5, 4]);
+    ctx.lineCap = 'round';
+    for (let i = 1; i < state.links.length; i++) {
+      const ga = project3D(fkG.origins[i], W, H);
+      const gb = project3D(fkG.origins[i + 1], W, H);
+      ctx.lineWidth = gWidths[i];
+      ctx.beginPath(); ctx.moveTo(ga[0], ga[1]); ctx.lineTo(gb[0], gb[1]); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    const pGhostEE = project3D(fkG.ee, W, H);
+    ctx.strokeStyle = gm.color;
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(pGhostEE[0], pGhostEE[1], 6.5, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = gm.color;
+    ctx.beginPath(); ctx.arc(pGhostEE[0], pGhostEE[1], 2.2, 0, Math.PI * 2); ctx.fill();
+    ctx.font = '600 9.5px Consolas, monospace';
+    const stagger = Math.floor(gOrder / 2) * 12;
+    const baseOffY = (gOrder % 2 === 0) ? (-10 - stagger) : (14 + stagger);
+    const lblY = clampN(pGhostEE[1] + baseOffY, 26, H - 18);
+    ctx.fillText(`${gm.short} İkiz`, pGhostEE[0] + 9, lblY);
+    ctx.restore();
+    gOrder++;
+  });
+  // Robot Base pedestal
+  const pBase = project3D([0, 0, 0], W, H);
+  ctx.fillStyle = '#d6d3c9';
+  ctx.strokeStyle = '#52525b';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(pBase[0], pBase[1], 24, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  // Robot Arm Links + Aktif Kas Enerjisi Akışı (amber/terakota kılıf)
+  const linkWidths = [15, 13, 11, 8, 7, 6];
+  const isAtRest = !tr || (tr.vel[idx] < 0.008 && state.brakesEngaged);
+  for (let i = 0; i < state.links.length; i++) {
+    if (i === 0) continue;
+    const a = project3D(fk.origins[i], W, H);
+    const b = project3D(fk.origins[i + 1], W, H);
+    if (tr && !isAtRest && tr.tau && tr.tau[idx]) {
+      const stall = Math.max(state.links[i].stall_torque || 35, 1);
+      const act = Math.min(1.0, Math.abs(tr.tau[idx][i]) / stall);
+      if (act > 0.08) {
+        ctx.strokeStyle = `rgba(217, 119, 6, ${(0.22 + 0.55 * act).toFixed(2)})`;
+        ctx.lineWidth = linkWidths[i] + 5.5 * act;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(a[0], a[1]);
+        ctx.lineTo(b[0], b[1]);
+        ctx.stroke();
+      }
+    }
+    ctx.strokeStyle = i === 1 || i === 2 ? '#334155' : '#475569';
+    ctx.lineWidth = linkWidths[i];
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(a[0], a[1]);
+    ctx.lineTo(b[0], b[1]);
+    ctx.stroke();
+  }
+  // Joints — distributed along kinematic structure via getJointWorldPositions so all 6 joints are clearly clickable
+  state.jointScreen = [];
+  const jWorlds = getJointWorldPositions(fk);
+  for (let i = 0; i < jWorlds.length; i++) {
+    const p = project3D(jWorlds[i], W, H);
+    state.jointScreen[i] = p;
+    const sel = (i === state.selectedJoint);
+    const hov = (i === state.hoverJoint);
+    const locked = state.locked[i];
+    ctx.lineWidth = sel ? 3.0 : (hov ? 2.6 : 1.8);
+    ctx.strokeStyle = sel ? '#0f766e' : (hov ? '#b45309' : (locked ? '#b91c1c' : '#18181b'));
+    ctx.fillStyle = locked ? '#fee2e2' : (i === 1 ? '#b45309' : '#e4e1d8');
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], sel ? 9 : (hov ? 7.5 : (i === 1 ? 7 : 5.5)), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    if (locked) {
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = '700 8px Consolas, monospace';
+      ctx.fillText('L', p[0] - 2.5, p[1] + 3.2);
+    }
+    if (hov && !sel) {
+      ctx.setLineDash([3, 2]);
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(p[0], p[1], 10, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+  // Joint local reference frame gizmo (F_i) on the selected joint
+  if (state.selectedJoint >= 0) {
+    state.gizmoScreen = drawJointGizmo(ctx, W, H, state.selectedJoint, fk);
+  } else {
+    state.gizmoScreen = null;
+  }
+  // End-Effector (Grabber) with 3D oriented palm & jaw fork reflecting X-axis/axial roll
+  {
+    const handX = fk.xAxes[6] || [1, 0, 0];
+    const handY = fk.yAxes[6] || [0, 1, 0];
+    const handZ = fk.zAxes[6] || [0, 0, -1];
+    const jawHalf = 0.026, jawFwd = 0.032;
+    const j1Base = add3(fk.ee, scale3(handX, jawHalf));
+    const j2Base = add3(fk.ee, scale3(handX, -jawHalf));
+    const j1Tip = add3(j1Base, scale3(handZ, jawFwd));
+    const j2Tip = add3(j2Base, scale3(handZ, jawFwd));
+    const pB1 = project3D(j1Base, W, H), pB2 = project3D(j2Base, W, H);
+    const pT1 = project3D(j1Tip, W, H), pT2 = project3D(j2Tip, W, H);
+    ctx.strokeStyle = '#0f766e';
+    ctx.lineWidth = 3.2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(pB1[0], pB1[1]); ctx.lineTo(pB2[0], pB2[1]);
+    ctx.moveTo(pB1[0], pB1[1]); ctx.lineTo(pT1[0], pT1[1]);
+    ctx.moveTo(pB2[0], pB2[1]); ctx.lineTo(pT2[0], pT2[1]);
+    ctx.stroke();
+    // Small orientation indicator tick along handY
+    const pYTick = project3D(add3(fk.ee, scale3(handY, 0.025)), W, H);
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 2.0;
+    ctx.beginPath(); ctx.moveTo(pGripper[0], pGripper[1]); ctx.lineTo(pYTick[0], pYTick[1]); ctx.stroke();
+    // 3D End-Effector SO(3) Triad F_ee (X=red, Y=green, Z=blue)
+    const triadLenEE = 0.055;
+    const eeAxes = [
+      { vec: handX, col: '#dc2626', lbl: 'x_e' },
+      { vec: handY, col: '#16a34a', lbl: 'y_e' },
+      { vec: handZ, col: '#2563eb', lbl: 'z_e' }
+    ];
+    for (let ai = 0; ai < eeAxes.length; ai++) {
+      const tip = project3D(add3(fk.ee, scale3(eeAxes[ai].vec, triadLenEE)), W, H);
+      ctx.strokeStyle = eeAxes[ai].col;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(pGripper[0], pGripper[1]);
+      ctx.lineTo(tip[0], tip[1]);
+      ctx.stroke();
+      ctx.fillStyle = eeAxes[ai].col;
+      ctx.font = '700 8.5px Consolas, monospace';
+      ctx.fillText(eeAxes[ai].lbl, tip[0] + 2, tip[1] - 2);
+    }
+  }
+  ctx.fillStyle = '#0f766e';
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(pGripper[0], pGripper[1], 8.0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  const handRPYNow = extractHandRPYDeg(getEndEffectorRotation(fk));
+  ctx.fillStyle = '#0f766e';
+  ctx.font = '600 10.5px "Source Sans 3", system-ui, sans-serif';
+  const hasRot3D = Math.abs(handRPYNow[0]) > 1.0 || Math.abs(handRPYNow[1]) > 1.0 || Math.abs(handRPYNow[2]) > 1.0;
+  ctx.fillText(
+    hasRot3D
+      ? `Tutucu RPY(${Math.round(handRPYNow[0])}°,${Math.round(handRPYNow[1])}°,${Math.round(handRPYNow[2])}°)`
+      : 'Tutucu (El)',
+    pGripper[0] + 11,
+    pGripper[1] - 4
+  );
+  // Target Object + Desired 3D Target SO(3) Orientation Triad
+  {
+    const desRPYT = getDesiredTargetRPYDeg(state.target, state.waistYaw);
+    const RdT = buildTargetRotationSO3(desRPYT[0], desRPYT[1], desRPYT[2]);
+    const triadLenT = 0.060;
+    const tgtAxes = [
+      { vec: [RdT[0][0], RdT[1][0], RdT[2][0]], col: '#dc2626', lbl: 'x_d' },
+      { vec: [RdT[0][1], RdT[1][1], RdT[2][1]], col: '#16a34a', lbl: 'y_d' },
+      { vec: [RdT[0][2], RdT[1][2], RdT[2][2]], col: '#2563eb', lbl: 'z_d' }
+    ];
+    ctx.save();
+    ctx.setLineDash([4, 2]);
+    for (let ai = 0; ai < tgtAxes.length; ai++) {
+      const tip = project3D(add3(state.target, scale3(tgtAxes[ai].vec, triadLenT)), W, H);
+      ctx.strokeStyle = tgtAxes[ai].col;
+      ctx.lineWidth = 1.9;
+      ctx.beginPath();
+      ctx.moveTo(pTarget[0], pTarget[1]);
+      ctx.lineTo(tip[0], tip[1]);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  ctx.fillStyle = 'rgba(194, 65, 12, 0.18)';
+  ctx.strokeStyle = '#c2410c';
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.arc(pTarget[0], pTarget[1], 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#c2410c';
+  ctx.beginPath();
+  ctx.arc(pTarget[0], pTarget[1], 3.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillText('Hedef Obje', pTarget[0] + 12, pTarget[1] + 4);
+  // Store screen positions for the drag hit-tests
+  state.screenTarget = pTarget;
+  state.screenGripper = pGripper;
+  // Setup mode: dashed rings invite dragging
+  if (!tr) {
+    ctx.setLineDash([5, 4]);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#c2410c';
+    ctx.beginPath();
+    ctx.arc(pTarget[0], pTarget[1], 17, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = '#0f766e';
+    ctx.beginPath();
+    ctx.arc(pGripper[0], pGripper[1], 17, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#52525b';
+    ctx.font = '600 10px Consolas, monospace';
+    ctx.fillText('sürükle', pTarget[0] - 38, pTarget[1] + 26);
+  }
+  // Active drag plane overlay (only while dragging)
+  if (state.dragInfo) {
+    ctx.globalAlpha = 0.42;
+    ctx.fillStyle = '#0f766e';
+    ctx.strokeStyle = '#0f766e';
+    ctx.lineWidth = 1;
+    const quad = (plane, c) => {
+      let pts = null;
+      if (plane === 'XZ') {
+        pts = [[-0.25, c, 0.0], [1.25, c, 0.0], [1.25, c, 1.8], [-0.25, c, 1.8]];
+      } else if (plane === 'YZ') {
+        pts = [[c, -0.6, 0.0], [c, 0.6, 0.0], [c, 0.6, 1.8], [c, -0.6, 1.8]];
+      } else {
+        pts = [[-0.25, -0.6, c], [1.25, -0.6, c], [1.25, 0.6, c], [-0.25, 0.6, c]];
+      }
+      ctx.beginPath();
+      for (let k = 0; k < pts.length; k++) {
+        const p = project3D(pts[k], W, H);
+        if (k === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    };
+    quad(state.dragInfo.plane, state.dragInfo.constVal);
+    ctx.globalAlpha = 1.0;
+    ctx.setLineDash([4, 3]);
+    ctx.strokeStyle = '#0f766e';
+    const labelPt = project3D(state.dragInfo.plane === 'XZ' ? [-0.25, state.dragInfo.constVal, 1.8]
+      : state.dragInfo.plane === 'YZ' ? [state.dragInfo.constVal, -0.6, 1.8]
+        : [-0.25, -0.6, state.dragInfo.constVal], W, H);
+    ctx.beginPath();
+    ctx.moveTo(labelPt[0], labelPt[1]);
+    ctx.lineTo(labelPt[0] + 46, labelPt[1]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#0f766e';
+    ctx.font = '600 10px Consolas, monospace';
+    const constLbl = state.dragInfo.plane === 'XZ' ? 'y'
+      : state.dragInfo.plane === 'YZ' ? 'x' : 'z';
+    ctx.fillText(constLbl + ' = ' + state.dragInfo.constVal.toFixed(2) + ' m',
+      labelPt[0] + 52, labelPt[1] + 4);
+  }
+  drawBaseFrameTriad(ctx, W, H);
+  // On-canvas Color Legend for Active Robot & Selected Ghost Models
+  if (state.showGhost) {
+    const legX = 10;
+    const legY = 44;
+    const actMeta = GHOST_MODEL_MAP[state.controller];
+    const actLabel = `Aktif: ${actMeta ? actMeta.short : state.controller}`
+      + ((!state.theoremMode && tr) ? ` · e=${(tr.err[idx] * 100).toFixed(1)} cm` : '');
+    const legendRows = [{ kind: 'primary', color: '#334155', accent: '#d97706', text: actLabel }];
+    activeGhostIds.forEach(gmId => {
+      const gm = GHOST_MODEL_MAP[gmId];
+      const gtr = state.ghostTrajs ? state.ghostTrajs[gmId] : null;
+      let txt = `${gm.short}`;
+      if (!state.theoremMode && gtr && gtr.p && gtr.p.length) {
+        const gIdx = Math.min(idx, gtr.p.length - 1);
+        const errG = norm3(sub3(gtr.p[gIdx], state.target)) * 100.0;
+        txt += ` · e=${errG.toFixed(1)}cm (%${gtr.metrics.overshootPct.toFixed(0)})`;
+      } else if (!tr) {
+        txt += ' · ikiz hazır';
+      }
+      legendRows.push({ kind: 'ghost', color: gm.color, dash: gm.dash || [4, 3], text: txt });
+    });
+    if (activeGhostIds.length === 0) {
+      legendRows.push({ kind: 'note', color: '#64748b', text: 'Üstten ikiz model seçin' });
+    }
+    ctx.save();
+    ctx.font = '600 9.5px "Source Sans 3", system-ui, sans-serif';
+    let maxTw = ctx.measureText('Aktif & Hayalet Renkleri').width;
+    legendRows.forEach(r => { maxTw = Math.max(maxTw, ctx.measureText(r.text).width); });
+    const cardW = Math.min(Math.max(150, Math.ceil(maxTw) + 34), Math.max(170, W - 210));
+    const rowH = 13.5;
+    const cardH = 22 + legendRows.length * rowH;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.90)';
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.85)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(legX, legY, cardW, cardH, 4);
+    else ctx.rect(legX, legY, cardW, cardH);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#1e293b';
+    ctx.font = '700 9.5px "Source Sans 3", system-ui, sans-serif';
+    ctx.fillText('Aktif & Hayalet Renkleri', legX + 7, legY + 12.5);
+    legendRows.forEach((r, ri) => {
+      const ry = legY + 24 + ri * rowH;
+      if (r.kind === 'primary') {
+        ctx.strokeStyle = r.color;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(legX + 7, ry - 3); ctx.lineTo(legX + 23, ry - 3); ctx.stroke();
+        ctx.fillStyle = r.accent;
+        ctx.beginPath(); ctx.arc(legX + 20, ry - 3, 2.3, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '700 9.5px "Source Sans 3", system-ui, sans-serif';
+        ctx.fillText(r.text, legX + 27, ry);
+      } else if (r.kind === 'ghost') {
+        ctx.strokeStyle = r.color;
+        ctx.lineWidth = 2.2;
+        ctx.setLineDash(r.dash);
+        ctx.beginPath(); ctx.moveTo(legX + 7, ry - 3); ctx.lineTo(legX + 23, ry - 3); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = r.color;
+        ctx.font = '600 9.5px "Source Sans 3", system-ui, sans-serif';
+        ctx.fillText(r.text, legX + 27, ry);
+      } else {
+        ctx.fillStyle = r.color;
+        ctx.font = 'italic 9px "Source Sans 3", system-ui, sans-serif';
+        ctx.fillText(r.text, legX + 7, ry);
+      }
+    });
+    ctx.restore();
+  }
+  // Canlı sahne özeti (başlık çubuğundaki pill'e yazılır; HUD düğmeleriyle çakışmaz)
+  const scLbl = document.getElementById('lblSceneStat');
+  if (scLbl) {
+    if (tr) {
+      if (state.theoremMode) {
+        const ord = tr.ordinal && tr.ordinal[idx] ? tr.ordinal[idx] : { proximityClass: 'UZAK', looming: 'SABİT' };
+        const gp = tr.gazePhase && tr.gazePhase[idx] ? tr.gazePhase[idx] : 'S0 HEDEF KİLİT';
+        scLbl.textContent = `${gp} · ${ord.proximityClass}`;
+      } else {
+        scLbl.textContent = `t=${tr.t[idx].toFixed(2)}s | e=${(tr.err[idx]*100).toFixed(1)}cm | v=${tr.vel[idx].toFixed(2)}m/s`;
+      }
+    } else {
+      scLbl.textContent = state.theoremMode ? 'KURULUM (ORDİNAL)' : 'Kurulum Kipi';
+    }
+  }
+}
+// Render Left & Right Eye Perspective Viewports (showing the hand shrinking as it reaches toward the target!)
+function drawEyeViewport(canvasId, isLeft, idx) {
+  const cv = document.getElementById(canvasId);
+  if (!cv) return;
+  fitCanvasSize(cv);
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+
+  // ========== 1. Gerçek 3B pinhole göz kamerası (kafanın içindeki iki göz) ==========
+  const tr = state.traj;
+  const vMode = (tr && tr.visionMode) ? tr.visionMode : (state.visionMode || 'binocular');
+  const isMonoStatic = (vMode === 'mono_static');
+  const isMonoView = (vMode === 'mono_left' || vMode === 'mono_right' || isMonoStatic);
+  const isEyeOccluded = ((vMode === 'mono_left' || isMonoStatic) && !isLeft) || (vMode === 'mono_right' && isLeft);
+  const neckYFrame = (tr && tr.headSwayY && tr.headSwayY[idx] !== undefined) ? tr.headSwayY[idx] : 0;
+  const neckZFrame = (tr && tr.headSwayZ && tr.headSwayZ[idx] !== undefined) ? tr.headSwayZ[idx] : 0;
+  const wy = (tr && tr.waistYaw && tr.waistYaw[idx] !== undefined) ? tr.waistYaw[idx] : (state.waistYaw || 0);
+  const camB = getCameraBasis((state.headSwayOffset || 0) + neckYFrame, neckZFrame, wy);
+  const origin = isLeft ? camB.leftEye : camB.rightEye;
+  const qFrame = (tr && tr.q && tr.q.length)
+    ? tr.q[Math.max(0, Math.min(idx, tr.q.length - 1))]
+    : Q0;
+  const fk = forwardKinematics(qFrame, state.links, wy);
+  // İnsan gözleri hedefe park eder (toe-in): her göz ayrı sabitler
+  const midPt = scale3(add3(fk.ee, state.target), 0.5);
+  const lookAt = (tr && tr.lookAt && tr.lookAt[idx])
+    ? tr.lookAt[idx]
+    : (!tr ? state.target
+      : (state.gazeMode === 'hand' ? fk.ee
+      : state.gazeMode === 'mid' ? midPt
+      : state.gazeMode === 'auto' && state.gazeAuto && state.gazeAuto.currentLook ? state.gazeAuto.currentLook
+      : state.target));
+  let fwd = sub3(lookAt, origin);
+  const fn = norm3(fwd);
+  fwd = fn < 1e-6 ? [1, 0, 0] : scale3(fwd, 1 / fn);
+  const upWorld = [0, 0, 1];
+  let right = cross3(fwd, upWorld);
+  const rn = norm3(right);
+  right = rn < 1e-6 ? [0, -1, 0] : scale3(right, 1 / rn);
+  const up = cross3(right, fwd);
+  const fPx = state.focalPx * Math.min(W / state.imgW, H / state.imgH);
+  const CX = W / 2, CY = H / 2;
+  const proj = (p) => {
+    const d = sub3(p, origin);
+    const zf = dot3(d, fwd);
+    if (zf < 0.03) return null;
+    const xr = dot3(d, right), yr = dot3(d, up);
+    return { x: CX + fPx * xr / zf, y: CY - fPx * yr / zf, z: zf };
+  };
+  const depthAlpha = (z) => clampN(1.22 - z * 0.28, 0.45, 1);
+  const rrPath = (x, y, w, h, r) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  };
+
+  // ========== 2. Oda: zemin, duvar, köşe ==========
+  // Tavan ışığından süzülen sıcak zemin/duvar gradyanı (arka plan)
+  const roomGrad = ctx.createLinearGradient(0, 0, 0, H);
+  roomGrad.addColorStop(0, '#efece4');
+  roomGrad.addColorStop(0.52, '#e6e3d8');
+  roomGrad.addColorStop(1, '#d2cec2');
+  ctx.fillStyle = roomGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Arka duvar (x = 2.35 m düzlemi) — hafif sıcak fildişi
+  const WALL_X = 2.35, WALL_TOP = 1.75;
+  const wallC = (y, z) => proj([WALL_X, y, z]);
+  const wBL = wallC(-1.35, 0), wBR = wallC(1.35, 0), wTR = wallC(1.35, WALL_TOP), wTL = wallC(-1.35, WALL_TOP);
+  if (wBL && wBR && wTR && wTL) {
+    const g = ctx.createLinearGradient(0, wTL.y, 0, wBL.y);
+    g.addColorStop(0, '#ece9e0'); g.addColorStop(0.72, '#e2ded2'); g.addColorStop(1, '#cfcbbf');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(wBL.x, wBL.y); ctx.lineTo(wBR.x, wBR.y); ctx.lineTo(wTR.x, wTR.y); ctx.lineTo(wTL.x, wTL.y);
+    ctx.closePath(); ctx.fill();
+  }
+  // Sol yan duvar (y = +1.30) — biraz daha koyu, köşe hissi
+  const sideC = (x, z) => proj([x, 1.30, z]);
+  const sA = sideC(0.0, 0), sB = sideC(WALL_X, 0), sC = sideC(WALL_X, WALL_TOP), sD = sideC(0.0, WALL_TOP);
+  if (sA && sB && sC && sD) {
+    const g = ctx.createLinearGradient(0, sD.y, 0, sA.y);
+    g.addColorStop(0, '#ddd9cd'); g.addColorStop(1, '#c6c2b4');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(sA.x, sA.y); ctx.lineTo(sB.x, sB.y); ctx.lineTo(sC.x, sC.y); ctx.lineTo(sD.x, sD.y);
+    ctx.closePath(); ctx.fill();
+    // Köşe dikey çizgisi
+    ctx.strokeStyle = 'rgba(90, 86, 76, 0.5)';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(sB.x, sB.y); ctx.lineTo(sC.x, sC.y); ctx.stroke();
+  }
+
+  // Pencere (arka duvar, boy dikdörtgen) — dışarıdan ışık gelir
+  const winC = (y, z) => proj([WALL_X, y, z]);
+  const win = [winC(0.55, 0.55), winC(1.30, 0.55), winC(1.30, 1.48), winC(0.55, 1.48)];
+  if (win.every(Boolean)) {
+    const [a, b, c, d] = win;
+    const wg = ctx.createLinearGradient(a.x, a.y, a.x, d.y);
+    wg.addColorStop(0, '#f4f9fc'); wg.addColorStop(0.55, '#dfeef5'); wg.addColorStop(1, '#f3efe0');
+    ctx.fillStyle = wg;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c.x, c.y); ctx.lineTo(d.x, d.y);
+    ctx.closePath(); ctx.fill();
+    // çerçeve + orta dikme
+    ctx.strokeStyle = '#b7ac99'; ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c.x, c.y); ctx.lineTo(d.x, d.y);
+    ctx.closePath();
+    const mTop = winC(0.925, 1.48), mBot = winC(0.925, 0.55);
+    if (mTop && mBot) { ctx.moveTo(mTop.x, mTop.y); ctx.lineTo(mBot.x, mBot.y); }
+    ctx.stroke();
+    // güneş lekesi
+    if (win[2]) {
+      const sun = proj([WALL_X, 1.02, 1.30]);
+      if (sun) {
+        const sg = ctx.createRadialGradient(sun.x, sun.y, 1, sun.x, sun.y, 46);
+        sg.addColorStop(0, 'rgba(255, 252, 235, 0.95)');
+        sg.addColorStop(1, 'rgba(255, 252, 235, 0)');
+        ctx.fillStyle = sg;
+        ctx.fillRect(sun.x - 50, sun.y - 50, 100, 100);
+      }
+    }
+  }
+
+  // Zemin (z = 0 düzlemi) + ızgara — perspektifle küçülür
+  const floorC = (x, y) => proj([x, y, 0]);
+  const fA = floorC(-0.75, -1.32), fB = floorC(WALL_X, -1.32), fC = floorC(WALL_X, 1.32), fD = floorC(-0.75, 1.32);
+  if (fA && fB && fC && fD) {
+    const fg = ctx.createLinearGradient(0, fA.y, 0, (fB.y + fA.y) / 2);
+    fg.addColorStop(0, '#c8b98f'); fg.addColorStop(0.45, '#b3a377'); fg.addColorStop(1, '#8f8262');
+    ctx.fillStyle = fg;
+    ctx.beginPath();
+    ctx.moveTo(fA.x, fA.y); ctx.lineTo(fB.x, fB.y); ctx.lineTo(fC.x, fC.y); ctx.lineTo(fD.x, fD.y);
+    ctx.closePath(); ctx.fill();
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(fA.x, fA.y); ctx.lineTo(fB.x, fB.y); ctx.lineTo(fC.x, fC.y); ctx.lineTo(fD.x, fD.y);
+    ctx.closePath(); ctx.clip();
+    // ızgara çizgileri (0.2 m aralıklı)
+    ctx.lineWidth = 1;
+    for (let gx = -0.6; gx <= WALL_X + 0.001; gx += 0.2) {
+      const p1 = floorC(gx, -1.32), p2 = floorC(gx, 1.32);
+      if (p1 && p2) {
+        ctx.strokeStyle = 'rgba(84, 72, 48, ' + (0.42 - 0.22 * Math.abs(gx - 0.4) / 2.4) + ')';
+        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+      }
+    }
+    for (let gy = -1.2; gy <= 1.21; gy += 0.2) {
+      const p1 = floorC(-0.75, gy), p2 = floorC(WALL_X, gy);
+      if (p1 && p2) {
+        ctx.strokeStyle = 'rgba(84, 72, 48, 0.34)';
+        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+      }
+    }
+    ctx.restore();
+    // süpürgelik (duvar tabanı)
+    ctx.strokeStyle = 'rgba(120, 112, 96, 0.8)';
+    ctx.lineWidth = 2;
+    const s1 = floorC(WALL_X, -1.35), s2 = floorC(WALL_X, 1.35);
+    if (s1 && s2) {
+      ctx.save(); ctx.translate(0, -2);
+      ctx.beginPath(); ctx.moveTo(s1.x, s1.y); ctx.lineTo(s2.x, s2.y); ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // ========== 3. Raf (hedef üzerinde durduğu tahta) ==========
+  const t = state.target;
+  const shelfTop = t[2] - 0.050;
+  const shelf = { x0: t[0] - 0.02, x1: t[0] + 0.26, y0: t[1] - 0.52, y1: t[1] + 0.52, zTop: shelfTop, th: 0.05 };
+  const sq = (x, y, z) => proj([x, y, z]);
+  // üst yüz
+  const sT = [sq(shelf.x0, shelf.y0, shelf.zTop), sq(shelf.x1, shelf.y0, shelf.zTop), sq(shelf.x1, shelf.y1, shelf.zTop), sq(shelf.x0, shelf.y1, shelf.zTop)];
+  if (sT.every(Boolean)) {
+    const g = ctx.createLinearGradient(sT[0].x, sT[0].y, sT[2].x, sT[2].y);
+    g.addColorStop(0, '#d8c298'); g.addColorStop(0.5, '#cbb384'); g.addColorStop(1, '#a68d5e');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(sT[0].x, sT[0].y); ctx.lineTo(sT[1].x, sT[1].y); ctx.lineTo(sT[2].x, sT[2].y); ctx.lineTo(sT[3].x, sT[3].y);
+    ctx.closePath(); ctx.fill();
+    // ahşap damar çizgileri
+    ctx.strokeStyle = 'rgba(120, 100, 66, 0.35)';
+    ctx.lineWidth = 1;
+    for (let k = 1; k <= 3; k++) {
+      const yy = shelf.y0 + (shelf.y1 - shelf.y0) * k / 4;
+      const p1 = sq(shelf.x0 + 0.01, yy, shelf.zTop + 0.001), p2 = sq(shelf.x1 - 0.01, yy, shelf.zTop + 0.001);
+      if (p1 && p2) { ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); }
+    }
+  }
+  // ön yüz (kameraya bakan)
+  const sF = [sq(shelf.x0, shelf.y0, shelf.zTop), sq(shelf.x1, shelf.y0, shelf.zTop), sq(shelf.x1, shelf.y0, shelf.zTop - shelf.th), sq(shelf.x0, shelf.y0, shelf.zTop - shelf.th)];
+  if (sF.every(Boolean)) {
+    const g = ctx.createLinearGradient(0, sF[0].y, 0, sF[2].y);
+    g.addColorStop(0, '#b49c6e'); g.addColorStop(1, '#84704c');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(sF[0].x, sF[0].y); ctx.lineTo(sF[1].x, sF[1].y); ctx.lineTo(sF[2].x, sF[2].y); ctx.lineTo(sF[3].x, sF[3].y);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(56, 46, 28, 0.5)';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(sF[0].x, sF[0].y); ctx.lineTo(sF[1].x, sF[1].y); ctx.stroke();
+  }
+
+  // ========== 4. Hedef: kupa (raftan ışık alan terakota silindir) ==========
+  const mugR = 0.036, mugH = 0.095;
+  const mug = { x: t[0], y: t[1], zBase: shelfTop, zTop: shelfTop + mugH };
+  const mc = proj([mug.x, mug.y, mug.zBase + mugH / 2]);
+  const mct = proj([mug.x, mug.y, mug.zTop]);
+  if (mc && mct) {
+    const zf = mc.z;
+    const rx = Math.max(4, fPx * mugR / zf);
+    const ry = rx * 0.42;
+    // raftaki temas gölgesi
+    const sh = proj([mug.x, mug.y, shelfTop + 0.001]);
+    if (sh) {
+      ctx.save();
+      ctx.globalAlpha = 0.32;
+      ctx.fillStyle = '#241a10';
+      ctx.beginPath(); ctx.ellipse(sh.x, sh.y, rx * 1.35, rx * 0.34, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.globalAlpha = depthAlpha(zf);
+    // gövde silüeti (altta hafif daralan)
+    const topL = proj([mug.x, mug.y - mugR, mug.zTop]);
+    const topR = proj([mug.x, mug.y + mugR, mug.zTop]);
+    const botL = proj([mug.x, mug.y - mugR * 0.78, mug.zBase]);
+    const botR = proj([mug.x, mug.y + mugR * 0.78, mug.zBase]);
+    if (topL && topR && botL && botR) {
+      const bg = ctx.createLinearGradient(topL.x - 2, 0, topR.x + 2, 0);
+      bg.addColorStop(0, '#5d3018'); bg.addColorStop(0.2, '#8a4a26'); bg.addColorStop(0.45, '#c07038'); bg.addColorStop(0.62, '#dd9a5e'); bg.addColorStop(0.82, '#9a5527'); bg.addColorStop(1, '#4c2812');
+      ctx.fillStyle = bg;
+      ctx.beginPath();
+      ctx.moveTo(topL.x, topL.y);
+      ctx.quadraticCurveTo((topL.x + botL.x) / 2 - 3, (topL.y + botL.y) / 2, botL.x, botL.y);
+      ctx.lineTo(botR.x, botR.y);
+      ctx.quadraticCurveTo((topR.x + botR.x) / 2 + 3, (topR.y + botR.y) / 2, topR.x, topR.y);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = 'rgba(38, 20, 8, 0.55)'; ctx.lineWidth = 1.2; ctx.stroke();
+      // ışık şeridi (specular)
+      const hlx = topL.x + (topR.x - topL.x) * 0.38;
+      const grad = ctx.createLinearGradient(hlx - 5, 0, hlx + 5, 0);
+      grad.addColorStop(0, 'rgba(255, 235, 205, 0)');
+      grad.addColorStop(0.5, 'rgba(255, 235, 205, 0.75)');
+      grad.addColorStop(1, 'rgba(255, 235, 205, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(hlx - 5, topL.y + 2, 10, botL.y - topL.y - 2);
+    }
+    // ağız: dış halka + kahve
+    ctx.fillStyle = '#e2b183';
+    ctx.beginPath(); ctx.ellipse(mct.x, mct.y, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#33200f';
+    ctx.beginPath(); ctx.ellipse(mct.x, mct.y, rx * 0.72, ry * 0.68, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(214, 169, 110, 0.85)';
+    ctx.beginPath(); ctx.ellipse(mct.x, mct.y, rx * 0.72, ry * 0.68, 0, Math.PI * 1.08, Math.PI * 1.55); ctx.fill();
+    // sap (kulaç tarafı)
+    ctx.strokeStyle = '#5d3018';
+    ctx.lineWidth = Math.max(2, fPx * 0.011 / zf);
+    ctx.beginPath();
+    ctx.arc(topR ? (mct.x + rx * 0.92) : mct.x + rx * 0.9, mct.y + ry * 1.1, rx * 0.42, -Math.PI * 0.42, Math.PI * 0.42);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ========== 5. Kol: gölgeli kapsüller + eklem küreleri (uzaktan yakına) ==========
+  const oPole = [proj([0, 0, 0.06]), proj([0, 0, 0.885])];
+  const capSeg = (p3a, p3b, diaM, cDark, cMid, cLight, aa) => {
+    const a = proj(p3a), b = proj(p3b);
+    if (!a || !b) return;
+    const zm = (a.z + b.z) / 2;
+    const th = Math.max(2.5, fPx * diaM / zm);
+    const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1;
+    const nx = -dy / L, ny = dx / L, mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    ctx.save();
+    ctx.globalAlpha = aa != null ? aa : depthAlpha(zm);
+    // dış kontur
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(16, 21, 29, 0.5)';
+    ctx.lineWidth = th + 2.4;
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    // gövde gradyanı
+    const g = ctx.createLinearGradient(mx - nx * th / 2, my - ny * th / 2, mx + nx * th / 2, my + ny * th / 2);
+    g.addColorStop(0, cDark); g.addColorStop(0.36, cMid); g.addColorStop(0.58, cLight); g.addColorStop(0.86, cMid); g.addColorStop(1, cDark);
+    ctx.strokeStyle = g;
+    ctx.lineWidth = th;
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    ctx.restore();
+  };
+  const sphere = (p3, rM, cMid, cRim, spec) => {
+    const p = proj(p3); if (!p) return;
+    const r = Math.max(2, fPx * rM / p.z);
+    ctx.save();
+    ctx.globalAlpha = depthAlpha(p.z);
+    const g = ctx.createRadialGradient(p.x - r * 0.38, p.y - r * 0.42, r * 0.05, p.x, p.y, r);
+    g.addColorStop(0, spec || '#dfe7ef');
+    g.addColorStop(0.32, cMid);
+    g.addColorStop(1, cRim);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(12, 16, 22, 0.5)';
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+    // speküler nokta
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
+    ctx.beginPath(); ctx.ellipse(p.x - r * 0.36, p.y - r * 0.42, r * 0.22, r * 0.14, -0.5, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  };
+  const O = fk.origins;
+  // gövde direği (omuz altı) — en yakın, altta
+  capSeg([0, 0, 0.05], [0, 0, 0.885], 0.148, '#1c242f', '#2f3a49', '#46566c', 0.96);
+  // üst kol (omuz → dirsek)
+  capSeg(O[1], O[2], 0.080, '#232e3e', '#354258', '#526380');
+  // ön kol (dirsek → bilek)
+  capSeg(O[2], O[3], 0.061, '#27323f', '#3a4656', '#5a6a80');
+  // el: bilekten parmak ucuna (iki kapsül — hafif incelen)
+  const wrist = O[5], ee = fk.ee;
+  const midHand = add3(wrist, scale3(sub3(ee, wrist), 0.55));
+  capSeg(wrist, midHand, 0.056, '#202a35', '#333f4e', '#4e5f74');
+  capSeg(midHand, ee, 0.046, '#1f2934', '#303c4a', '#48586c');
+  // parmaklar (3 kısa kapsül, hafif yelpaze)
+  const dv = sub3(ee, wrist);
+  const dirE = scale3(dv, 1 / (norm3(dv) || 1));
+  const perpH = [-dirE[1], dirE[0], 0];
+  const pn = norm3(perpH);
+  const perp = pn < 1e-6 ? [1, 0, 0] : scale3(perpH, 1 / pn);
+  for (let fi = -1; fi <= 1; fi++) {
+    const tipF = [
+      ee[0] + dirE[0] * 0.055 + perp[0] * fi * 0.024,
+      ee[1] + dirE[1] * 0.055 + perp[1] * fi * 0.024,
+      ee[2] + dirE[2] * 0.055 - 0.030
+    ];
+    capSeg(ee, tipF, 0.017, '#1b232c', '#2c3742', '#445264');
+  }
+  // eklem küreleri (omuz, dirsek, bilek)
+  sphere(O[1], 0.047, '#39465c', '#161d27', '#e3ebf3');
+  sphere(O[2], 0.040, '#333f52', '#141a23', '#dde6ee');
+  sphere(O[3], 0.030, '#2d3847', '#10161e', '#d5dfe8');
+
+  // ========== 6. El görüntü düzlemindeki iz (soluk turkuaz) ==========
+  if (tr) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(15, 118, 110, 0.40)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    const d0 = currentEyeData(0);
+    const scl = W / state.imgW, sclY = H / state.imgH;
+    const p0 = isLeft ? d0.gL : d0.gR;
+    ctx.moveTo(p0[0] * scl, p0[1] * sclY);
+    for (let k = 1; k <= idx; k++) {
+      const dk = currentEyeData(k);
+      const pk = isLeft ? dk.gL : dk.gR;
+      ctx.lineTo(pk[0] * scl, pk[1] * sclY);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ========== 7. Fiksasyon retikülü (S0–S6 durumuna göre) ==========
+  const gazeLabelFrame = (tr && tr.gaze && tr.gaze[idx]) ? tr.gaze[idx] : state.gazeMode;
+  const gazePhaseFrame = (tr && tr.gazePhase && tr.gazePhase[idx]) ? tr.gazePhase[idx] : 'S0 HEDEF KİLİT';
+  const isSampleFrame = (tr && tr.isVisualSample && tr.isVisualSample[idx] !== undefined) ? tr.isVisualSample[idx] : true;
+  const fixP = proj(lookAt);
+  if (fixP) {
+    const isHand = (gazeLabelFrame === 'hand');
+    const isMid = (gazeLabelFrame === 'mid');
+    ctx.save();
+    ctx.strokeStyle = isHand ? 'rgba(15, 118, 110, 0.95)' : (isMid ? 'rgba(180, 83, 9, 0.95)' : 'rgba(194, 65, 12, 0.95)');
+    ctx.lineWidth = 1.6;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath(); ctx.arc(fixP.x, fixP.y, 15, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(fixP.x - 23, fixP.y); ctx.lineTo(fixP.x - 10, fixP.y);
+    ctx.moveTo(fixP.x + 10, fixP.y); ctx.lineTo(fixP.x + 23, fixP.y);
+    ctx.moveTo(fixP.x, fixP.y - 23); ctx.lineTo(fixP.x, fixP.y - 10);
+    ctx.moveTo(fixP.x, fixP.y + 10); ctx.lineTo(fixP.x, fixP.y + 23);
+    ctx.stroke();
+    ctx.font = '600 8.5px Consolas, monospace';
+    ctx.fillStyle = ctx.strokeStyle;
+    const retTxt = isHand ? 'EL' : (isMid ? 'TARAMA' : 'HEDEF');
+    ctx.fillText(retTxt, fixP.x + 17, fixP.y - 14);
+    ctx.restore();
+  }
+  // ========== 7b. XYZ'siz 2B Retinal Eşleştirme Göstergesi (Δu, Δv oku + ρ_s looming halkası) ==========
+  if (!isEyeOccluded) {
+    const pHandRet = proj(fk.ee);
+    const pTgtRet = proj(state.target);
+    const dEye = currentEyeData(idx);
+    const scalePx = Math.min(W / state.imgW, H / state.imgH);
+    if (pHandRet && pTgtRet) {
+      const rHand = clampN(0.5 * dEye.sg * scalePx, 5, 44);
+      const sGoalNorm = dEye.st * (state.gripperRealM / Math.max(state.targetRealM, 1e-4));
+      const rMatch = clampN(0.5 * sGoalNorm * scalePx, 5, 44);
+      ctx.save();
+      // El üzerinde eşmerkezli looming halkaları: yeşil = s_g(t), kesikli turuncu = ρ_s=1 hedef boyu
+      ctx.strokeStyle = 'rgba(15, 118, 110, 0.92)';
+      ctx.lineWidth = 2.0;
+      ctx.beginPath(); ctx.arc(pHandRet.x, pHandRet.y, rHand, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = 'rgba(194, 65, 12, 0.88)';
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.arc(pHandRet.x, pHandRet.y, rMatch, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(pTgtRet.x, pTgtRet.y, clampN(0.5 * dEye.st * scalePx, 5, 44), 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+      // El -> Hedef 2B retinal yönelim hata vektörü (Δu, Δv)
+      const vx = pTgtRet.x - pHandRet.x, vy = pTgtRet.y - pHandRet.y;
+      const vLen = Math.hypot(vx, vy);
+      if (vLen > 8) {
+        const ux = vx / vLen, uy = vy / vLen;
+        const x1 = pHandRet.x + ux * 6, y1 = pHandRet.y + uy * 6;
+        const x2 = pTgtRet.x - ux * 6, y2 = pTgtRet.y - uy * 6;
+        ctx.strokeStyle = 'rgba(29, 78, 216, 0.88)';
+        ctx.lineWidth = 1.8;
+        ctx.setLineDash([5, 3]);
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.setLineDash([]);
+        const nx = -uy, ny = ux;
+        ctx.fillStyle = 'rgba(29, 78, 216, 0.92)';
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - 7 * ux + 3.5 * nx, y2 - 7 * uy + 3.5 * ny);
+        ctx.lineTo(x2 - 7 * ux - 3.5 * nx, y2 - 7 * uy - 3.5 * ny);
+        ctx.closePath(); ctx.fill();
+        const lblText = state.theoremMode ? 'YÖN (Δu,Δv)' : `Δu=${Math.round(vx)} Δv=${Math.round(vy)}`;
+        ctx.font = '700 8.5px Consolas, monospace';
+        const tw = ctx.measureText(lblText).width;
+        const midX = clampN(0.5 * (x1 + x2), tw * 0.5 + 8, W - tw * 0.5 - 8);
+        const midY = clampN(Math.min(pHandRet.y, pTgtRet.y) - Math.max(rHand, rMatch) - 10, 38, H - 56);
+        rrPath(midX - tw * 0.5 - 4, midY - 9, tw + 8, 12, 3);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+        ctx.fill();
+        ctx.fillStyle = '#1e3a8a';
+        ctx.fillText(lblText, midX - tw * 0.5, midY);
+      } else {
+        const alignLbl = 'HİZALI (ρ_s≈1)';
+        ctx.font = '700 8.5px Consolas, monospace';
+        const tw = ctx.measureText(alignLbl).width;
+        const ax = clampN(pHandRet.x + 10, 6, W - tw - 12);
+        const ay = clampN(pHandRet.y - rHand - 8, 38, H - 56);
+        rrPath(ax - 3, ay - 9, tw + 6, 12, 3);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+        ctx.fill();
+        ctx.fillStyle = '#0f766e';
+        ctx.fillText(alignLbl, ax, ay);
+      }
+      ctx.restore();
+    }
+  }
+  if (tr && !isSampleFrame && !isEyeOccluded) {
+    ctx.save();
+    rrPath(7, 7, Math.min(W - 14, 215), 18, 4);
+    ctx.fillStyle = 'rgba(180, 83, 9, 0.85)';
+    ctx.fill();
+    ctx.font = '700 8.5px Consolas, monospace';
+    ctx.fillStyle = '#fffbeb';
+    ctx.fillText('S3 KÖR UÇUŞ · ÖRNEK TUTULUYOR', 13, 19);
+    ctx.restore();
+  }
+  // Monoküler açık gözde önceki kafa pozu hayalet hedef/el + hareket paralaks vektörü Δu_mp
+  if (isMonoView && !isEyeOccluded) {
+    const scl = W / state.imgW, sclY = H / state.imgH;
+    ctx.save();
+    if (!isMonoStatic && tr && tr.prevEyeRetT && tr.prevEyeRetT[idx]) {
+      const pOldT = tr.prevEyeRetT[idx];
+      const dNow = currentEyeData(idx);
+      const pCurT = isLeft ? dNow.tL : dNow.tR;
+      const x1 = pOldT[0] * scl, y1 = pOldT[1] * sclY;
+      const x2 = pCurT[0] * scl, y2 = pCurT[1] * sclY;
+      ctx.strokeStyle = 'rgba(217, 119, 6, 0.85)';
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.arc(x1, y1, 9, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = '700 8.5px Consolas, monospace';
+      ctx.fillText('t-Δt', x1 + 10, y1 - 4);
+    }
+    if (!tr || isSampleFrame) {
+      rrPath(7, 7, Math.min(W - 14, 224), 18, 4);
+      ctx.fillStyle = isMonoStatic ? 'rgba(139, 38, 53, 0.88)' : 'rgba(15, 118, 110, 0.88)';
+      ctx.fill();
+      ctx.font = '700 8.5px Consolas, monospace';
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillText(isMonoStatic ? 'TEK GÖZ SABİT KAFA (PARALAKS YOK)' : 'TEK GÖZ · AKTİF BOYUN PARALAKSI', 13, 19);
+    }
+    ctx.restore();
+  }
+
+  // ========== 8. Derinlik telemetrisi — Teorem Kipinde sayı maskelenir ==========
+  const d = currentEyeData(idx);
+  const d0 = currentEyeData(0);
+  const sg = d.sg, st = d.st;
+  const zg = depthFromSize(sg, state.gripperRealM);
+  const zdG = depthFromDisparity(Math.abs(d.gL[0] - d.gR[0]));
+  const zt = depthFromSize(st, state.targetRealM);
+  const zdT = depthFromDisparity(Math.abs(d.tL[0] - d.tR[0]));
+  const aG = agreementPct(zg, zdG);
+  const aT = agreementPct(zt, zdT);
+  const neckBaseMm = (tr && tr.neckBaseMm && tr.neckBaseMm[idx] !== undefined) ? tr.neckBaseMm[idx] : 0;
+  const mpPx = (tr && tr.motionParallaxPx && tr.motionParallaxPx[idx] !== undefined) ? tr.motionParallaxPx[idx] : 0;
+  const uColor = (a) => a < 12 ? '#7be0a3' : a < 30 ? '#ffd166' : '#ff8f8f';
+  const chipW = Math.min(W - 14, 305);
+  if (!isEyeOccluded) {
+    ctx.save();
+    rrPath(7, H - 46, chipW, 40, 6);
+    ctx.fillStyle = 'rgba(14, 16, 20, 0.68)';
+    ctx.fill();
+    ctx.font = '500 8.6px Consolas, monospace';
+    if (state.theoremMode) {
+      const ord = (tr && tr.ordinal && tr.ordinal[idx]) ? tr.ordinal[idx] : { proximityClass: 'UZAK', horiz: 'ORTA', vert: 'ORTA', depth: 'GERİDE' };
+      ctx.fillStyle = '#5eead4';
+      ctx.fillText(`ORDİNAL: ${ord.proximityClass} · ${ord.horiz} / ${ord.vert}`, 14, H - 30);
+      ctx.fillStyle = uColor(aG);
+      ctx.fillText(isMonoView ? `BOYUN PARALAKSI · FAZ: ${gazePhaseFrame}` : `DERİNLİK KONİSİ: ${ord.depth} · FAZ: ${gazePhaseFrame}`, 14, H - 19);
+      ctx.fillStyle = '#fde68a';
+      ctx.fillText(`UYUM: ${aG < 12 ? 'YÜKSEK' : aG < 30 ? 'ORTA' : 'DÜŞÜK'} (SAYI YOK)`, 14, H - 8);
+    } else if (isMonoView) {
+      ctx.fillStyle = '#c9c6bb';
+      ctx.fillText('el Z_loom=' + zg.toFixed(2) + 'm  hedef Z_mp=' + zt.toFixed(2) + 'm', 14, H - 30);
+      ctx.fillStyle = '#7be0a3';
+      ctx.fillText('boyun baz B=' + neckBaseMm.toFixed(1) + 'mm  Δu_mp=' + mpPx.toFixed(1) + 'px', 14, H - 19);
+      ctx.fillStyle = '#fde68a';
+      ctx.fillText('el s_g=' + sg.toFixed(1) + 'px  hedef s_t=' + st.toFixed(1) + 'px', 14, H - 8);
+    } else {
+      ctx.fillStyle = '#c9c6bb';
+      ctx.fillText('el  Z_boy=' + zg.toFixed(2) + 'm  Z_disp=' + zdG.toFixed(2) + 'm', 14, H - 30);
+      ctx.fillStyle = uColor(aG);
+      ctx.fillText('el  uyum=%' + aG.toFixed(0) + '   Δu_g=' + Math.abs(d.gL[0] - d.gR[0]).toFixed(1) + 'px', 14, H - 19);
+      ctx.fillStyle = uColor(aT);
+      ctx.fillText('hedef uyum=%' + aT.toFixed(0) + '   Z_t=' + zt.toFixed(2) + 'm  Δu_t=' + Math.abs(d.tL[0] - d.tR[0]).toFixed(1) + 'px', 14, H - 8);
+    }
+    ctx.restore();
+  }
+
+  // Kapalı göz örtüsü + canlı boyun salınım eğrisi (Monoküler kip)
+  if (isEyeOccluded) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.86)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+    ctx.lineWidth = 2;
+    rrPath(8, 8, W - 16, H - 16, 8);
+    ctx.stroke();
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = '700 11px "Source Sans 3", system-ui, sans-serif';
+    ctx.fillText(isMonoStatic ? `${isLeft ? 'SOL' : 'SAĞ'} GÖZ KAPALI (SABİT KAFA · B_boyun=0mm)` : `${isLeft ? 'SOL' : 'SAĞ'} GÖZ KAPALI (MONOKÜLER KİP)`, 16, 28);
+    ctx.fillStyle = '#cbd5e1';
+    ctx.font = '500 9.5px "Source Sans 3", system-ui, sans-serif';
+    ctx.fillText(isMonoStatic ? 'Boyun sabit: boyut–uzaklık yanılsaması (kalibrasyon yok)' : `Derinlik: Açık ${isLeft ? 'sağ' : 'sol'} göz + boyun paralaksı`, 16, 44);
+    // Küçük boyun salınım dalgası (y_boyun)
+    const gx = 16, gy = 56, gw = Math.max(80, W - 32), gh = Math.max(36, H - 102);
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.85)';
+    rrPath(gx, gy, gw, gh, 5); ctx.fill();
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(gx, gy + gh / 2); ctx.lineTo(gx + gw, gy + gh / 2); ctx.stroke();
+    ctx.strokeStyle = isMonoStatic ? '#f87171' : '#38bdf8';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    const samples = 48;
+    for (let s = 0; s <= samples; s++) {
+      const f = s / samples;
+      const sx = gx + f * gw;
+      const uS = Math.min(1.0, f / 0.85);
+      const sG = uS * uS * (3.0 - 2.0 * uS);
+      const sy = isMonoStatic ? (gy + gh / 2) : (gy + gh / 2 - (gh * 0.36) * (-0.65 + 1.50 * sG));
+      if (s === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+    }
+    ctx.stroke();
+    const curOff = isMonoStatic ? 0 : clampN((neckYFrame / Math.max(state.neckParallaxAmp || 0.038, 1e-4)), -1, 1);
+    const dotX = tr && tr.t.length ? gx + (idx / Math.max(tr.t.length - 1, 1)) * gw : gx + gw * 0.25;
+    const dotY = gy + gh / 2 - (gh * 0.36) * curOff;
+    ctx.fillStyle = isMonoStatic ? '#f87171' : '#f59e0b';
+    ctx.beginPath(); ctx.arc(dotX, dotY, 4.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#93c5fd';
+    ctx.font = '600 9px Consolas, monospace';
+    const biasNow = (tr && tr.scaleBiasPct && tr.scaleBiasPct[idx] !== undefined) ? tr.scaleBiasPct[idx] : (isMonoStatic ? 28.0 : 0.0);
+    ctx.fillText(`y_boyun=${(neckYFrame * 1000).toFixed(1)}mm | B=${neckBaseMm.toFixed(1)}mm | Bias=%${biasNow.toFixed(0)}`, 16, H - 24);
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillText(`Hedef Paralaks Δu_mp=${mpPx.toFixed(1)}px | Retinal Ölçek s_g=${sg.toFixed(1)}px`, 16, H - 11);
+    ctx.restore();
+  }
+
+  // ========== 9. Vinyet (periferal karartma — odak dışı hissi) ==========
+  const vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.32, W / 2, H / 2, Math.min(W, H) * 0.72);
+  vg.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  vg.addColorStop(1, 'rgba(22, 19, 15, 0.42)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, W, H);
+}
+
+
+// Render the 3 Right-Column Academic Plots (HiDPI + non-overlapping top legend strip)
+function initHiDpiPlot(id, logW, logH) {
+  const cv = document.getElementById(id);
+  if (!cv) return null;
+  const dpr = Math.max(2, Math.min(3, window.devicePixelRatio || 2));
+  const cw = (cv.parentElement && cv.parentElement.clientWidth > 120) ? Math.round(cv.parentElement.clientWidth) : logW;
+  const ch = logH;
+  const bw = Math.round(cw * dpr), bh = Math.round(ch * dpr);
+  if (cv.width !== bw) cv.width = bw;
+  if (cv.height !== bh) cv.height = bh;
+  cv.style.height = ch + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, cw, ch);
+  const padL = 38, padR = 12, padT = 22, padB = 18;
+  const pw = cw - padL - padR, ph = ch - padT - padB;
+  ctx.strokeStyle = '#edf1f5'; ctx.lineWidth = 1;
+  for (let g = 1; g <= 3; g++) {
+    const gy = padT + (ph * g) / 4;
+    ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(padL + pw, gy); ctx.stroke();
+  }
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1;
+  ctx.strokeRect(padL, padT, pw, ph);
+  return { cv, ctx, W: cw, H: ch, padL, padT, pw, ph };
+}
+function drawAcademicPlots(idx) {
+  const tr = state.traj;
+  if (!tr) return;
+  const drawSeries = (ctx, vals, minV, maxV, p, color, lw, dash) => {
+    ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    const span = Math.max(maxV - minV, 1e-6);
+    for (let i = 0; i < vals.length; i++) {
+      const x = p.padL + (i / Math.max(vals.length - 1, 1)) * p.pw;
+      const y = p.padT + p.ph - ((vals[i] - minV) / span) * p.ph;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  };
+  const drawCursor = (p) => {
+    const { ctx } = p;
+    const cx = p.padL + (idx / Math.max(tr.t.length - 1, 1)) * p.pw;
+    ctx.strokeStyle = '#8b2635'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(cx, p.padT); ctx.lineTo(cx, p.padT + p.ph); ctx.stroke();
+    ctx.fillStyle = '#475569'; ctx.font = '500 8.5px Consolas, monospace';
+    ctx.fillText('0s', p.padL, p.padT + p.ph + 12);
+    const tEndStr = (tr.t[tr.t.length - 1] || 0).toFixed(1) + 's';
+    ctx.textAlign = 'right';
+    ctx.fillText(tEndStr, p.padL + p.pw, p.padT + p.ph + 12);
+    ctx.textAlign = 'left';
+  };
+  // --- Plot A: Bell-shaped velocity profile |v(t)| & Remaining Error |e(t)| ---
+  {
+    const p = initHiDpiPlot('cvPlotVel', 390, 148);
+    if (p) {
+      const { ctx } = p;
+      const maxV = Math.max(0.45, Math.max.apply(null, tr.vel) * 1.15);
+      const maxE = Math.max(0.20, tr.err[0] * 1.1);
+      drawSeries(ctx, tr.err, 0, maxE, p, '#64748b', 1.5, [4, 3]);
+      drawSeries(ctx, tr.vel, 0, maxV, p, '#1e3a5f', 2.2);
+      drawCursor(p);
+      ctx.font = '600 9.5px Consolas, monospace';
+      ctx.fillStyle = '#1e3a5f'; ctx.fillText('— Hız |v(t)| (m/s)', p.padL, 14);
+      ctx.fillStyle = '#64748b'; ctx.textAlign = 'right';
+      ctx.fillText('-- Kalan Hata |e(t)|', p.padL + p.pw, 14); ctx.textAlign = 'left';
+    }
+  }
+  // --- Plot B: Perspective Apparent Size Shrinking s_g(t) -> s_t & Scale Ratio ---
+  {
+    const p = initHiDpiPlot('cvPlotLoom', 390, 148);
+    if (p) {
+      const { ctx } = p;
+      const allPx = tr.sgPx.concat(tr.stPx);
+      const minPx = Math.min.apply(null, allPx) * 0.85;
+      const maxPx = Math.max.apply(null, allPx) * 1.10;
+      drawSeries(ctx, tr.stPx, minPx, maxPx, p, '#8b2635', 1.5, [4, 3]);
+      drawSeries(ctx, tr.sgPx, minPx, maxPx, p, '#1e3a5f', 2.2);
+      drawCursor(p);
+      ctx.font = '600 9.5px Consolas, monospace';
+      ctx.fillStyle = '#1e3a5f';
+      ctx.fillText(`— El s_g (${tr.sgPx[0].toFixed(0)}→${tr.sgPx[tr.sgPx.length - 1].toFixed(0)}px)`, p.padL, 14);
+      ctx.fillStyle = '#8b2635'; ctx.textAlign = 'right';
+      ctx.fillText(`-- Hedef s_t (${tr.stPx[0].toFixed(0)}px)`, p.padL + p.pw, 14); ctx.textAlign = 'left';
+    }
+  }
+  // --- Plot C: Singularity Index w(q) & Peak Joint Torque ---
+  {
+    const p = initHiDpiPlot('cvPlotSing', 390, 148);
+    if (p) {
+      const { ctx } = p;
+      const maxW = Math.max(0.08, Math.max.apply(null, tr.w) * 1.15);
+      const yThresh = p.padT + p.ph - (0.02 / maxW) * p.ph;
+      ctx.strokeStyle = 'rgba(139, 38, 53, 0.35)'; ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(p.padL, yThresh); ctx.lineTo(p.padL + p.pw, yThresh); ctx.stroke();
+      ctx.setLineDash([]);
+      drawSeries(ctx, tr.w, 0, maxW, p, '#1e3a5f', 2.2);
+      const maxTau = Math.max(30.0, tr.metrics.peakTau * 1.1);
+      const t2Arr = tr.tau.map(row => Math.abs(row[1]));
+      drawSeries(ctx, t2Arr, 0, maxTau, p, '#7c4d12', 1.6);
+      drawCursor(p);
+      ctx.font = '600 9.5px Consolas, monospace';
+      ctx.fillStyle = '#1e3a5f'; ctx.fillText(`— w(q) min=${tr.metrics.minW.toFixed(3)}`, p.padL, 14);
+      ctx.fillStyle = '#7c4d12'; ctx.textAlign = 'right';
+      ctx.fillText('— Omuz Torku |τ_2|', p.padL + p.pw, 14); ctx.textAlign = 'left';
+    }
+  }
+}
+function setModeBanner(kind, text) {
+  const b = document.getElementById('modeBanner');
+  b.className = 'mode-banner' + (kind ? ' ' + kind : '');
+  b.textContent = text;
+}
+function formatGazeChip(mode, phaseLabel) {
+  const modeText = {
+    auto: 'otomatik alterasyon',
+    mid: 'el + hedef birlikte',
+    hand: 'eli izliyor',
+    target: 'hedefe kilitli'
+  }[mode] || 'hedefe kilitli';
+  if (state.theoremMode) {
+    const ph = phaseLabel || 'S0 HEDEF KİLİT';
+    return `Kafa: <b>${modeText}</b> · Faz: <b>${ph}</b> | geri besleme: yalnızca stereo koni`;
+  }
+  return `Kafa: <b>yaw ${(state.gazeYaw * 57.2958).toFixed(0)}° · pitch ${(state.gazePitch * 57.2958).toFixed(0)}°</b> · ${modeText} | geri besleme: yalnızca stereo görüş`;
+}
+function updateTheoremStripDom(ord, gazePhase, pulseStr, sigmaDeg) {
+  const pEl = document.getElementById('thProx');
+  const gEl = document.getElementById('thGazeState');
+  const uEl = document.getElementById('thPulse');
+  const eEl = document.getElementById('thEfference');
+  if (pEl) pEl.innerHTML = `Yakınlık Sınıfı: <b>${ord.proximityClass} (${ord.looming})</b>`;
+  if (gEl) gEl.innerHTML = `Bakış Durumu: <b>${gazePhase}</b>`;
+  if (uEl) uEl.innerHTML = `Enerji Sinerjisi: <b>${pulseStr}</b>`;
+  if (eEl) {
+    const effTxt = !state.brakesEngaged ? 'GEÇERSİZ (SERBEST)' : (sigmaDeg > 1.5 ? 'SACCADE SÜZÜLÜYOR' : 'FRENLE KORUNMUŞ');
+    eEl.innerHTML = `Efference Copy: <b>${effTxt}</b>`;
+    eEl.className = 'th-badge' + (!state.brakesEngaged ? ' warn' : '');
+  }
+}
+// Setup mode: arm sits in its initial (hanging) posture, target placed, nothing simulated yet
+function renderSetupPreview() {
+  const assess = computePreReachAssessment();
+  const badge = document.getElementById('reachBadge');
+  const fk0 = forwardKinematics(Q0, state.links);
+  const g0 = projectStereoAndLooming(fk0.ee, state.gripperRealM, 0, state.headSwayOffset);
+  const t0 = projectStereoAndLooming(state.target, state.targetRealM, 0, state.headSwayOffset);
+  const rho0 = (g0.sizePx / state.gripperRealM) / Math.max(t0.sizePx / state.targetRealM, 1e-4);
+  const ord0 = computeOrdinalPerceptionJS(g0, t0, rho0, 'UZAK', null, state.noisePx);
+  const w0 = computeJacobianAndManip(Q0, state.links).w;
+  if (state.theoremMode) {
+    badge.className = assess.reachable ? 'status-pill' : 'status-pill danger';
+    badge.textContent = assess.reachable ? 'ERİŞİLİR · PARALAKS POZİTİF' : 'SINGULARITY SINIRINA YAKIN';
+    document.getElementById('chipReachDist').innerHTML =
+      `Menzil Sınıfı: <b>${ord0.proximityClass}</b> · Kol Güvenliği: <b>${assess.reachable ? 'YETERLİ' : 'SINIRDA'}</b>`;
+    document.getElementById('chipLooming').innerHTML =
+      `Looming Akışı: <b>${ord0.looming}</b> · Yön: <b>${ord0.horiz} / ${ord0.vert} (${ord0.depth})</b>`;
+    document.getElementById('chipSing').innerHTML = `Singularity: <b>${w0 >= 0.04 ? 'RAHAT BÖLGE' : 'SINIR BÖLGESİ'}</b>`;
+    document.getElementById('chipGaze').innerHTML = formatGazeChip(state.gazeMode, 'S0 HEDEF KİLİT');
+    document.getElementById('lblTime').textContent = 'KURULUM KİPİ';
+    document.getElementById('lblLeftEye').textContent = `Sol Retina: ${ord0.proximityClass} · ${ord0.horiz}`;
+    document.getElementById('lblRightEye').textContent = `Sağ Retina: ${ord0.depth} · Uyum ${ord0.conf}`;
+    document.getElementById('mathGripperSize').textContent = `1. El Perspektifi: ${ord0.proximityClass} · Uyum ${ord0.conf}`;
+    document.getElementById('mathTargetSize').textContent = `2. Hedef Konisi: Görüş Alanında (${ord0.horiz} · ${ord0.vert})`;
+    document.getElementById('mathScaleRatio').textContent = `3. Ölçek Yakınsaması: ${ord0.proximityClass} -> TEMAS`;
+  } else {
+    if (assess.reachable) {
+      badge.className = 'status-pill';
+      badge.textContent = `ULAŞILABİLİR (Paralks Δu=${assess.parallaxPx.toFixed(1)}px)`;
+    } else if (assess.needsWaist && assess.waistReachable) {
+      badge.className = 'status-pill';
+      badge.textContent = `BELDEN DÖNÜŞ + KOL İLE ERİŞİLİR (Bel ${assess.goalWaistDeg.toFixed(0)}°)`;
+    } else {
+      badge.className = 'status-pill danger';
+      badge.textContent = `KOL BOYU / SINGULARITY SINIRI AŞILIYOR`;
+    }
+    const waistInfo = assess.needsWaist
+      ? ` · Bel ${assess.goalWaistDeg.toFixed(0)}° dönünce: <b>${assess.distAfterWaistCm.toFixed(1)} cm</b>`
+      : '';
+    document.getElementById('chipReachDist').innerHTML =
+      `Hedef Uzaklığı (omuzdan): <b>${assess.distCm.toFixed(1)} cm</b> / Güvenli Sınır: <b>${assess.maxSafeCm.toFixed(1)} cm</b> (Toplam Kol: ${assess.totalArmCm.toFixed(0)} cm)${waistInfo}`;
+    document.getElementById('chipLooming').innerHTML =
+      `Başlangıç El Boyu s_g(0): <b>${assess.sg0Px.toFixed(1)} px</b> / Hedef s_t: <b>${assess.stPx.toFixed(1)} px</b>`;
+    document.getElementById('chipSing').innerHTML = `Başlangıç w(q0): <b>${w0.toFixed(3)}</b>`;
+    document.getElementById('chipGaze').innerHTML = formatGazeChip(state.gazeMode, 'S0 HEDEF KİLİT');
+    document.getElementById('lblTime').textContent = 't = 0.00 s (kurulum)';
+    const vm0 = state.visionMode || 'binocular';
+    document.getElementById('lblLeftEye').textContent = (vm0 === 'mono_right')
+      ? 'KAPALI (Sağ Tek Göz + Boyun Paralaksı Kipi)'
+      : `Kurulum önizleme | s_g=${assess.sg0Px.toFixed(1)}px${vm0 === 'mono_left' ? ' [TEK GÖZ AÇIK]' : vm0 === 'mono_static' ? ' [SABİT TEK GÖZ · PARALAKS YOK]' : ''}`;
+    document.getElementById('lblRightEye').textContent = (vm0 === 'mono_left')
+      ? 'KAPALI (Sol Tek Göz + Boyun Paralaksı Kipi)'
+      : (vm0 === 'mono_static')
+        ? 'KAPALI (Sabit Tek Göz Kipi · Paralaks YOK)'
+        : `Kurulum önizleme | s_t=${assess.stPx.toFixed(1)}px${vm0 === 'mono_right' ? ' [TEK GÖZ AÇIK]' : ''}`;
+  }
+  updateTheoremStripDom(ord0, 'S0 HEDEF KİLİT', 'BEKLEMEDE (FREN)', 0.0);
+  const telOrd = document.getElementById('telOrdinal');
+  const telGp = document.getElementById('telGazePhase');
+  const telSa = document.getElementById('telSampleAge');
+  const telPu = document.getElementById('telPulse');
+  const telEf = document.getElementById('telEffSigma');
+  const telOr = document.getElementById('telOrient');
+  if (telOrd) telOrd.textContent = ord0.proximityClass;
+  if (telGp) telGp.textContent = 'S0 HEDEF KİLİT';
+  if (telSa) telSa.textContent = state.theoremMode ? 'TAZE ÖRNEK' : '0 ms (TAZE)';
+  if (telPu) telPu.textContent = 'BEKLEMEDE';
+  if (telEf) telEf.textContent = state.theoremMode ? (state.brakesEngaged ? 'KİLİTLİ' : 'GEÇERSİZ') : (state.brakesEngaged ? '0.0° (KİLİTLİ)' : 'SERBEST');
+  if (telOr) {
+    const des0 = getDesiredTargetRPYDeg(state.target, 0);
+    const Rd0 = buildTargetRotationSO3(des0[0], des0[1], des0[2]);
+    const Ree0 = getEndEffectorRotation(fk0);
+    const r0 = extractHandRPYDeg(Ree0);
+    const o0 = computeOrientationErrorSO3(Ree0, Rd0);
+    telOr.textContent = `${Math.round(r0[0])}°,${Math.round(r0[1])}°,${Math.round(r0[2])}° (|e_ω|=${o0.errDeg.toFixed(1)}°)`;
+  }
+  updateEEFieldsFromQ(Q0);
+  draw3DScene(0);
+  drawEyeViewport('cvLeftEye', true, 0);
+  drawEyeViewport('cvRightEye', false, 0);
+  drawStereoTopView(0);
+  drawSideView(0);
+  ['cvPlotVel', 'cvPlotLoom', 'cvPlotSing'].forEach(id => {
+    const p = initHiDpiPlot(id, 390, 148);
+    if (!p) return;
+    p.ctx.fillStyle = '#71717a';
+    p.ctx.font = '500 11px "Source Sans 3", system-ui, sans-serif';
+    p.ctx.fillText('Simülasyon başlatıldığında grafik çizilecek', p.padL + 8, p.padT + p.ph / 2);
+  });
+  updateControlDiagramLive(null, 0);
+}
+function enterSetupMode() {
+  stopPlay();
+  state.traj = null;
+  state.ghostTraj = null;
+  state.ghostTrajs = {};
+  state.compareResults = {};
+  state.waistYaw = 0.0;
+  state.goalWaistYaw = computeTargetWaistYaw(state.target, state.links);
+  resetGazeToTarget(state.target, 0.0);
+  animateSetupHeadToTarget();
+  document.getElementById('tbodyCompare').innerHTML =
+    '<tr><td colspan="10" style="text-align:center;color:var(--ink-muted);">Ayarları yapın, sonra ▶ Simülasyonu Başlat veya Modelleri Karşılaştır</td></tr>';
+  ['kpiMT','kpiOS','kpiJerk','kpiLoom','kpiManip','kpiTorque','kpiEInit','kpiTComp','kpiLVis','kpiEtaPulse'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '--';
+  });
+  setModeBanner('', 'KURULUM MODU — kolu ve hedefi ayarlayın, sonra ▶ Başlat');
+  renderGhostModelBar();
+  renderSetupPreview();
+}
+function updateUIFrame(idx) {
+  const tr = state.traj;
+  if (!tr) { renderSetupPreview(); return; }
+  if (state.headAnimFrame) {
+    cancelAnimationFrame(state.headAnimFrame);
+    state.headAnimFrame = null;
+  }
+  if (idx === undefined || idx === null || Number.isNaN(idx)) idx = state.frameIdx || 0;
+  idx = Math.max(0, Math.min(tr.t.length - 1, idx));
+  state.frameIdx = idx;
+  if (tr.waistYaw && tr.waistYaw[idx] !== undefined) state.waistYaw = tr.waistYaw[idx];
+  if (tr.gazeYaw && tr.gazeYaw[idx] !== undefined) {
+    state.gazeYaw = tr.gazeYaw[idx];
+    state.visualHeadYaw = tr.gazeYaw[idx];
+  }
+  if (tr.gazePitch && tr.gazePitch[idx] !== undefined) {
+    state.gazePitch = tr.gazePitch[idx];
+    state.visualHeadPitch = tr.gazePitch[idx];
+  }
+  if (tr.lookAt && tr.lookAt[idx]) state.lookAt = tr.lookAt[idx].slice();
+  const ord = (tr.ordinal && tr.ordinal[idx]) ? tr.ordinal[idx] : { proximityClass: 'UZAK', horiz: 'ORTA', vert: 'ORTA', depth: 'GERİDE', looming: 'SABİT', conf: 'YÜKSEK' };
+  const gazePhase = (tr.gazePhase && tr.gazePhase[idx]) ? tr.gazePhase[idx] : 'S0 HEDEF KİLİT';
+  const pulseStr = (tr.activePulse && tr.activePulse[idx]) ? tr.activePulse[idx] : 'BEKLEMEDE';
+  const effSig = (tr.effSigmaDeg && tr.effSigmaDeg[idx] !== undefined) ? tr.effSigmaDeg[idx] : 0.0;
+  const isSamp = (tr.isVisualSample && tr.isVisualSample[idx] !== undefined) ? tr.isVisualSample[idx] : true;
+  const sAge = (tr.sampleAgeMs && tr.sampleAgeMs[idx] !== undefined) ? tr.sampleAgeMs[idx] : 0;
+  if (idx >= tr.t.length - 1) {
+    setModeBanner('done', state.theoremMode
+      ? `TAMAMLANDI — Hedef Sınıfı: ${ord.proximityClass} (${gazePhase})`
+      : `TAMAMLANDI — ${tr.metrics.mt.toFixed(2)} s, aşma %${tr.metrics.overshootPct.toFixed(1)}`);
+  }
+  updateTheoremStripDom(ord, gazePhase, pulseStr, effSig);
+  // Telemetri HUD: bakış, S0–S6 fazı, örnek yaşı, ordinal durum, sinerji, efference copy
+  const tel = {
+    time: document.getElementById('telTime'),
+    gaze: document.getElementById('telGaze'),
+    gazePhase: document.getElementById('telGazePhase'),
+    sampleAge: document.getElementById('telSampleAge'),
+    ordinal: document.getElementById('telOrdinal'),
+    rho: document.getElementById('telRho'),
+    disp: document.getElementById('telDisp'),
+    delay: document.getElementById('telDelay'),
+    pulse: document.getElementById('telPulse'),
+    effSigma: document.getElementById('telEffSigma'),
+    orient: document.getElementById('telOrient'),
+    brake: document.getElementById('telBrake'),
+    ts: document.getElementById('telTimeScale')
+  };
+  if (tel.time && tr) {
+    const zLabel = { target: 'HEDEF', hand: 'EL', mid: 'TARAMA', auto: 'OTOMATİK' };
+    tel.time.textContent = state.theoremMode ? `ADIM ${idx}` : `${tr.t[idx].toFixed(2)} s`;
+    tel.gaze.textContent = zLabel[tr.gaze[idx]] || 'TARAMA';
+    if (tel.gazePhase) tel.gazePhase.textContent = gazePhase;
+    if (tel.sampleAge) tel.sampleAge.textContent = state.theoremMode
+      ? (isSamp ? 'TAZE ÖRNEK' : 'TUTULUYOR (HOLD)')
+      : `${sAge} ms (${isSamp ? 'TAZE' : 'HOLD'})`;
+    if (tel.ordinal) tel.ordinal.textContent = ord.proximityClass;
+    tel.rho.textContent = state.theoremMode ? `${ord.proximityClass}` : `${tr.scaleRatio[idx].toFixed(3)}`;
+    tel.disp.textContent = state.theoremMode ? `${ord.depth}` : `${tr.dispG[idx].toFixed(1)} px`;
+    tel.delay.textContent = state.theoremMode ? 'KORTİKAL' : `${(state.delay * 1000).toFixed(0)} ms`;
+    if (tel.pulse) tel.pulse.textContent = pulseStr;
+    if (tel.effSigma) tel.effSigma.textContent = state.theoremMode
+      ? (effSig <= 0.1 ? 'FREN KİLİTLİ' : 'AÇIK-DÖNGÜ TAKİBİ')
+      : `${effSig.toFixed(1)}° (${effSig <= 0.1 ? 'KİLİTLİ' : 'DRİFT'})`;
+    if (tel.orient) {
+      const hr = (tr.handRPY && tr.handRPY[idx]) ? tr.handRPY[idx] : [0, 0, 0];
+      const oe = (tr.oriErrDeg && tr.oriErrDeg[idx] !== undefined) ? tr.oriErrDeg[idx] : 0.0;
+      tel.orient.textContent = `${Math.round(hr[0])}°,${Math.round(hr[1])}°,${Math.round(hr[2])}° (|e_ω|=${oe.toFixed(1)}°)`;
+    }
+    tel.brake.textContent = state.brakesEngaged ? 'AKTİF' : 'SERBEST';
+    tel.brake.style.color = state.brakesEngaged ? '#1e5631' : '#8b1e1e';
+    tel.ts.textContent = `x${state.timeScale}`;
+  }
+  document.getElementById('rngScrub').max = tr.t.length - 1;
+  document.getElementById('rngScrub').value = idx;
+  document.getElementById('lblTime').textContent = state.theoremMode ? `Faz: ${gazePhase}` : `t = ${tr.t[idx].toFixed(2)} s`;
+  const assess = computePreReachAssessment();
+  const badge = document.getElementById('reachBadge');
+  if (state.theoremMode) {
+    badge.className = assess.reachable ? 'status-pill' : 'status-pill danger';
+    badge.textContent = `${ord.proximityClass} · ${gazePhase}`;
+    document.getElementById('chipReachDist').innerHTML =
+      `Yakınlık Sınıfı: <b>${ord.proximityClass}</b> · Ulaşım: <b>${assess.reachable ? 'ERİŞİLİR' : 'SINIRDA'}</b>`;
+    document.getElementById('chipLooming').innerHTML =
+      `Looming: <b>${ord.looming}</b> · Konum: <b>${ord.horiz} / ${ord.vert} (${ord.depth})</b>`;
+    document.getElementById('chipSing').innerHTML =
+      `Singularity: <b>${tr.w[idx] >= 0.04 ? 'RAHAT BÖLGE' : 'SÖNÜMLEME AKTİF'}</b>`;
+    document.getElementById('chipGaze').innerHTML = formatGazeChip(state.gazeMode, gazePhase);
+    document.getElementById('lblLeftEye').textContent = `Sol Retina: ${ord.proximityClass} · ${ord.horiz}`;
+    document.getElementById('lblRightEye').textContent = `Sağ Retina: ${ord.depth} · ${gazePhase}`;
+    document.getElementById('mathGripperSize').textContent = `1. El Perspektifi: ${ord.looming} (${ord.proximityClass})`;
+    document.getElementById('mathTargetSize').textContent = `2. Hedef Konisi: ${ord.horiz} · ${ord.vert} (${ord.conf})`;
+    document.getElementById('mathScaleRatio').textContent = `3. Koni Yakınsaması: ${ord.proximityClass} -> TEMAS`;
+  } else {
+    if (assess.reachable) {
+      badge.className = 'status-pill';
+      const wTag = Math.abs(state.waistYaw || 0) > 0.02
+        ? ` · Bel ${(state.waistYaw * 180 / Math.PI).toFixed(0)}°`
+        : '';
+      badge.textContent = `ULAŞILABİLİR (Paralks Δu=${assess.parallaxPx.toFixed(1)}px${wTag})`;
+    } else if (assess.needsWaist && assess.waistReachable) {
+      badge.className = 'status-pill';
+      badge.textContent = `SENKRON BEL (${(state.waistYaw * 180 / Math.PI).toFixed(0)}°) + KOL İLE ERİŞİM`;
+    } else {
+      badge.className = 'status-pill danger';
+      badge.textContent = `SINGULARITY SINIRI AŞILDI (Güvenli Sönümleme Aktif)`;
+    }
+    const waistInfo = assess.needsWaist
+      ? ` · Bel ${(state.waistYaw * 180 / Math.PI).toFixed(0)}° sonrası: <b>${assess.distAfterWaistCm.toFixed(1)} cm</b>`
+      : '';
+    document.getElementById('chipReachDist').innerHTML =
+      `Hedef Uzaklığı: <b>${assess.distCm.toFixed(1)} cm</b> / Güvenli Sınır: <b>${assess.maxSafeCm.toFixed(1)} cm</b> (Toplam Kol: ${assess.totalArmCm.toFixed(0)} cm)${waistInfo}`;
+    document.getElementById('chipLooming').innerHTML =
+      `El Perspektif Boyu s_g: <b>${tr.sgPx[idx].toFixed(1)} px</b> &rarr; Ölçek Oranı ρ_s: <b>${tr.scaleRatio[idx].toFixed(2)}</b>`;
+    document.getElementById('chipSing').innerHTML =
+      `Singularity w(q): <b>${tr.w[idx].toFixed(3)}</b> (λ=${tr.lam[idx].toFixed(3)})`;
+    document.getElementById('chipGaze').innerHTML = formatGazeChip(state.gazeMode, gazePhase);
+    const vmF = (tr && tr.visionMode) ? tr.visionMode : (state.visionMode || 'binocular');
+    const nbMm = (tr && tr.neckBaseMm && tr.neckBaseMm[idx] !== undefined) ? tr.neckBaseMm[idx] : 0;
+    const mpF = (tr && tr.motionParallaxPx && tr.motionParallaxPx[idx] !== undefined) ? tr.motionParallaxPx[idx] : 0;
+    const biasPct = (tr && tr.scaleBiasPct && tr.scaleBiasPct[idx] !== undefined) ? tr.scaleBiasPct[idx] : 0;
+    if (vmF === 'mono_static') {
+      document.getElementById('lblLeftEye').textContent =
+        `SOL AÇIK (SABİT) · B_boyun=0.0mm | Bias=%${biasPct.toFixed(0)} | s_g=${tr.sgPx[idx].toFixed(1)}px`;
+      document.getElementById('lblRightEye').textContent =
+        'SAĞ KAPALI · Boyun Sabit (Paralaks YOK)';
+    } else if (vmF === 'mono_left') {
+      document.getElementById('lblLeftEye').textContent =
+        `SOL AÇIK · B_boyun=${nbMm.toFixed(1)}mm | Bias=%${biasPct.toFixed(0)} | s_g=${tr.sgPx[idx].toFixed(1)}px | Δu_mp=${mpF.toFixed(1)}px`;
+      document.getElementById('lblRightEye').textContent =
+        `SAĞ KAPALI · Boyun kayması y=${((tr.headSwayY[idx] || 0) * 1000).toFixed(1)}mm`;
+    } else if (vmF === 'mono_right') {
+      document.getElementById('lblLeftEye').textContent =
+        `SOL KAPALI · Boyun kayması y=${((tr.headSwayY[idx] || 0) * 1000).toFixed(1)}mm`;
+      document.getElementById('lblRightEye').textContent =
+        `SAĞ AÇIK · B_boyun=${nbMm.toFixed(1)}mm | Bias=%${biasPct.toFixed(0)} | s_g=${tr.sgPx[idx].toFixed(1)}px | Δu_mp=${mpF.toFixed(1)}px`;
+    } else {
+      document.getElementById('lblLeftEye').textContent =
+        `u_L=${tr.eyeLeftG[idx][0].toFixed(0)}, v_L=${tr.eyeLeftG[idx][1].toFixed(0)} | s_g=${tr.sgPx[idx].toFixed(1)}px`;
+      document.getElementById('lblRightEye').textContent =
+        `u_R=${tr.eyeRightG[idx][0].toFixed(0)}, v_R=${tr.eyeRightG[idx][1].toFixed(0)} | Disparity d=${tr.dispG[idx].toFixed(1)}px`;
+    }
+    document.getElementById('mathGripperSize').textContent =
+      `s_g(t) = ${tr.sgPx[0].toFixed(1)} px -> ${tr.sgPx[idx].toFixed(1)} px`;
+    document.getElementById('mathTargetSize').textContent =
+      `s_t = ${tr.stPx[idx].toFixed(1)} px (Paralks Δu = ${assess.parallaxPx.toFixed(1)} px)`;
+    document.getElementById('mathScaleRatio').textContent =
+      `ρ_s(t) = ${tr.scaleRatio[idx].toFixed(3)} (Hedef = 1.000)`;
+  }
+  draw3DScene(idx);
+  drawEyeViewport('cvLeftEye', true, idx);
+  drawEyeViewport('cvRightEye', false, idx);
+  drawStereoTopView(idx);
+  drawSideView(idx);
+  drawAcademicPlots(idx);
+  updateControlDiagramLive(tr, idx);
+}
+function updateControlDiagramLive(tr, idx) {
+  const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const rEl = document.getElementById('diagRetinaVal');
+  const gEl = document.getElementById('diagGazeVal');
+  const lEl = document.getElementById('diagLawVal');
+  const sEl = document.getElementById('diagSingVal');
+  const blkRet = document.getElementById('diagBlkRetina');
+  const blkGaze = document.getElementById('diagBlkGaze');
+  const blkLaw = document.getElementById('diagBlkLaw');
+  const blkSing = document.getElementById('diagBlkSing');
+  [blkRet, blkGaze, blkLaw, blkSing].forEach(b => {
+    if (b) { b.classList.remove('active-phase', 'ballistic-phase'); }
+  });
+  const hasTraj = !!(tr && tr.t && tr.t.length);
+  const k = hasTraj ? Math.max(0, Math.min(idx || 0, tr.t.length - 1)) : 0;
+  const vMode = (tr && tr.visionMode) ? tr.visionMode : (state.visionMode || 'binocular');
+  const isMonoStatic = (vMode === 'mono_static');
+  const isMonoActive = (vMode === 'mono_left' || vMode === 'mono_right');
+  const waistDeg = (hasTraj && tr.waistYaw && tr.waistYaw.length) ? (tr.waistYaw[k] / DEG) : ((state.goalWaistYaw || 0) / DEG);
+  const maxWaistDeg = (tr && tr.metrics && tr.metrics.maxWaistDeg !== undefined) ? tr.metrics.maxWaistDeg : ((state.goalWaistYaw || 0) / DEG);
+  const waistActive = Math.abs(waistDeg) >= 6.0 || Math.abs(maxWaistDeg) >= 6.0;
+  const hasRoll = (state.goalRollDeg !== null && state.goalRollDeg !== undefined && isFinite(state.goalRollDeg));
+  const ctrl = state.controller || 'hdap';
+
+  const activePill = isMonoStatic ? 'mono_static' : (isMonoActive ? 'mono_left' : (waistActive ? 'waist_sync' : 'binocular'));
+  document.querySelectorAll('#diagModeBar .diag-mode-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-diag-mode') === activePill);
+  });
+
+  // 1. Blok: Görme Kipine Göre Ölçüm Denklemleri (tüm satırlar <= 35 karakter)
+  if (isMonoStatic) {
+    setTxt('diagRetTitle', '1. ÖLÇÜM (SABİT TEK GÖZ)');
+    setTxt('diagRetSub', 'Tek göz sabit: boyut belirsiz!');
+    setTxt('diagRetEq1', 'Yön: Δu=u_h−u_e , Δv=v_h−v_e');
+    setTxt('diagRetEq2', 'Önbilgi: Ŵ_h = (1+δ_W)·W_h (Sabit)');
+    setTxt('diagRetEq3', 'B_boyun=0 ⇒ Z_loom yanılsamalı!');
+    setTxt('diagFeedbackTxt', 'Geri Besleme (Sabit Tek Göz): Yalnız 1 göz açık, B_boyun=0 mm ⇒ Boyut–Uzaklık Yanılsaması!');
+  } else if (isMonoActive) {
+    const sideTxt = vMode === 'mono_right' ? 'SAĞ' : 'SOL';
+    setTxt('diagRetTitle', `1. ÖLÇÜM (${sideTxt} TEK + BOYUN)`);
+    setTxt('diagRetSub', 'Boyun kaymasıyla 3B ölçek bulur');
+    setTxt('diagRetEq1', 'Paralaks: Z_mp = f·B_boy / Δu_mp');
+    setTxt('diagRetEq2', 'Ölçek: Ŵ_h = s_h·Z_mp / f → W_h');
+    setTxt('diagRetEq3', 'Birleşim: 0.35·Z_mp + 0.65·Z_loom');
+    setTxt('diagFeedbackTxt', `Geri Besleme (${sideTxt} Tek Göz + Boyun Paralaksı): Çoklu-ışın B_boyun ve kalibrasyonlu s_t, s_g`);
+  } else {
+    setTxt('diagRetTitle', '1. ÖLÇÜM (ÇİFT GÖZ STEREO)');
+    setTxt('diagRetSub', 'Cetvel/XYZ yok; piksel + boy oranı');
+    setTxt('diagRetEq1', 'Yön: Δu=u_h−u_e , Δv=v_h−v_e');
+    setTxt('diagRetEq2', 'Boy: ρ_s=(s_e/W_e)/(s_h/W_h)→1');
+    setTxt('diagRetEq3', 'Stereo: Z = f·B / (u_sol−u_sağ)');
+    setTxt('diagFeedbackTxt', 'Geri Besleme (Çift Göz Stereo): u_sol, u_sağ, el boyutu s_g, hedef boyutu s_t (XYZW yok)');
+  }
+
+  // 2. Blok: Bakış Kapısı
+  setTxt('diagGazeEq3', isMonoActive ? 'Boyun-Göz Senkron + S3 Örnek Tut' : (isMonoStatic ? 'Boyun Sabit + S0-S6 Örnekleme' : 'Örnekleme: ~20–80 Hz (S3 Hold)'));
+
+  // 3. Blok: Aktif Kontrol Yasasına Göre Denklemler
+  if (ctrl === 'pid') {
+    setTxt('diagLawTitle', '3. HIZ YASASI (KLASİK PID)');
+    setTxt('diagLawSub', 'Sürekli kazanç; gecikmede taşabilir');
+    setTxt('diagLawEq1', 'u = K_p·e + K_i·∫e + K_d·ė');
+    setTxt('diagLawEq2', 'Uyarı: Gecikmede k·δ > 1/e riski!');
+    setTxt('diagLawEq3', 'Sabit PID gecikmeye göre kısılmaz');
+  } else if (ctrl === 'lqr') {
+    setTxt('diagLawTitle', '3. HIZ YASASI (LQR OPTİMAL)');
+    setTxt('diagLawSub', 'Karesel maliyet + görsel sönüm');
+    setTxt('diagLawEq1', 'J = ∫(eᵀQe + uᵀRu) dt azaltımı');
+    setTxt('diagLawEq2', 'v_el = −K_lqr · [ê, v_ölç]');
+    setTxt('diagLawEq3', 'Gecikme arttıkça R büyür, yumuşar');
+  } else if (ctrl === 'governor') {
+    setTxt('diagLawTitle', '3. HIZ YASASI (GOVERNOR)');
+    setTxt('diagLawSub', 'Kademeli taşma korumalı kazanç');
+    setTxt('diagLawEq1', 'v_el = g_gov · k(δ) · e_ret');
+    setTxt('diagLawEq2', 'Sınır: g_gov·δ_etkin ≤ 1/e ≈ 0.37');
+    setTxt('diagLawEq3', 'Hedefe yaklaşınca kademeli kısılır');
+  } else if (ctrl === 'bio') {
+    setTxt('diagLawTitle', '3. HIZ YASASI (BİYOMİMETİK)');
+    setTxt('diagLawSub', 'Tek enerji darbesi + frenleme');
+    setTxt('diagLawEq1', 'Faz 1: Darbe v = φ(t)·k·e_bağ');
+    setTxt('diagLawEq2', 'Faz 2: k ≤ 0.37 / δ_etkin (Fren)');
+    setTxt('diagLawEq3', 'Darbe enerjisi gecikmeden bağımsız');
+  } else if (ctrl === 'fixed') {
+    setTxt('diagLawTitle', '3. HIZ YASASI (SABİT ORAN P)');
+    setTxt('diagLawSub', 'Gecikmeye uyarlanmayan P kazancı');
+    setTxt('diagLawEq1', 'v_el = k_sabit · e_ret');
+    setTxt('diagLawEq2', 'Sabit k yüksekse gecikmede salınır');
+    setTxt('diagLawEq3', 'Balistik çan eğrisi (Faz 1) YOK');
+  } else {
+    setTxt('diagLawTitle', `3. HIZ YASASI (${ctrl === 'hlsl' ? 'HLSL' : ctrl === 'custom' ? 'ÖZEL' : 'HDA / HLSL'})`);
+    setTxt('diagLawSub', 'Hız eğrisi & taşmama güvenliği');
+    setTxt('diagLawEq1', 'Faz 1: v_el = φ(t)·k·e (Çan Eğrisi)');
+    setTxt('diagLawEq2', 'Faz 2: k ≤ 0.37 / δ_etkin (Fren)');
+    setTxt('diagLawEq3', 'Gecikme × 2 ⇒ hız kazancı k ÷ 2');
+  }
+
+  // 4. Blok: Bel, 6-DOF J(q), SO(3) Bilek & Tekillik
+  setTxt('diagSingTitle', waistActive ? '4. BEL + 6-DOF J(q) & FREN' : '4. 6-DOF J(q), SO(3) & FREN');
+  setTxt('diagSingSub', waistActive ? 'Sütun (θ_bel) + 3B kol + fren' : (hasRoll ? '3B konum + Roll bilek (j₆)' : '3B öteleme + 3B yönelim (6×6)'));
+  setTxt('diagSingEq1', waistActive ? 'θ̇_bel∥v_el; [v;ω]=J(q)θ̇' : '[v;ω] = J(q)θ̇  (J=[Jv;Jω])');
+  setTxt('diagSingEq2', 'e_ω=½Σ(r×r_d), θ̇_ω=Jω^T e_ω');
+  setTxt('diagSingEq3', 'w(q)<0.02⇒λ | Hedef⇒τ_b=kilit');
+
+  if (!hasTraj) {
+    const fk0 = forwardKinematics(Q0, state.links);
+    const g0 = projectStereoAndLooming(fk0.ee, state.gripperRealM, 0, state.headSwayOffset);
+    const t0 = projectStereoAndLooming(state.target, state.targetRealM, 0, state.headSwayOffset);
+    const du0 = (vMode === 'mono_right') ? (t0.uR - g0.uR) : (t0.uL - g0.uL);
+    const rho0 = (g0.sizePx / state.gripperRealM) / Math.max(t0.sizePx / state.targetRealM, 1e-4);
+    const w0 = computeJacobianAndManip(Q0, state.links).w;
+    const des0 = getDesiredTargetRPYDeg(state.target, 0);
+    const o0 = computeOrientationErrorSO3(getEndEffectorRotation(fk0), buildTargetRotationSO3(des0[0], des0[1], des0[2])).errDeg;
+    if (rEl) rEl.textContent = state.theoremMode ? 'ORDİNAL · YÖN+BOY' : (isMonoStatic ? `Δu=${du0.toFixed(0)}px | Bias=%28` : `Δu=${du0.toFixed(0)}px | ρ_s=${rho0.toFixed(2)}`);
+    if (gEl) gEl.textContent = isMonoActive ? 'S0 KİLİT · Boyun Hazır' : 'S0 KİLİT · L_vis≈20Hz';
+    if (lEl) lEl.textContent = state.brakesEngaged ? 'KURULUM (FREN KİLİT)' : 'FRENLER SERBEST';
+    if (sEl) sEl.textContent = state.theoremMode ? (w0 >= 0.04 ? 'RAHAT BÖLGE' : 'SINIR BÖLGE') : (waistActive ? `θ_bel=${waistDeg.toFixed(0)}° | w=${w0.toFixed(3)}` : `w=${w0.toFixed(3)} | |e_ω|=${o0.toFixed(0)}°`);
+  } else {
+    const du = (vMode === 'mono_right') ? (tr.eyeRightT[k][0] - tr.eyeRightG[k][0]) : (tr.eyeLeftT[k][0] - tr.eyeLeftG[k][0]);
+    const rho = tr.scaleRatio[k];
+    const biasNow = (tr.scaleBiasPct && tr.scaleBiasPct[k] !== undefined) ? tr.scaleBiasPct[k] : 0;
+    const ord = (tr.ordinal && tr.ordinal[k]) ? tr.ordinal[k] : { proximityClass: 'UZAK', looming: 'SABİT' };
+    const gp = (tr.gazePhase && tr.gazePhase[k]) ? tr.gazePhase[k].split(' ')[0] : 'S0';
+    const lVis = tr.metrics && tr.metrics.visualLoadHz ? tr.metrics.visualLoadHz : 20;
+    const balIdx = (tr.metrics && tr.metrics.ballisticIdx !== undefined) ? tr.metrics.ballisticIdx : 0;
+    const wq = tr.w[k] || 0;
+    const oriK = (tr.oriErrDeg && tr.oriErrDeg[k] !== undefined) ? tr.oriErrDeg[k] : 0;
+    const tMax = tr.tau[k] ? Math.max.apply(null, tr.tau[k].map(Math.abs)) : 0;
+    const isAtGoal = (k >= tr.t.length - 2 || (tr.err[k] <= 0.015 && tr.vel[k] < 0.02));
+    const isBal = (k <= balIdx && tr.vel[k] > 0.01);
+    if (rEl) rEl.textContent = state.theoremMode
+      ? `${ord.proximityClass} · ${ord.looming}`
+      : ((isMonoActive || isMonoStatic) ? `Δu=${du.toFixed(0)}px | Bias=%${biasNow.toFixed(1)}` : `Δu=${du.toFixed(0)}px | ρ_s=${rho.toFixed(2)}`);
+    if (gEl) gEl.textContent = state.theoremMode ? `${gp} BAKIŞ AKTİF` : `${gp} · L_vis=${lVis.toFixed(0)} Hz`;
+    if (lEl) lEl.textContent = isAtGoal ? 'TEMAS: FREN KİLİTLİ' : (isBal ? 'FAZ 1: BALİSTİK İTKİ' : 'FAZ 2: KOMPANZASYON');
+    if (sEl) sEl.textContent = state.theoremMode ? (wq >= 0.04 ? 'RAHAT · KORUMALI' : 'SÖNÜMLEME AKTİF') : (waistActive ? `θ_bel=${waistDeg.toFixed(0)}° | |e_ω|=${oriK.toFixed(0)}°` : `w=${wq.toFixed(3)} | |e_ω|=${oriK.toFixed(0)}° | τ=${tMax.toFixed(0)}`);
+    if (blkRet) blkRet.classList.add('active-phase');
+    if (blkGaze) blkGaze.classList.add('active-phase');
+    if (blkLaw) blkLaw.classList.add(isBal ? 'ballistic-phase' : 'active-phase');
+    if (blkSing && isAtGoal) blkSing.classList.add('active-phase');
+  }
+  // Katma değer özet kutularını canlı karşılaştırma sonuçlarıyla güncelle
+  const cr = state.compareResults || {};
+  const best = cr.hdap || cr.hlsl || (tr ? tr.metrics : null);
+  const pidM = cr.pid || ((state.ghostTrajs && state.ghostTrajs.pid) ? state.ghostTrajs.pid.metrics : null);
+  const vcOs = document.getElementById('vcOvershoot');
+  const vcOsPid = document.getElementById('vcOvershootPid');
+  const vcVis = document.getElementById('vcVisLoad');
+  const vcEi = document.getElementById('vcEInit');
+  const vcEiPid = document.getElementById('vcEInitPid');
+  if (vcOs && best) vcOs.textContent = state.theoremMode ? 'Sıfır Taşma (g ≤ 1/eδ)' : `Önerilen: %${best.overshootPct.toFixed(1)} aşma`;
+  if (vcOsPid && pidM) vcOsPid.textContent = state.theoremMode ? 'Klasik PID: Taşma Riskli' : `Klasik PID: %${pidM.overshootPct.toFixed(1)} aşma`;
+  if (vcVis && best && best.visualLoadHz !== undefined) vcVis.textContent = `Önerilen: ${best.visualLoadHz.toFixed(1)} Hz (~%${Math.max(0, 100 - best.visualLoadHz).toFixed(0)} tasarruf)`;
+  if (vcEi && best && best.eInitMm !== undefined) vcEi.textContent = state.theoremMode ? 'Yakınlaşma: Yüksek İsabet' : `Önerilen: ${best.eInitMm.toFixed(0)} mm`;
+  if (vcEiPid && pidM && pidM.eInitMm !== undefined) vcEiPid.textContent = state.theoremMode ? 'PID: Sürekli Düzeltme' : `Klasik PID: ${pidM.eInitMm.toFixed(0)} mm`;
+  updateKinematicDiagramLive(tr, idx);
+}
+function updateKinematicDiagramLive(tr, idx) {
+  const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  // Şema etiketleri Türkçe ondalık virgülle yazılır (60,7 cm gibi).
+  const f1 = (v) => Number(v).toFixed(1).replace('.', ',');
+  const f2 = (v) => Number(v).toFixed(2).replace('.', ',');
+  const hasTraj = !!(tr && tr.t && tr.t.length);
+  const k = hasTraj ? Math.max(0, Math.min(idx || 0, tr.t.length - 1)) : 0;
+  const vMode = (tr && tr.visionMode) ? tr.visionMode : (state.visionMode || 'binocular');
+  const isMonoStatic = (vMode === 'mono_static');
+  const isMonoActive = (vMode === 'mono_left' || vMode === 'mono_right');
+  const waistRad = (hasTraj && tr.waistYaw && tr.waistYaw.length) ? tr.waistYaw[k] : (state.goalWaistYaw || 0);
+  const maxWaistDeg = (tr && tr.metrics && tr.metrics.maxWaistDeg !== undefined) ? tr.metrics.maxWaistDeg : ((state.goalWaistYaw || 0) / DEG);
+  const waistActive = Math.abs(waistRad / DEG) >= 6.0 || Math.abs(maxWaistDeg) >= 6.0;
+  const d1Cm = Math.round(state.links[0].d * 100);
+  const l2Cm = Math.round(state.links[1].a * 100);
+  const l3Cm = Math.round(state.links[2].a * 100);
+  const lElCm = Math.round((state.links[3].d + state.links[4].d + state.links[5].d) * 100);
+  const safeMaxM = typeof armReachSphereRadius === 'function' ? armReachSphereRadius(state.links) * 0.88 : (state.links[1].a + state.links[2].a + state.links[3].d + state.links[4].d + state.links[5].d) * 0.88;
+  const camZOffCm = Math.round((state.camPos[2] - state.links[0].d) * 100);
+  const camXCm = Math.round(state.camPos[0] * 100);
+  const fkNow = hasTraj ? forwardKinematics(tr.q[k], state.links, waistRad) : forwardKinematics(Q0, state.links, 0);
+  const dEye = currentEyeData(hasTraj ? k : 0);
+  const wVal = hasTraj ? (tr.w[k] || 0) : computeJacobianAndManip(Q0, state.links).w;
+  const sgVal = hasTraj ? tr.sgPx[k] : dEye.sg;
+  const stVal = hasTraj ? tr.stPx[k] : dEye.st;
+  const rhoVal = hasTraj ? tr.scaleRatio[k] : ((dEye.sg / Math.max(state.gripperRealM, 1e-4)) / Math.max(dEye.st / Math.max(state.targetRealM, 1e-4), 1e-4));
+  const duVal = (isMonoActive || isMonoStatic)
+    ? ((vMode === 'mono_right') ? (dEye.tR[0] - dEye.gR[0]) : (dEye.tL[0] - dEye.gL[0]))
+    : (dEye.tL[0] - dEye.tR[0]);
+  const nbMm = (hasTraj && tr.neckBaseMm && tr.neckBaseMm[k] !== undefined) ? tr.neckBaseMm[k] : 0.0;
+  const mpPx = (hasTraj && tr.motionParallaxPx && tr.motionParallaxPx[k] !== undefined) ? tr.motionParallaxPx[k] : 0.0;
+  const biasVal = (hasTraj && tr.scaleBiasPct && tr.scaleBiasPct[k] !== undefined) ? tr.scaleBiasPct[k] : (isMonoStatic ? 28.0 : 0.0);
+  const hasRoll = (state.goalRollDeg !== null && state.goalRollDeg !== undefined && isFinite(state.goalRollDeg));
+  const desRPYK = (hasTraj && tr.targetRPY && tr.targetRPY[k]) ? tr.targetRPY[k] : getDesiredTargetRPYDeg(state.target, waistRad);
+  const ReeK = getEndEffectorRotation(fkNow);
+  const handRPYK = (hasTraj && tr.handRPY && tr.handRPY[k]) ? tr.handRPY[k] : extractHandRPYDeg(ReeK);
+  const oriErrK = (hasTraj && tr.oriErrDeg && tr.oriErrDeg[k] !== undefined)
+    ? tr.oriErrDeg[k]
+    : computeOrientationErrorSO3(ReeK, buildTargetRotationSO3(desRPYK[0], desRPYK[1], desRPYK[2])).errDeg;
+
+  // Vector SVG etiketleri
+  setTxt('kinSvgWaist', `θ_bel = ${f1(waistRad / DEG)}° · j₁, ẑ₀`);
+  setTxt('kinSvgD1', `d₁ = ${d1Cm} cm`);
+  setTxt('kinSvgCamZ', `ΔZ = +${camZOffCm} cm`);
+  setTxt('kinSvgCamX', `ΔX = ${camXCm < 0 ? '−' : ''}${Math.abs(camXCm)} cm`);
+  setTxt('kinSvgRMax', `R_max = ${f1(safeMaxM * 100)} cm`);
+  setTxt('kinSvgL2', `L₂ = ${l2Cm} cm`);
+  setTxt('kinSvgL3', `L₃ = ${l3Cm} cm`);
+  setTxt('kinSvgLEl', `L_el = ${lElCm} cm`);
+  setTxt('kinSvgOrient', `SE(3): F_ee RPY(${Math.round(handRPYK[0])}°, ${Math.round(handRPYK[1])}°, ${Math.round(handRPYK[2])}°) | hedef (${Math.round(desRPYK[0])}°, ${Math.round(desRPYK[1])}°, ${Math.round(desRPYK[2])}°) | |e_ω| = ${f1(oriErrK)}°`);
+  setTxt('kinSvgVisionBadge', isMonoStatic ? 'TEK GÖZ SABİT (PARALAKS YOK)' : (isMonoActive ? `${vMode === 'mono_right' ? 'SAĞ' : 'SOL'} TEK + BOYUN PARALAKSI` : (waistActive ? 'ÇİFT GÖZ + SENKRON BEL' : 'ÇİFT GÖZ STEREO')));
+  setTxt('kinSvgB', `B = ${Math.round(state.baseline * 1000)} mm`);
+  setTxt('kinSvgBNeck', `B_boy = ${f1(nbMm)} mm`);
+  setTxt('kinSvgF', `f = ${Math.round(state.focalPx)} px`);
+  setTxt('kinSvgSgSt', `s_g = ${f1(sgVal)} px · s_t = ${f1(stVal)} px · Δu = ${duVal.toFixed(0)} px`);
+  setTxt('kinSvgRho', `ρ_s = ${f2(rhoVal)} → 1,00`);
+  setTxt('kinSvgParallaxEq', isMonoStatic
+    ? `Sabit Tek Göz: Z_loom = f·Ŵ_t/s_t (Ŵ_t %${biasVal.toFixed(0)} yanlı, B_boy = 0 ⇒ Boyut Sapması)`
+    : (isMonoActive
+        ? `Boyun Paralaksı: Z_mp = f·B_boy/Δu_mp | Kalan Ölçek Sapması = %${f1(biasVal)}`
+        : 'Benzer Üçgen: s = f·W/Z | Çift Göz Stereo: Z = f·B / (u_L − u_R)'));
+
+  // 3 Sütunlu Canlı Parametre Sözlüğü (#paramDictGrid)
+  setTxt('pd_d1', `${d1Cm} cm`);
+  setTxt('pd_waist', `${(waistRad / DEG).toFixed(1)}°`);
+  setTxt('pd_L23', `${l2Cm} / ${l3Cm} cm`);
+  setTxt('pd_rmax', `${(safeMaxM * 100).toFixed(1)} cm`);
+  setTxt('pd_qsum', `RPY(${Math.round(handRPYK[0])}°,${Math.round(handRPYK[1])}°,${Math.round(handRPYK[2])}°) | |e_ω|=${oriErrK.toFixed(1)}°`);
+  setTxt('pd_w', `${wVal.toFixed(3)}`);
+  setTxt('pd_B', `${Math.round(state.baseline * 1000)} mm`);
+  setTxt('pd_Bneck', `${nbMm.toFixed(1)} mm`);
+  setTxt('pd_f', `${Math.round(state.focalPx)} px`);
+  setTxt('pd_sgst', `${sgVal.toFixed(1)} / ${stVal.toFixed(1)} px`);
+  setTxt('pd_rho', `${rhoVal.toFixed(2)}`);
+  setTxt('pd_du', `${duVal.toFixed(0)} px / Δu_mp=${mpPx.toFixed(1)}`);
+
+  const ctrl = state.controller || 'hdap';
+  const holdS = (ctrl === 'hdap' || ctrl === 'hlsl' || ctrl === 'bio') ? 0.05 : 0.01;
+  const deltaEffS = (state.delay || 0.06) + 0.5 * holdS;
+  const kScale = state.speed ? state.speed.kScale : 1.0;
+  const gRule = kScale / Math.E;
+  setTxt('pd_td', `${Math.round((state.delay || 0.06) * 1000)} ms`);
+  setTxt('pd_delta', `${Math.round(deltaEffS * 1000)} ms`);
+  setTxt('pd_g', `${gRule.toFixed(3)} ${gRule <= 0.37 ? '(OK)' : '(>1/e)'}`);
+  setTxt('pd_einit', (hasTraj && tr.metrics && tr.metrics.eInitMm !== undefined) ? `${tr.metrics.eInitMm.toFixed(1)} mm` : '--');
+  setTxt('pd_tcomp', (hasTraj && tr.metrics && tr.metrics.tCompPct !== undefined) ? `%${tr.metrics.tCompPct.toFixed(0)} (${tr.metrics.tComp.toFixed(2)}s)` : '--');
+  const atGoal = hasTraj && (k >= tr.t.length - 2 || (tr.err[k] <= 0.015 && tr.vel[k] < 0.02));
+  setTxt('pd_brake', !hasTraj ? (state.brakesEngaged ? 'BEKLEME KİLİT' : 'SERBEST') : (atGoal ? 'FREN KİLİTLİ (τ_b)' : 'AKTİF HAREKET'));
+}
+function updateKPIs() {
+  const tr = state.traj;
+  if (!tr) return;
+  const m = tr.metrics;
+  const names = {
+    hlsl: 'HLSL (Bizim İnsansı Modelimiz)',
+    governor: 'Iskender Governor (Basamak)',
+    pid: 'Klasik PID',
+    lqr: 'LQR Durum Geri Besleme',
+    fixed: 'Sabit Kazanç (P)',
+    custom: 'Özel Formül',
+    bio: 'Biyomimetik Pulse (Enerji Süresi)',
+    hdap: 'İnsan-HDA (Dinamik Yaklaşım)'
+  };
+  document.getElementById('lblActiveCtrl').textContent = names[state.controller] || state.controller;
+  document.getElementById('kpiMT').textContent = `${m.mt.toFixed(2)} s`;
+  document.getElementById('kpiOS').textContent = `${m.overshootPct.toFixed(1)} %`;
+  document.getElementById('kpiJerk').textContent = `${m.onsetAcc.toFixed(1)} m/s²`;
+  document.getElementById('kpiLoom').textContent = `${m.sgStart.toFixed(0)}→${m.sgEnd.toFixed(0)} px`;
+  document.getElementById('kpiManip').textContent = `${m.minW.toFixed(3)}`;
+  document.getElementById('kpiTorque').textContent = `${m.peakTau.toFixed(1)} Nm`;
+  if (m.eInitMm !== undefined) {
+    document.getElementById('kpiEInit').textContent = `${m.eInitMm.toFixed(1)} mm`;
+    document.getElementById('kpiTComp').textContent = `${m.tComp.toFixed(2)} s / %${m.tCompPct.toFixed(0)}`;
+  }
+  const elLVis = document.getElementById('kpiLVis');
+  const elEta = document.getElementById('kpiEtaPulse');
+  if (elLVis && m.visualLoadHz !== undefined) elLVis.textContent = `${m.visualLoadHz.toFixed(1)} Hz`;
+  if (elEta && m.pulseEffPct !== undefined) elEta.textContent = `${m.pulseEffPct.toFixed(0)} %`;
+}
+function syncGhostTrajs(reuseMap) {
+  state.ghostTrajs = {};
+  state.ghostTraj = null;
+  if (!state.showGhost || !state.ghostModels || !state.ghostModels.length) return;
+  const snap = snapshotHeadWaistState();
+  try {
+    state.ghostModels.forEach(gmId => {
+      if (gmId === state.controller || !GHOST_MODEL_MAP[gmId]) return;
+      const r = (reuseMap && reuseMap[gmId])
+        ? reuseMap[gmId]
+        : runSimulationForController(gmId, gmId === 'pid' ? 'plain_dls' : state.singMode, { isGhost: true });
+      state.ghostTrajs[gmId] = r;
+      state.compareResults[gmId] = r.metrics;
+    });
+  } finally {
+    restoreHeadWaistState(snap);
+  }
+  state.ghostTraj = state.ghostTrajs.pid
+    || state.ghostTrajs[state.ghostModels.find(id => id !== state.controller)]
+    || null;
+}
+function renderGhostModelBar() {
+  const bar = document.getElementById('ghostModelBar');
+  if (!bar) return;
+  bar.classList.toggle('hidden', !state.showGhost);
+  bar.innerHTML = '';
+  const lbl = document.createElement('span');
+  lbl.className = 'ghost-bar-lbl';
+  lbl.textContent = 'İkiz Modeller:';
+  bar.appendChild(lbl);
+  const others = GHOST_MODELS.map(m => m.id).filter(id => id !== state.controller);
+  const refreshAfterGhostToggle = () => {
+    renderGhostModelBar();
+    if (state.traj) {
+      syncGhostTrajs();
+      updateKPIs();
+      renderCompareTable();
+      updateUIFrame(state.frameIdx);
+    } else {
+      renderSetupPreview();
+    }
+  };
+  GHOST_MODELS.forEach(m => {
+    const isOn = state.ghostModels.includes(m.id);
+    const isPrimary = (m.id === state.controller);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ghost-pill' + (isOn ? ' active' : '') + (isPrimary ? ' is-primary-ctrl' : '');
+    btn.dataset.ghostModel = m.id;
+    btn.style.color = isOn ? m.color : '#475569';
+    btn.title = isPrimary
+      ? `${m.label} — şu anda ana aktif model (${m.color})`
+      : `${m.label} hayalet ikiz (${isOn ? 'AÇIK' : 'KAPALI'}) — Renk: ${m.color}`;
+    const sw = document.createElement('span');
+    sw.className = 'ghost-swatch';
+    sw.style.background = `repeating-linear-gradient(to right, ${m.color} 0 4px, transparent 4px 6px)`;
+    const tx = document.createElement('span');
+    tx.textContent = isPrimary ? `${m.short} (Ana)` : m.short;
+    btn.appendChild(sw);
+    btn.appendChild(tx);
+    btn.addEventListener('click', () => {
+      const idx = state.ghostModels.indexOf(m.id);
+      if (idx >= 0) state.ghostModels.splice(idx, 1);
+      else state.ghostModels.push(m.id);
+      refreshAfterGhostToggle();
+    });
+    bar.appendChild(btn);
+  });
+  const allActive = others.length > 0 && others.every(id => state.ghostModels.includes(id));
+  const btnAll = document.createElement('button');
+  btnAll.type = 'button';
+  btnAll.id = 'btnGhostAll';
+  btnAll.className = 'ghost-pill' + (allActive ? ' active' : '');
+  btnAll.style.color = allActive ? '#1e3a5f' : '#475569';
+  btnAll.textContent = allActive ? 'Sadece PID' : 'Tümü';
+  btnAll.title = allActive
+    ? 'Hayalet ikizleri yalnızca Klasik PID modeline döndür'
+    : 'Aktif kol dışındaki tüm kontrol modellerini kendi renkleriyle hayalet ikiz olarak göster';
+  btnAll.addEventListener('click', () => {
+    state.ghostModels = allActive ? ['pid'] : others.slice();
+    refreshAfterGhostToggle();
+  });
+  bar.appendChild(btnAll);
+}
+function runAndAnimate() {
+  stopPlay();
+  state.traj = runSimulationForController(state.controller, state.singMode);
+  syncGhostTrajs();
+  renderGhostModelBar();
+  state.compareResults[state.controller] = state.traj.metrics;
+  updateKPIs();
+  renderCompareTable();
+  drawDashPhase();
+  state.frameIdx = 0;
+  setModeBanner('running', 'SİMÜLASYON ÇALIŞIYOR — kol ilk pozisyondan hedefe uzanıyor');
+  startPlay();
+}
+function snapshotHeadWaistState() {
+  return {
+    waistYaw: state.waistYaw,
+    goalWaistYaw: state.goalWaistYaw,
+    gazeYaw: state.gazeYaw,
+    gazePitch: state.gazePitch,
+    visualHeadYaw: state.visualHeadYaw,
+    visualHeadPitch: state.visualHeadPitch,
+    baseGaze: state.baseGaze ? state.baseGaze.slice() : null,
+    lookAt: state.lookAt ? state.lookAt.slice() : null
+  };
+}
+function restoreHeadWaistState(snap) {
+  if (!snap) return;
+  state.waistYaw = snap.waistYaw;
+  state.goalWaistYaw = snap.goalWaistYaw;
+  state.gazeYaw = snap.gazeYaw;
+  state.gazePitch = snap.gazePitch;
+  state.visualHeadYaw = snap.visualHeadYaw;
+  state.visualHeadPitch = snap.visualHeadPitch;
+  if (snap.baseGaze) state.baseGaze = snap.baseGaze.slice();
+  if (snap.lookAt) state.lookAt = snap.lookAt.slice();
+}
+function runAllComparison() {
+  stopPlay();
+  const list = ['hlsl', 'hdap', 'governor', 'pid', 'lqr', 'fixed', 'bio'];
+  const trajMap = {};
+  const snap = snapshotHeadWaistState();
+  try {
+    list.forEach(c => {
+      const r = runSimulationForController(c, state.singMode);
+      trajMap[c] = r;
+      state.compareResults[c] = r.metrics;
+      if (c === state.controller) state.traj = r;
+    });
+    if (!state.traj) state.traj = runSimulationForController(state.controller, state.singMode);
+    syncGhostTrajs(trajMap);
+  } finally {
+    restoreHeadWaistState(snap);
+  }
+  renderGhostModelBar();
+  updateKPIs();
+  renderCompareTable();
+  updateUIFrame(state.traj.t.length - 1);
+  if (typeof drawDashPhase === 'function') drawDashPhase();
+}
+function renderCompareTable() {
+  const tbody = document.getElementById('tbodyCompare');
+  const labels = {
+    hdap: 'İnsan-HDA',
+    hlsl: 'HLSL (Bizim Modelimiz)',
+    governor: 'Governor (Basamak)',
+    pid: 'PID',
+    lqr: 'LQR',
+    fixed: 'Sabit Kazanç (P)',
+    bio: 'Biyomimetik Pulse'
+  };
+  const keys = Object.keys(labels).filter(k => state.compareResults[k]);
+  if (keys.length === 0) return;
+  tbody.innerHTML = keys.map(k => {
+    const m = state.compareResults[k];
+    const cls = k === state.controller ? ' class="active-row"' : '';
+    return `<tr${cls}>
+      <td>${labels[k]}</td>
+      <td>${m.mt.toFixed(2)}</td>
+      <td>${m.overshootPct.toFixed(1)}%</td>
+      <td>${m.onsetAcc.toFixed(1)} m/s²</td>
+      <td>${m.minW.toFixed(3)}</td>
+      <td>${m.peakTau.toFixed(1)}</td>
+      <td>${(m.eInitMm || 0).toFixed(1)}</td>
+      <td>${(m.tCompPct || 0).toFixed(0)}</td>
+      <td>${(m.visualLoadHz || 100).toFixed(1)}</td>
+      <td>${(m.pulseEffPct || 0).toFixed(0)}%</td>
+    </tr>`;
+  }).join('');
+}
+function startPlay() {
+  if (state.playing) return;
+  state.playing = true;
+  document.getElementById('btnPlayPause').innerHTML = '&#10074;&#10074; Duraklat';
+  const br = document.getElementById('btnRunReach');
+  if (br) br.innerHTML = '&#10074;&#10074; Durdur';
+  const sb = document.getElementById('soStartBtn');
+  if (sb) sb.innerHTML = '&#10074;&#10074; Durdur';
+  state.timer = setInterval(() => {
+    if (!state.traj || state.frameIdx >= state.traj.t.length - 1) {
+      stopPlay();
+      return;
+    }
+    // Zaman ölçeği yalnızca oynatım hızını böler; fizik ve metrikler (E_init,
+    // T_comp) aynı kalır — x0.1 ağır çekimde sakkad/darbe sınırları görünür olur.
+    state.playAccum += 2 * state.timeScale;
+    const adv = Math.floor(state.playAccum);
+    if (adv >= 1) {
+      state.playAccum -= adv;
+      updateUIFrame(state.frameIdx + adv);
+    }
+  }, 30);
+}
+function stopPlay() {
+  state.playing = false;
+  document.getElementById('btnPlayPause').innerHTML = '&#9654; Oynat';
+  const br = document.getElementById('btnRunReach');
+  if (br) br.innerHTML = '&#9654; Simülasyonu Başlat';
+  const sb = document.getElementById('soStartBtn');
+  if (sb) sb.innerHTML = '&#9654; Simülasyonu Başlat';
+  if (state.timer) {
+    clearInterval(state.timer);
+    state.timer = null;
+  }
+}
+// ============ Initial arm pose: joint sliders + IK-driven EE position ============
+const ARM_JOINT_LABELS = ['j1', 'j2', 'j3', 'j4', 'j5', 'j6'];
+function buildJointSliders() {
+  const host = document.getElementById('jointSliders');
+  if (!host) return;
+  host.innerHTML = '';
+  state.links.forEach((L, i) => {
+    const row = document.createElement('div');
+    row.className = 'jr';
+    row.title = L.name;
+    row.innerHTML =
+      '<label>' + ARM_JOINT_LABELS[i] + '</label>' +
+      '<input type="range" id="arm_j' + i + '" min="' + L.limits_deg[0] +
+      '" max="' + L.limits_deg[1] + '" step="0.5" value="0">' +
+      '<span class="jv" id="arm_jv' + i + '">0.0°</span>';
+    host.appendChild(row);
+  });
+  ARM_JOINT_LABELS.forEach((_, i) => {
+    document.getElementById('arm_j' + i).addEventListener('input', () => {
+      refreshArmPoseUI();
+      enterSetupMode();
+    });
+  });
+}
+function setJointSlidersFromQ(q) {
+  for (let i = 0; i < state.links.length; i++) {
+    const s = document.getElementById('arm_j' + i);
+    if (!s) continue;
+    const v = q[i] / DEG;
+    s.value = v;
+    document.getElementById('arm_jv' + i).textContent = v.toFixed(1) + '°';
+  }
+  updateEEFieldsFromQ(q);
+}
+function readJointSliders() {
+  const q = [];
+  for (let i = 0; i < state.links.length; i++) {
+    q.push(parseFloat(document.getElementById('arm_j' + i).value) * DEG);
+  }
+  return q;
+}
+function refreshArmPoseUI() {
+  Q0 = readJointSliders();
+  for (let i = 0; i < state.links.length; i++) {
+    document.getElementById('arm_jv' + i).textContent =
+      (Q0[i] / DEG).toFixed(1) + '°';
+  }
+  updateEEFieldsFromQ(Q0);
+}
+function updateEEFieldsFromQ(q) {
+  const p0 = forwardKinematics(q, state.links).ee;
+  if (!state.eeFieldsTouched) {
+    document.getElementById('numEx').value = p0[0].toFixed(3);
+    document.getElementById('numEy').value = p0[1].toFixed(3);
+    document.getElementById('numEz').value = p0[2].toFixed(3);
+  }
+  const lbl = document.getElementById('valEE');
+  if (lbl) {
+    lbl.textContent = state.theoremMode
+      ? 'ordinal başlangıç pozu (sayı maskeli)'
+      : 'x ' + p0[0].toFixed(2) + ' · y ' + p0[1].toFixed(2) + ' · z ' + p0[2].toFixed(2) + ' m';
+  }
+}
+function solveIK(initQ, target, links, maxIter, damp) {
+  maxIter = maxIter || 80;
+  damp = damp || 0.02;
+  const q = initQ.slice();
+  for (let it = 0; it < maxIter; it++) {
+    const fk = forwardKinematics(q, links);
+    const e = sub3(target, fk.ee);
+    const r = norm3(e);
+    if (r < 1e-4) break;
+    const jm = computeJacobianAndManip(q, links);
+    const Jv = jm.Jv;
+    const A = jm.JJT.map((row, i) => row.map((v, j) => i === j ? v + damp * damp : v));
+    const y = solve3x3(A, e);
+    for (let j = 0; j < q.length; j++) {
+      if (state.locked[j]) continue;
+      q[j] += Jv[0][j] * y[0] + Jv[1][j] * y[1] + Jv[2][j] * y[2];
+      const lo = links[j].limits_deg[0] * DEG, hi = links[j].limits_deg[1] * DEG;
+      if (q[j] < lo) q[j] = lo; else if (q[j] > hi) q[j] = hi;
+    }
+  }
+  const fkEnd = forwardKinematics(q, links);
+  const err = norm3(sub3(target, fkEnd.ee));
+  return { q, err, ok: err < 5e-3 };
+}
+function solveIKToTarget(target) {
+  const sol = solveIK(Q0, target, state.links, 120, 0.03);
+  const hint = document.getElementById('ikHint');
+  if (hint) {
+    if (sol.ok) {
+      hint.textContent = 'IK: erişilebilir · son hata ' + (sol.err * 1000).toFixed(1) + ' mm';
+      hint.style.color = 'var(--ok)';
+    } else {
+      hint.textContent = 'IK tam yakınsamadı · son hata ' + (sol.err * 1000).toFixed(1) +
+        ' mm (kol boyu / singularity sınırı)';
+      hint.style.color = 'var(--warn)';
+    }
+  }
+  setJointSlidersFromQ(sol.q);
+  Q0 = sol.q;
+  return sol;
+}
+// Shared eye-frame data helper (used by the two eye viewports and the top view)
+function currentEyeData(idx) {
+  const tr = state.traj;
+  if (tr) {
+    const i = Math.max(0, Math.min(idx, tr.t.length - 1));
+    return {
+      gL: tr.eyeLeftG[i], gR: tr.eyeRightG[i],
+      tL: tr.eyeLeftT[i], tR: tr.eyeRightT[i],
+      sg: tr.sgPx[i], st: tr.stPx[i]
+    };
+  }
+  const g = projectStereoAndLooming(forwardKinematics(Q0, state.links).ee, state.gripperRealM, 0, state.headSwayOffset);
+  const t = projectStereoAndLooming(state.target, state.targetRealM, 0, state.headSwayOffset);
+  return { gL: [g.uL, g.vL], gR: [g.uR, g.vR], tL: [t.uL, t.vL], tR: [t.uR, t.vR],
+           sg: g.sizePx, st: t.sizePx };
+}
+function depthFromSize(sizePx, realWm) {
+  return state.focalPx * realWm / Math.max(sizePx, 1e-6);
+}
+function depthFromDisparity(dPx) {
+  return state.focalPx * state.baseline / Math.max(dPx, 1e-6);
+}
+function agreementPct(a, b) {
+  return 100.0 * Math.abs(a - b) / Math.max(Math.max(a, b), 1e-6);
+}
+function drawStereoTopView(idx) {
+  const cv = document.getElementById('cvStereoTop');
+  if (!cv) return;
+  fitCanvasSize(cv);
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+  const tr = state.traj;
+  const wy = (tr && tr.waistYaw && tr.waistYaw[idx] !== undefined) ? tr.waistYaw[idx] : (state.waistYaw || 0);
+  const qTop = (tr && tr.q && tr.q.length) ? tr.q[Math.max(0, Math.min(idx, tr.q.length - 1))] : Q0;
+  const fkTop = forwardKinematics(qTop, state.links, wy);
+  const grip = tr ? tr.p[idx] : fkTop.ee;
+  const shTop = fkTop.origins[1];
+  const target = state.target;
+  const vMode = (tr && tr.visionMode) ? tr.visionMode : (state.visionMode || 'binocular');
+  const isMonoStaticTop = (vMode === 'mono_static');
+  const isMonoActiveTop = (vMode === 'mono_left' || vMode === 'mono_right');
+  const isMonoTop = (isMonoActiveTop || isMonoStaticTop);
+  const neckYTop = (tr && tr.headSwayY && tr.headSwayY[idx] !== undefined) ? tr.headSwayY[idx] : 0;
+  const neckZTop = (tr && tr.headSwayZ && tr.headSwayZ[idx] !== undefined) ? tr.headSwayZ[idx] : 0;
+  const cam = getCameraBasis((state.headSwayOffset || 0) + neckYTop, neckZTop, wy);
+  const prevEyeW = isMonoActiveTop
+    ? ((tr && tr.prevEyeWorld && tr.prevEyeWorld[idx])
+        ? tr.prevEyeWorld[idx]
+        : add3(vMode === 'mono_right' ? cam.rightEye : cam.leftEye, [0, -0.04, 0]))
+    : null;
+  const pts = [cam.leftEye, cam.rightEye, grip, target, [0, 0, 0], shTop];
+  if (prevEyeW) pts.push(prevEyeW);
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const xmin = Math.min.apply(null, xs) - 0.10;
+  const xmax = Math.max.apply(null, xs) + 0.10;
+  const ymin = Math.min.apply(null, ys) - 0.10;
+  const ymax = Math.max.apply(null, ys) + 0.10;
+  const topPad = 20, botPad = 36;
+  const s = Math.min((W - 52) / Math.max(xmax - xmin, 1e-6), (H - topPad - botPad) / Math.max(ymax - ymin, 1e-6));
+  const ox = (W - (xmax - xmin) * s) / 2 - xmin * s;
+  const oy = topPad + (H - topPad - botPad - (ymax - ymin) * s) / 2 + ymax * s;
+  const px = p => [ox + p[0] * s, oy - p[1] * s];
+  const pBase = px([0, 0, 0]);
+  const pShTop = px(shTop);
+  ctx.strokeStyle = Math.abs(wy) > 0.015 ? '#0f766e' : '#64748b';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(pBase[0], pBase[1]); ctx.lineTo(pShTop[0], pShTop[1]); ctx.stroke();
+  ctx.fillStyle = Math.abs(wy) > 0.015 ? '#0f766e' : '#cbd5e1';
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(pBase[0], pBase[1], 8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#475569';
+  ctx.beginPath();
+  ctx.arc(pShTop[0], pShTop[1], 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#475569';
+  ctx.font = '600 9px "Source Sans 3", system-ui, sans-serif';
+  ctx.fillText(Math.abs(wy) > 0.015 ? `sütun ${(wy * 180 / Math.PI).toFixed(0)}°` : 'sütun', pBase[0] - 14, pBase[1] + 22);
+  ctx.fillText('omuz', pShTop[0] - 12, pShTop[1] - 10);
+  const pL = px(cam.leftEye), pR = px(cam.rightEye);
+  const pG = px(grip), pT = px(target);
+  const sight = (a, b, col, dashed) => {
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.4;
+    ctx.setLineDash(dashed === false ? [] : [4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(a[0], a[1]);
+    ctx.lineTo(b[0], b[1]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  };
+  if (isMonoStaticTop) {
+    sight(pL, pG, 'rgba(30,58,95,0.75)', false);
+    sight(pL, pT, 'rgba(139,38,53,0.75)', false);
+  } else if (isMonoActiveTop && prevEyeW) {
+    const pActive = vMode === 'mono_right' ? pR : pL;
+    const pPrev = px(prevEyeW);
+    sight(pPrev, pG, 'rgba(124,77,18,0.55)', true);
+    sight(pPrev, pT, 'rgba(124,77,18,0.55)', true);
+    sight(pActive, pG, 'rgba(30,58,95,0.75)', false);
+    sight(pActive, pT, 'rgba(139,38,53,0.75)', false);
+    ctx.strokeStyle = '#7c4d12';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(pPrev[0], pPrev[1]); ctx.lineTo(pActive[0], pActive[1]); ctx.stroke();
+    ctx.fillStyle = '#7c4d12';
+    ctx.beginPath(); ctx.arc(pPrev[0], pPrev[1], 4.2, 0, Math.PI * 2); ctx.fill();
+    ctx.font = '600 8px Consolas, monospace';
+    ctx.fillText('t-Δt', pPrev[0] - 14, pPrev[1] - 8);
+  } else {
+    sight(pL, pG, 'rgba(30,58,95,0.55)');
+    sight(pR, pG, 'rgba(30,58,95,0.55)');
+    sight(pL, pT, 'rgba(139,38,53,0.55)');
+    sight(pR, pT, 'rgba(139,38,53,0.55)');
+  }
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(pL[0], pL[1]);
+  ctx.lineTo(pR[0], pR[1]);
+  ctx.stroke();
+  [[pL, 'SOL', vMode === 'mono_right'], [pR, 'SAĞ', vMode === 'mono_left' || isMonoStaticTop]].forEach(pair => {
+    const occ = pair[2];
+    ctx.fillStyle = occ ? '#94a3b8' : '#1e3a5f';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(pair[0][0], pair[0][1], occ ? 4.0 : 5.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = occ ? '#64748b' : '#1e3a5f';
+    ctx.font = '600 8px Consolas, monospace';
+    ctx.fillText(occ ? `${pair[1]}(X)` : pair[1], pair[0][0] - 8, pair[0][1] + 16);
+  });
+  if (state.showGhost && state.ghostModels && state.ghostModels.length) {
+    GHOST_MODELS.forEach(gm => {
+      if (gm.id === state.controller || !state.ghostModels.includes(gm.id)) return;
+      const gtr = state.ghostTrajs ? state.ghostTrajs[gm.id] : null;
+      if (!gtr || !gtr.p || !gtr.p.length) return;
+      const gIdx = Math.min(idx, gtr.p.length - 1);
+      const pgTop = px(gtr.p[gIdx]);
+      ctx.save();
+      ctx.strokeStyle = gm.color;
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash(gm.dash || [3, 3]);
+      ctx.beginPath();
+      ctx.arc(pgTop[0], pgTop[1], 5.5, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = gm.color;
+      ctx.beginPath();
+      ctx.arc(pgTop[0], pgTop[1], 2.0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+  }
+  ctx.fillStyle = '#1e3a5f';
+  ctx.beginPath();
+  ctx.arc(pG[0], pG[1], 6.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = '#8b2635';
+  ctx.beginPath();
+  ctx.arc(pT[0], pT[1], 7.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(pT[0], pT[1], 2.5, 0, Math.PI * 2);
+  ctx.fill();
+  const d = currentEyeData(idx);
+  const dG = Math.abs(d.gL[0] - d.gR[0]);
+  const dT = Math.abs(d.tL[0] - d.tR[0]);
+  const zdG = depthFromDisparity(dG), zsG = depthFromSize(d.sg, state.gripperRealM);
+  const zdT = depthFromDisparity(dT), zsT = depthFromSize(d.st, state.targetRealM);
+  const agreeG = agreementPct(zsG, zdG);
+  const nbMmTop = (tr && tr.neckBaseMm && tr.neckBaseMm[idx] !== undefined) ? tr.neckBaseMm[idx] : 0;
+  const mpTop = (tr && tr.motionParallaxPx && tr.motionParallaxPx[idx] !== undefined) ? tr.motionParallaxPx[idx] : 0;
+  const biasTop = (tr && tr.scaleBiasPct && tr.scaleBiasPct[idx] !== undefined) ? tr.scaleBiasPct[idx] : (isMonoStaticTop ? 28.0 : 0.0);
+  const pad = 8, lh = 12;
+  const ord = (tr && tr.ordinal && tr.ordinal[idx]) ? tr.ordinal[idx] : { proximityClass: 'UZAK', depth: 'GERİDE', horiz: 'ORTA' };
+  const agreeWord = agreeG < 12 ? 'YÜKSEK' : agreeG < 30 ? 'ORTA' : 'DÜŞÜK';
+  const lines = state.theoremMode
+    ? [
+        [`Koni: ${ord.proximityClass} · El ${ord.depth}`, '#1e3a5f'],
+        [isMonoStaticTop ? `Mod: TEK GÖZ SABİT (PARALAKS YOK) · Bias=%${biasTop.toFixed(0)}` : (isMonoTop ? `Mod: TEK GÖZ BOYUN–GÖZ PARALAKSI · Uyum: ${agreeWord}` : `Yön: ${ord.horiz} · Koni Uyum: ${agreeWord}`), isMonoStaticTop ? '#8b2635' : (agreeG < 12 ? '#1e5631' : agreeG < 30 ? '#7c4d12' : '#8b2635')]
+      ]
+    : (isMonoStaticTop
+      ? [
+          [`B_boyun=0.0mm (Paralaks YOK)  Bias=%${biasTop.toFixed(0)}  s_g=${d.sg.toFixed(1)}px`, '#8b2635'],
+          [`Z_loom(yanlı)=${zsG.toFixed(2)}m  y_boyun=0.0mm`, '#1e3a5f']
+        ]
+      : (isMonoTop
+        ? [
+            ['B_boyun=' + nbMmTop.toFixed(1) + 'mm  Δu_mp=' + mpTop.toFixed(1) + 'px  s_g=' + d.sg.toFixed(1) + 'px', '#1e293b'],
+            ['Z_loom=' + zsG.toFixed(2) + 'm  y_boyun=' + (neckYTop * 1000).toFixed(1) + 'mm  Bias=%' + biasTop.toFixed(0), '#1e3a5f']
+          ]
+        : [
+            ['B=' + (state.baseline * 1000).toFixed(0) + 'mm  Δu_g=' + dG.toFixed(1) + 'px  Δu_t=' + dT.toFixed(1) + 'px', '#1e293b'],
+            ['Z_disp=' + zdG.toFixed(2) + 'm  Z_boy=' + zsG.toFixed(2) + 'm  uyum=%' + agreeG.toFixed(0), agreeG < 12 ? '#1e5631' : agreeG < 30 ? '#7c4d12' : '#8b2635']
+          ]));
+  ctx.font = '500 9px Consolas, monospace';
+  let yy = H - pad - lh * (lines.length - 1);
+  for (let k = 0; k < lines.length; k++) {
+    ctx.fillStyle = lines[k][1];
+    ctx.fillText(lines[k][0], pad, yy);
+    yy += lh;
+  }
+  ctx.fillStyle = '#475569';
+  ctx.font = '600 9px "Source Sans 3", system-ui, sans-serif';
+  ctx.fillText(isMonoStaticTop ? 'kuşbakışı: sabit tek göz (paralaks yok · boyut yanılsaması)' : (isMonoTop ? 'kuşbakışı: tek açık göz + yavaş boyun–göz paralaks üçgeni' : 'kuşbakışı: omuz, iki göz ve kesişim noktası'), pad, 12);
+  const lbl = document.getElementById('lblTopView');
+  if (lbl) {
+    lbl.textContent = state.theoremMode
+      ? `${ord.proximityClass} · Derinlik: ${ord.depth} · Uyum: ${agreeWord}`
+      : (isMonoStaticTop
+          ? `SABİT TEK GÖZ · B_boyun=0.0mm | Bias=%${biasTop.toFixed(0)} | Z=${zsG.toFixed(2)}m`
+          : (isMonoTop
+              ? `B_boyun=${nbMmTop.toFixed(1)}mm | Δu_mp=${mpTop.toFixed(1)}px | Z=${zsG.toFixed(2)}m`
+              : ('Δu_g = ' + dG.toFixed(1) + ' px | Z = ' + zdG.toFixed(2) + ' m | uyum %' + agreeG.toFixed(0))));
+  }
+  const km = document.getElementById('kuviewMetrics');
+  if (km) {
+    km.innerHTML = state.theoremMode
+      ? `<span>Yakınlık: <b>${ord.proximityClass}</b></span><span>Derinlik Konisi: <b>${ord.depth}</b></span><span>Paralks Uyum: <b>${agreeWord}</b></span>`
+      : (isMonoStaticTop
+          ? `<span>Z_loom: <b>${zsG.toFixed(2)} m</b></span><span>B_boyun: <b>0.0 mm</b></span><span>Ölçek Sapma: <b>%${biasTop.toFixed(0)}</b></span>`
+          : (isMonoTop
+              ? `<span>Z_loom: <b>${zsG.toFixed(2)} m</b></span><span>B_boyun: <b>${nbMmTop.toFixed(1)} mm</b></span><span>Δu_mp: <b>${mpTop.toFixed(1)} px</b></span>`
+              : `<span>Z_boy: <b>${zsG.toFixed(2)} m</b></span><span>Z_disp: <b>${zdG.toFixed(2)} m</b></span><span>Δu_t: <b>${dT.toFixed(1)} px</b></span><span>Uyum: <b>%${agreeG.toFixed(0)}</b></span>`));
+  }
+}
+function drawSideView(idx) {
+  const cv = document.getElementById('cvSide');
+  if (!cv) return;
+  fitCanvasSize(cv);
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  const tr = state.traj;
+  const wy = (tr && tr.waistYaw && tr.waistYaw[idx] !== undefined) ? tr.waistYaw[idx] : (state.waistYaw || 0);
+  const q = (tr && tr.q && tr.q.length)
+    ? tr.q[Math.max(0, Math.min(idx, tr.q.length - 1))]
+    : Q0;
+  const fk = forwardKinematics(q, state.links, wy);
+  const joints = fk.origins;
+  const grip = fk.ee;
+  const target = state.target;
+
+  const xs = joints.map(p => p[0]).concat([grip[0], target[0], 0.0]);
+  const zs = joints.map(p => p[2]).concat([grip[2], target[2], 0.0]);
+  const xmin = Math.min.apply(null, xs) - 0.10;
+  const xmax = Math.max.apply(null, xs) + 0.10;
+  const zmin = Math.max(-0.05, Math.min.apply(null, zs) - 0.08);
+  const zmax = Math.max.apply(null, zs) + 0.12;
+  const s = Math.min((W - 96) / Math.max(xmax - xmin, 1e-6), (H - 64) / Math.max(zmax - zmin, 1e-6));
+  const ox = (W - (xmax - xmin) * s) / 2 - xmin * s;
+  const oy = (H - (zmax - zmin) * s) / 2 + zmax * s;
+  const px = p => [ox + p[0] * s, oy - p[2] * s];
+
+  // Zemin ve 0.20 m ızgara
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = 2;
+  const gA = px([xmin, 0, 0]), gB = px([xmax, 0, 0]);
+  ctx.beginPath(); ctx.moveTo(gA[0], gA[1]); ctx.lineTo(gB[0], gB[1]); ctx.stroke();
+  ctx.strokeStyle = '#edf1f5';
+  ctx.lineWidth = 1;
+  for (let x = Math.ceil(xmin / 0.2) * 0.2; x <= xmax; x += 0.2) {
+    const a = px([x, 0, zmin]), b = px([x, 0, zmax]);
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+  }
+  for (let z = Math.ceil(zmin / 0.2) * 0.2; z <= zmax; z += 0.2) {
+    const a = px([xmin, 0, z]), b = px([xmax, 0, z]);
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+  }
+
+  // Çoklu Model Hayalet İkizleri (yandan görünüş)
+  if (state.showGhost && state.ghostModels && state.ghostModels.length) {
+    GHOST_MODELS.forEach(gm => {
+      if (gm.id === state.controller || !state.ghostModels.includes(gm.id)) return;
+      const gtr = state.ghostTrajs ? state.ghostTrajs[gm.id] : null;
+      if (!gtr || !gtr.q || !gtr.q.length) return;
+      const gIdx = Math.min(idx, gtr.q.length - 1);
+      const wyG = (gtr.waistYaw && gtr.waistYaw[gIdx] !== undefined) ? gtr.waistYaw[gIdx] : 0;
+      const fkG = forwardKinematics(gtr.q[gIdx], state.links, wyG);
+      ctx.save();
+      ctx.strokeStyle = gm.rgba;
+      ctx.lineWidth = Math.max(2, s * 0.03);
+      ctx.lineCap = 'round';
+      ctx.setLineDash(gm.dash || [4, 4]);
+      ctx.beginPath();
+      fkG.origins.slice(1).forEach((p, i) => {
+        const c = px(p);
+        if (i === 0) ctx.moveTo(c[0], c[1]); else ctx.lineTo(c[0], c[1]);
+      });
+      const pgG = px(fkG.ee);
+      ctx.lineTo(pgG[0], pgG[1]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    });
+  }
+
+  // Kinematik zincir (omuz → dirsek → bilek → tutucu)
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = Math.max(3, s * 0.05);
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  joints.forEach((p, i) => {
+    const c = px(p);
+    if (i === 0) ctx.moveTo(c[0], c[1]); else ctx.lineTo(c[0], c[1]);
+  });
+  const pg = px(grip);
+  ctx.lineTo(pg[0], pg[1]);
+  ctx.stroke();
+
+  // Eklem noktaları
+  ctx.font = '600 9px Consolas, monospace';
+  joints.forEach((p, i) => {
+    const c = px(p);
+    ctx.beginPath();
+    ctx.arc(c[0], c[1], i === 0 ? 7 : 5, 0, Math.PI * 2);
+    ctx.fillStyle = i === 0 ? '#1e3a5f' : '#334155';
+    ctx.fill();
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    if (i <= 3 && Math.hypot(c[0] - pg[0], c[1] - pg[1]) > 16) {
+      ctx.fillStyle = '#475569';
+      ctx.fillText('j' + i, c[0] + 7, c[1] - 6);
+    }
+  });
+
+  // Tutucu → hedef
+  const pT = px(target);
+  ctx.strokeStyle = 'rgba(139,38,53,0.55)';
+  ctx.lineWidth = 1.4;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(pg[0], pg[1]); ctx.lineTo(pT[0], pT[1]); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(pT[0], pT[1], 7, 0, Math.PI * 2);
+  ctx.strokeStyle = '#8b2635';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = '#8b2635';
+  ctx.font = '600 10px "Source Sans 3", system-ui, sans-serif';
+  ctx.fillText('hedef', pT[0] + 11, pT[1] + 3);
+  ctx.fillStyle = '#1e3a5f';
+  ctx.fillText('tutucu', pg[0] + 10, pg[1] - 5);
+
+  if (!state.theoremMode) {
+    const sb = 0.2 * s;
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(16, H - 12); ctx.lineTo(16 + sb, H - 12); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(16, H - 16); ctx.lineTo(16, H - 8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(16 + sb, H - 16); ctx.lineTo(16 + sb, H - 8); ctx.stroke();
+    ctx.fillStyle = '#475569';
+    ctx.font = '600 9px Consolas, monospace';
+    ctx.fillText('0.2 m', 20 + sb, H - 9);
+  }
+
+  ctx.fillStyle = '#475569';
+  ctx.font = '600 9px "Source Sans 3", system-ui, sans-serif';
+  ctx.fillText('yandan görünüş: X–Z düzlemi (omuz → dirsek → bilek)', 48, 12);
+
+  const lbl = document.getElementById('lblSideView');
+  if (lbl) {
+    const trS = state.traj;
+    const ordS = (trS && trS.ordinal && trS.ordinal[idx]) ? trS.ordinal[idx] : { depth: 'GERİDE', vert: 'ORTA' };
+    lbl.textContent = state.theoremMode
+      ? `Yatay Derinlik: ${ordS.depth} | Dikey: ${ordS.vert}`
+      : 'ΔX = ' + (target[0] - grip[0]).toFixed(2) + ' m | ΔZ = ' + (target[2] - grip[2]).toFixed(2) + ' m';
+  }
+}
+// ============ Joint lock grid, align-to-plane, limb floating editor ============
+const JOINT_LABELS = ['j1 gövde', 'j2 omuz', 'j3 dirsek', 'j4 bilek f/e', 'j5 bilek r/u', 'j6 el'];
+function buildLockGrid() {
+  const host = document.getElementById('lockGrid');
+  if (!host) return;
+  host.innerHTML = '';
+  state.lockCheckboxes = [];
+  JOINT_LABELS.forEach((nm, i) => {
+    const row = document.createElement('label');
+    row.className = 'lock-row' + (state.locked[i] ? ' locked' : '');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = !!state.locked[i];
+    const nmEl = document.createElement('span');
+    nmEl.className = 'lock-nm';
+    nmEl.textContent = nm;
+    row.appendChild(cb);
+    row.appendChild(nmEl);
+    host.appendChild(row);
+    state.lockCheckboxes.push(cb);
+    cb.addEventListener('change', () => {
+      state.locked[i] = cb.checked;
+      row.classList.toggle('locked', cb.checked);
+      enterSetupMode();
+    });
+  });
+}
+function syncLockCheckboxes() {
+  (state.lockCheckboxes || []).forEach((cb, i) => {
+    if (!cb) return;
+    cb.checked = !!state.locked[i];
+    const row = cb.parentNode;
+    if (row && row.classList && row.classList.toggle) {
+      row.classList.toggle('locked', !!state.locked[i]);
+    }
+  });
+}
+function alignJointsToPlane(plane) {
+  const axisIdx = plane === 'xy' ? 2 : plane === 'yz' ? 0 : 1;   // normal: z, x, y
+  const n = 6, lam = 0.02;
+  let q = Q0.slice();
+  for (let iter = 0; iter < 60; iter++) {
+    const fk = forwardKinematics(q, state.links);
+    const r = fk.origins.map(o => o[axisIdx]);
+    const J = [];
+    for (let i = 0; i < fk.origins.length; i++) {
+      const row = [];
+      for (let k = 0; k < n; k++) {
+        if (state.locked[k]) { row.push(0); continue; }
+        const eps = 1e-5;
+        const q2 = q.slice();
+        q2[k] += eps;
+        const fk2 = forwardKinematics(q2, state.links);
+        row.push((fk2.origins[i][axisIdx] - fk.origins[i][axisIdx]) / eps);
+      }
+      J.push(row);
+    }
+    const A = [];
+    for (let i = 0; i < n; i++) {
+      const row = [];
+      for (let j = 0; j < n; j++) {
+        let s = 0;
+        for (let k = 0; k < J.length; k++) s += J[k][i] * J[k][j];
+        row.push(s + (i === j ? lam * lam : 0));
+      }
+      A.push(row);
+    }
+    const b = [];
+    for (let i = 0; i < n; i++) {
+      let s = 0;
+      for (let k = 0; k < r.length; k++) s += J[k][i] * r[k];
+      b.push(-s);
+    }
+    const dq = solveDense(A, b);
+    if (!dq) break;
+    for (let j = 0; j < n; j++) {
+      if (state.locked[j]) continue;
+      q[j] += dq[j];
+      const L = state.links[j].limits_deg;
+      const lo = L[0] * Math.PI / 180, hi = L[1] * Math.PI / 180;
+      if (q[j] < lo) q[j] = lo; else if (q[j] > hi) q[j] = hi;
+    }
+  }
+  setJointSlidersFromQ(q);
+  Q0 = q;
+  syncControlsFromUI();
+  enterSetupMode();
+  const fk2 = forwardKinematics(q, state.links);
+  const maxOff = Math.max.apply(null, fk2.origins.map(o => Math.abs(o[axisIdx])));
+  const hint = document.getElementById('alignHint');
+  if (hint) {
+    hint.textContent = maxOff < 0.01
+      ? 'Hizalandı — maksimum dış-düzlem sapması ' + (maxOff * 100).toFixed(2) + ' cm'
+      : 'Tam hizalanmadı — ' + (maxOff * 100).toFixed(1) + ' cm dış-düzlem sapması kaldı (eklem sınırları/bağlantılar)';
+  }
+}
+// ---- Shared floating joint/limb controls & inspectors ----
+const JOINT_FULL_LABELS = [
+  'j1 Gövde / Omuz Kuşağı (Z-Yaw)',
+  'j2 Omuz Kaldırma (Y-Fleksiyon)',
+  'j3 Dirsek Menteşe (Y-Fleksiyon)',
+  'j4 Bilek Eğme (Y-Fleksiyon)',
+  'j5 Bilek Sapma (Z-Radyal/Ulnar)',
+  'j6 Önkol/El Dönme (X-Ekseni Roll)'
+];
+const LIMB_TR_NAMES = {
+  0: 'Gövde & Omuz Yüksekliği (d1)',
+  1: 'Üst Kol — Humerus (L2)',
+  2: 'Ön Kol — Radius/Ulna (L3)',
+  5: 'El & Tutucu (d6)'
+};
+function renderFloatingJointSliders(hostEl, indices) {
+  if (!hostEl) return;
+  hostEl.innerHTML = '';
+  indices.forEach(j => {
+    const L = state.links[j];
+    const lo = L.limits_deg[0], hi = L.limits_deg[1];
+    const curDeg = (Q0[j] || 0) / DEG;
+    const row = document.createElement('div');
+    row.className = 'jp-slider-row';
+    const head = document.createElement('div');
+    head.className = 'jp-slider-head';
+    const lbl = document.createElement('span');
+    lbl.textContent = JOINT_FULL_LABELS[j] || ('j' + (j + 1));
+    if (j === 5) lbl.style.color = '#c2410c';
+    const valSpan = document.createElement('span');
+    valSpan.className = 'jp-val';
+    valSpan.setAttribute('data-jp-val', String(j));
+    valSpan.textContent = curDeg.toFixed(1) + '°';
+    head.appendChild(lbl);
+    head.appendChild(valSpan);
+    const rng = document.createElement('input');
+    rng.type = 'range';
+    rng.min = String(lo);
+    rng.max = String(hi);
+    rng.step = '0.5';
+    rng.value = String(curDeg);
+    rng.setAttribute('data-jp-rng', String(j));
+    rng.addEventListener('input', () => {
+      const nv = parseFloat(rng.value);
+      Q0[j] = nv * DEG;
+      setJointSlidersFromQ(Q0);
+      syncControlsFromUI();
+      enterSetupMode();
+      syncFloatingJointSliders();
+    });
+    const steps = document.createElement('div');
+    steps.className = 'jp-steps';
+    [-15, 0, 15].forEach(delta => {
+      const b = document.createElement('button');
+      b.className = 'btn';
+      b.type = 'button';
+      b.textContent = delta === 0 ? '0° Sıfırla' : (delta > 0 ? '+15°' : '-15°');
+      b.addEventListener('click', () => {
+        const cur = (Q0[j] || 0) / DEG;
+        const targetDeg = delta === 0 ? 0 : cur + delta;
+        const clamped = Math.max(lo, Math.min(hi, targetDeg));
+        Q0[j] = clamped * DEG;
+        setJointSlidersFromQ(Q0);
+        syncControlsFromUI();
+        enterSetupMode();
+        syncFloatingJointSliders();
+      });
+      steps.appendChild(b);
+    });
+    row.appendChild(head);
+    row.appendChild(rng);
+    row.appendChild(steps);
+    hostEl.appendChild(row);
+  });
+}
+function syncFloatingJointSliders() {
+  document.querySelectorAll('[data-jp-rng]').forEach(el => {
+    const j = parseInt(el.getAttribute('data-jp-rng'), 10);
+    if (!isNaN(j) && Q0[j] !== undefined) el.value = (Q0[j] / DEG).toFixed(1);
+  });
+  document.querySelectorAll('[data-jp-val]').forEach(el => {
+    const j = parseInt(el.getAttribute('data-jp-val'), 10);
+    if (!isNaN(j) && Q0[j] !== undefined) el.textContent = (Q0[j] / DEG).toFixed(1) + '°';
+  });
+}
+function updateAnthroButtons() {
+  document.querySelectorAll('[data-anthro]').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-anthro') === state.activeAnthro);
+  });
+}
+// ---- Limb floating editor ----
+let limbEditIdx = -1;
+function refreshLimbPanelValues() {
+  if (limbEditIdx < 0) return;
+  const L = state.links[limbEditIdx];
+  const len = (limbEditIdx === 5 || limbEditIdx === 0) ? L.d : L.a;
+  document.getElementById('limbPanelSlider').value = len;
+  document.getElementById('limbPanelNum').value = len;
+  document.getElementById('limbPanelName').textContent = LIMB_TR_NAMES[limbEditIdx] || L.name.replace(/_/g, ' ');
+  document.getElementById('limbPanelVal').textContent = (len * 100).toFixed(1) + ' cm';
+  const limbJoints = limbEditIdx === 0 ? [0, 1] : limbEditIdx === 1 ? [1, 2, 5] : limbEditIdx === 2 ? [2, 3, 5] : [3, 4, 5];
+  renderFloatingJointSliders(document.getElementById('limbJointSliders'), limbJoints);
+  updateAnthroButtons();
+}
+function positionFloatingPanel(panel, cx, cy, pw, ph, gap) {
+  if (!panel || cx === undefined || cy === undefined || !isFinite(cx) || !isFinite(cy)) return;
+  const g = gap || 52;
+  const fitsRight = (cx + g + pw) <= (window.innerWidth - 8);
+  const left = fitsRight ? (cx + g) : Math.max(8, cx - g - pw);
+  const top = Math.min(Math.max(8, window.innerHeight - ph), Math.max(8, cy - Math.round(ph * 0.35)));
+  panel.style.left = Math.round(left) + 'px';
+  panel.style.top = Math.round(top) + 'px';
+}
+function openLimbPanel(idx, cx, cy) {
+  closeJointPanel(true);
+  limbEditIdx = idx;
+  state.limbPanelOpen = true;
+  state.limbPanelLink = idx;
+  refreshLimbPanelValues();
+  const panel = document.getElementById('limbPanel');
+  positionFloatingPanel(panel, cx, cy, 278, 390, 48);
+  panel.style.display = 'block';
+  refreshCustomList();
+}
+function closeLimbPanel() {
+  limbEditIdx = -1;
+  state.limbPanelOpen = false;
+  state.limbPanelLink = -1;
+  const p = document.getElementById('limbPanel');
+  if (p) p.style.display = 'none';
+}
+function syncActiveLimbProfileFromLinks(camDZOverride) {
+  const L = state.links;
+  const key = (document.getElementById('selLimbProfile') || {}).value || 'adult_avg';
+  const cur = LIMB_PROFILES[key] || LIMB_PROFILES.adult_avg;
+  const dz = (camDZOverride !== undefined && isFinite(camDZOverride)) ? camDZOverride : cur.camDZ;
+  const updated = Object.assign({}, cur, {
+    d1: L[0].d, L2: L[1].a, L3: L[2].a, d4: L[3].d, d5: L[4].d, d6: L[5].d, camDZ: dz
+  });
+  LIMB_PROFILES[key] = updated;
+  if (key !== 'adult_avg') LIMB_PROFILES.adult_avg = Object.assign({}, LIMB_PROFILES.adult_avg, updated);
+  const elL2 = document.getElementById('rngL2'), elL3 = document.getElementById('rngL3'), elCamZ = document.getElementById('rngCamZ');
+  if (elL2) elL2.value = L[1].a.toFixed(2);
+  if (elL3) elL3.value = L[2].a.toFixed(2);
+  if (elCamZ) elCamZ.value = Number(dz).toFixed(2);
+}
+function applyLimbLength(v) {
+  if (limbEditIdx < 0) return;
+  if (!isFinite(v) || v <= 0) return;
+  const L = state.links[limbEditIdx];
+  if (limbEditIdx === 5 || limbEditIdx === 0) L.d = v; else L.a = v;
+  state.activeAnthro = '';
+  syncActiveLimbProfileFromLinks();
+  refreshLimbPanelValues();
+  syncControlsFromUI();
+  enterSetupMode();
+}
+document.getElementById('limbPanelSlider').addEventListener('input', e => {
+  applyLimbLength(parseFloat(e.target.value));
+});
+document.getElementById('limbPanelNum').addEventListener('change', e => {
+  applyLimbLength(parseFloat(e.target.value));
+});
+document.getElementById('limbPanelClose').addEventListener('click', closeLimbPanel);
+const limbOpenJointBtn = document.getElementById('limbOpenJointBtn');
+if (limbOpenJointBtn) {
+  limbOpenJointBtn.addEventListener('click', () => {
+    const jIdx = limbEditIdx <= 0 ? 1 : (limbEditIdx === 1 ? 2 : (limbEditIdx === 2 ? 3 : 5));
+    const pEl = document.getElementById('limbPanel');
+    const px = parseFloat(pEl.style.left) || 220;
+    const py = parseFloat(pEl.style.top) || 140;
+    state.selectedJoint = jIdx;
+    openJointPanel(jIdx, px - 18, py - 14);
+    renderSetupPreview();
+  });
+}
+const ANTHRO = {
+  child: { d1: 0.72, a2: 0.26, a3: 0.22, d4: 0.0, d5: 0.0, d6: 0.10, camDZ: 0.20 },
+  teen:  { d1: 0.80, a2: 0.29, a3: 0.245, d4: 0.0, d5: 0.0, d6: 0.11, camDZ: 0.21 },
+  adult: { d1: 0.90, a2: 0.31, a3: 0.26, d4: 0.0, d5: 0.0, d6: 0.12, camDZ: 0.22 }
+};
+function applyGeometryProfile(p, anthroName) {
+  if (!p) return;
+  const L = state.links;
+  L[0].d = p.d1; L[1].a = p.a2; L[2].a = p.a3;
+  L[3].d = (p.d4 !== undefined) ? p.d4 : 0.0;
+  L[4].d = (p.d5 !== undefined) ? p.d5 : 0.0;
+  L[5].d = (p.d6 !== undefined) ? p.d6 : 0.12;
+  state.activeAnthro = anthroName || '';
+  syncActiveLimbProfileFromLinks(p.camDZ !== undefined ? p.camDZ : 0.22);
+  syncControlsFromUI();
+  enterSetupMode();
+  if (limbEditIdx >= 0) refreshLimbPanelValues();
+  if (state.jointPanelOpen && state.jointPanelIdx >= 0) refreshJointPanel();
+}
+function applyAnthroProfile(name) {
+  applyGeometryProfile(ANTHRO[name], name);
+}
+document.querySelectorAll('[data-anthro]').forEach(btn => {
+  btn.addEventListener('click', () => applyAnthroProfile(btn.getAttribute('data-anthro')));
+});
+function refreshCustomList() {
+  const sel = document.getElementById('limbCustomList');
+  if (!sel) return;
+  let items = [];
+  try { items = JSON.parse(localStorage.getItem('robosim_custom_limbs_v1') || '[]'); } catch (e) {}
+  sel.innerHTML = items.length
+    ? items.map(p => '<option value="' + String(p.name).replace(/"/g, '&quot;') + '">' + String(p.name) + '</option>').join('')
+    : '<option value="-">(özel profil yok)</option>';
+}
+function applyCustomProfile(p) {
+  applyGeometryProfile(p, '');
+}
+// ---- Joint floating inspector (#jointPanel) ----
+function refreshJointPanel() {
+  const idx = state.jointPanelIdx;
+  if (idx < 0 || idx >= state.links.length) return;
+  const L = state.links[idx];
+  document.getElementById('jointPanelTitle').textContent = JOINT_FULL_LABELS[idx] || ('j' + (idx + 1));
+  const sub = document.getElementById('jointPanelSub');
+  if (sub) {
+    sub.textContent = (state.gizmoMode === 'rotate')
+      ? 'Halkalardan döndürün (j6 X-ekseni) veya kaydırıcı ile açı verin.'
+      : 'Yuvarlak topu sürükleyin (bileşik), X/Y/Z okları ile tek eksende kaydırın.';
+  }
+  const bTr = document.getElementById('jpModeTranslate');
+  const bRo = document.getElementById('jpModeRotate');
+  if (bTr) bTr.classList.toggle('active', state.gizmoMode !== 'rotate');
+  if (bRo) bRo.classList.toggle('active', state.gizmoMode === 'rotate');
+  const dofMap = {
+    0: [0, 1],
+    1: [1, 0, 5],
+    2: [2, 5, 1],
+    3: [3, 4, 5],
+    4: [4, 5, 3],
+    5: [5, 3, 4]
+  };
+  renderFloatingJointSliders(document.getElementById('jointPanelSliders'), dofMap[idx] || [idx]);
+  const chk = document.getElementById('jpLockChk');
+  if (chk) chk.checked = !!state.locked[idx];
+  const loEl = document.getElementById('jpLimMin'), hiEl = document.getElementById('jpLimMax');
+  if (loEl) loEl.value = L.limits_deg[0].toFixed(0);
+  if (hiEl) hiEl.value = L.limits_deg[1].toFixed(0);
+}
+function openJointPanel(idx, cx, cy) {
+  closeLimbPanel();
+  state.jointPanelIdx = idx;
+  state.jointPanelOpen = true;
+  refreshJointPanel();
+  const panel = document.getElementById('jointPanel');
+  if (!panel) return;
+  positionFloatingPanel(panel, cx, cy, 296, 390, 82);
+  panel.style.display = 'block';
+}
+function closeJointPanel(keepSelection) {
+  state.jointPanelOpen = false;
+  state.jointPanelIdx = -1;
+  const panel = document.getElementById('jointPanel');
+  if (panel) panel.style.display = 'none';
+  if (!keepSelection) state.selectedJoint = -1;
+}
+document.getElementById('jointPanelClose').addEventListener('click', () => {
+  closeJointPanel(false);
+  renderSetupPreview();
+});
+document.getElementById('jpModeTranslate').addEventListener('click', () => {
+  const b = document.getElementById('gizmoTranslate');
+  if (b) b.click();
+  refreshJointPanel();
+});
+document.getElementById('jpModeRotate').addEventListener('click', () => {
+  const b = document.getElementById('gizmoRotate');
+  if (b) b.click();
+  refreshJointPanel();
+});
+document.getElementById('jpLockChk').addEventListener('change', e => {
+  const j = state.jointPanelIdx;
+  if (j < 0) return;
+  state.locked[j] = !!e.target.checked;
+  syncLockCheckboxes();
+  enterSetupMode();
+});
+document.getElementById('jpApplyLim').addEventListener('click', () => {
+  const j = state.jointPanelIdx;
+  if (j < 0) return;
+  const lo = parseFloat(document.getElementById('jpLimMin').value);
+  const hi = parseFloat(document.getElementById('jpLimMax').value);
+  const all = state.links.map(l => l.limits_deg.slice());
+  all[j] = [lo, hi];
+  if (applyJointLimits(all, { quiet: false })) refreshJointPanel();
+});
+document.getElementById('limbSaveCustom').addEventListener('click', () => {
+  const nameEl = document.getElementById('limbCustomName');
+  const name = (nameEl.value || '').trim();
+  if (!name) { nameEl.focus(); return; }
+  const L = state.links;
+  const prof = { name, d1: L[0].d, a2: L[1].a, a3: L[2].a, d4: L[3].d, d5: L[4].d, d6: L[5].d };
+  let items = [];
+  try { items = JSON.parse(localStorage.getItem('robosim_custom_limbs_v1') || '[]'); } catch (e) {}
+  items = items.filter(p => p.name !== name);
+  items.push(prof);
+  localStorage.setItem('robosim_custom_limbs_v1', JSON.stringify(items));
+  nameEl.value = '';
+  refreshCustomList();
+});
+document.getElementById('limbLoadCustom').addEventListener('click', () => {
+  const sel = document.getElementById('limbCustomList');
+  const name = sel.value;
+  let items = [];
+  try { items = JSON.parse(localStorage.getItem('robosim_custom_limbs_v1') || '[]'); } catch (e) {}
+  const p = items.find(x => x.name === name);
+  if (p) applyCustomProfile(p);
+});
+document.getElementById('limbDeleteCustom').addEventListener('click', () => {
+  const sel = document.getElementById('limbCustomList');
+  const name = sel.value;
+  let items = [];
+  try { items = JSON.parse(localStorage.getItem('robosim_custom_limbs_v1') || '[]'); } catch (e) {}
+  items = items.filter(p => p.name !== name);
+  localStorage.setItem('robosim_custom_limbs_v1', JSON.stringify(items));
+  refreshCustomList();
+});
+// Align-plane segmented control
+const PLANE_IDS = ['planeXY', 'planeXZ', 'planeYZ'];
+PLANE_IDS.forEach(id => {
+  document.getElementById(id).addEventListener('click', () => {
+    PLANE_IDS.forEach(o => document.getElementById(o).classList.toggle('active', o === id));
+    state.alignPlane = id === 'planeXY' ? 'xy' : id === 'planeXZ' ? 'xz' : 'yz';
+  });
+});
+document.getElementById('btnAlignPlane').addEventListener('click', () => {
+  alignJointsToPlane(state.alignPlane);
+});
+document.getElementById('btnClearSelection').addEventListener('click', () => {
+  state.selectedJoint = -1;
+  closeLimbPanel();
+  closeJointPanel(false);
+  const sel = document.getElementById('selInfo');
+  if (sel) sel.textContent = 'Seçim temizlendi.';
+  renderSetupPreview();
+});
+// ===== Joint reference frame gizmo (F_i): translate vs rotate mode =====
+const GIZMO_MODE_IDS = ['gizmoTranslate', 'gizmoRotate'];
+GIZMO_MODE_IDS.forEach(id => {
+  document.getElementById(id).addEventListener('click', () => {
+    const rotate = (id === 'gizmoRotate');
+    state.gizmoMode = rotate ? 'rotate' : 'translate';
+    GIZMO_MODE_IDS.forEach(o => document.getElementById(o).classList.toggle('active', o === id));
+    const hint = document.getElementById('gizmoModeHint');
+    if (hint) {
+      hint.innerHTML = rotate
+        ? 'Döndür: seçili X/Y/Z halkasından tutarak eklemi/kolu döndürür (j6 X-ekseni dahil); eklem limitlerini korur.'
+        : 'Ötele: X/Y/Z okunu tutarak yalnızca o eksende kaydırın; merkezdeki yuvarlak topu sürükleyerek bileşik hareket ettirin.';
+    }
+    if (state.jointPanelOpen) refreshJointPanel();
+    renderSetupPreview();
+  });
+});
+// ===== Eklem sınırı düzenleyici (yeni sınır profili) =====
+const LIMIT_STORAGE_KEY = 'robosim_joint_limits_v1';
+const LIMIT_DEFAULTS = [
+  [-60, 60],      // j1 gövde (omuz kuşağı)
+  [-35, 175],     // j2 omuz fleksiyon/ekstansiyon
+  [0, 140],       // j3 dirsek
+  [-70, 75],      // j4 bilek fleksiyon/ekstansiyon
+  [-40, 20],      // j5 bilek radyal/ulnar
+  [-30, 30]       // j6 el eksenel rotasyonu
+];
+function currentLimitInputs() {
+  const rows = document.querySelectorAll('#limitTable .limit-row');
+  const limits = [];
+  rows.forEach(row => {
+    const i = parseInt(row.getAttribute('data-j'), 10);
+    const lo = parseFloat(row.querySelector('.lm-min').value);
+    const hi = parseFloat(row.querySelector('.lm-max').value);
+    limits[i] = [lo, hi];
+  });
+  return limits;
+}
+function buildLimitTable(limits) {
+  const host = document.getElementById('limitTable');
+  if (!host) return;
+  host.innerHTML = '';
+  for (let j = 0; j < 6; j++) {
+    const L = limits && limits[j] ? limits[j] : state.links[j].limits_deg;
+    const row = document.createElement('div');
+    row.className = 'limit-row';
+    row.setAttribute('data-j', String(j));
+    row.innerHTML =
+      '<span class="lm-nm">' + ARM_JOINT_LABELS[j] + '</span>' +
+      '<input type="number" class="lm-min" step="1" min="-360" max="360" value="' + L[0].toFixed(0) + '" title="alt sınır (derece)">' +
+      '<input type="number" class="lm-max" step="1" min="-360" max="360" value="' + L[1].toFixed(0) + '" title="üst sınır (derece)">';
+    host.appendChild(row);
+  }
+}
+function applyJointLimits(limits, opts) {
+  opts = opts || {};
+  // Doğrula: min < max, genişlik en az 5°
+  for (let j = 0; j < 6; j++) {
+    const L = limits[j];
+    if (!L || !isFinite(L[0]) || !isFinite(L[1])) { setLimitHint('Geçersiz değer: j' + (j + 1)); return false; }
+    if (L[0] >= L[1]) { setLimitHint('j' + (j + 1) + ': alt sınır ≥ üst sınır — düzeltilmedi'); return false; }
+    if (L[1] - L[0] < 5) { setLimitHint('j' + (j + 1) + ': aralık en az 5° olmalı'); return false; }
+  }
+  for (let j = 0; j < 6; j++) {
+    state.links[j].limits_deg = [limits[j][0], limits[j][1]];
+    // Mevcut pozisyonu yeni sınıra sıkıştır
+    const lo = limits[j][0] * DEG, hi = limits[j][1] * DEG;
+    if (Q0[j] < lo) Q0[j] = lo; else if (Q0[j] > hi) Q0[j] = hi;
+  }
+  // Kaydırıcıları yeni sınırlarla yeniden kur
+  buildJointSliders();
+  setJointSlidersFromQ(Q0);
+  buildLimitTable(state.links.map(l => l.limits_deg));
+  syncControlsFromUI();
+  enterSetupMode();
+  setLimitHint(opts.quiet ? '' : 'Sınırlar uygulandı — simülasyon ve IK bu sınırlarla çalışır');
+  return true;
+}
+function setLimitHint(t) {
+  const el = document.getElementById('limitHint');
+  if (el) el.innerHTML = t || '&nbsp;';
+}
+function readProfiles() {
+  try { return JSON.parse(localStorage.getItem(LIMIT_STORAGE_KEY) || '[]'); } catch (e) { return []; }
+}
+function writeProfiles(items) {
+  try { localStorage.setItem(LIMIT_STORAGE_KEY, JSON.stringify(items)); } catch (e) {}
+}
+function refreshLimitProfileList() {
+  const sel = document.getElementById('limitProfileList');
+  if (!sel) return;
+  const items = readProfiles();
+  sel.innerHTML = items.length
+    ? items.map(p => '<option value="' + String(p.name).replace(/"/g, '&quot;') + '">' + String(p.name) + '</option>').join('')
+    : '<option value="-">(kayıtlı sınır profili yok)</option>';
+}
+document.getElementById('btnApplyLimits').addEventListener('click', () => {
+  applyJointLimits(currentLimitInputs(), { quiet: false });
+});
+document.getElementById('btnResetLimits').addEventListener('click', () => {
+  applyJointLimits(LIMIT_DEFAULTS, {});
+});
+document.getElementById('btnSaveLimitProfile').addEventListener('click', () => {
+  const input = document.getElementById('limitProfileName');
+  const name = (input.value || '').trim();
+  if (!name) { input.focus(); setLimitHint('Profil ismi boş olamaz'); return; }
+  const limits = currentLimitInputs();
+  if (!applyJointLimits(limits, { quiet: true })) return;
+  let items = readProfiles();
+  items = items.filter(p => p.name !== name);
+  items.push({ name, limits });
+  writeProfiles(items);
+  input.value = '';
+  refreshLimitProfileList();
+  setLimitHint('Profil kaydedildi: "' + name + '"');
+});
+document.getElementById('btnLoadLimitProfile').addEventListener('click', () => {
+  const sel = document.getElementById('limitProfileList');
+  const name = sel.value;
+  const p = readProfiles().find(x => x.name === name);
+  if (p) applyJointLimits(p.limits, {});
+});
+document.getElementById('btnDeleteLimitProfile').addEventListener('click', () => {
+  const sel = document.getElementById('limitProfileList');
+  const name = sel.value;
+  writeProfiles(readProfiles().filter(p => p.name !== name));
+  refreshLimitProfileList();
+});
+document.getElementById('btnDownloadModel').addEventListener('click', () => {
+  // Mevcut geometri + sınırları içeren gerçek bir model JSON'u üret
+  const out = JSON.parse(JSON.stringify(INITIAL_DATA));
+  out.name = (out.name || 'custom_arm') + '_custom_limits';
+  const limits = currentLimitInputs();
+  const ok = applyJointLimits(limits, { quiet: true });
+  if (!ok) return;
+  out.links = state.links.map(l => {
+    const nl = JSON.parse(JSON.stringify(l));
+    nl.limits_deg = [l.limits_deg[0], l.limits_deg[1]];
+    return nl;
+  });
+  out.description = (out.description || '') + ' | Kullanıcı tarafından düzenlenmiş eklem sınırları.';
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (out.name || 'custom_arm') + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  setLimitHint('Yeni model JSON indirildi — CLI: --model ' + a.download);
+});
+buildLimitTable();
+refreshLimitProfileList();
+// ===== Ayırıcılar: panelleri sürükleyerek ölçekle =====
+function bindSplitter(el, onMove, axis) {
+  if (!el) return;
+  let dragging = false;
+  el.addEventListener('pointerdown', e => {
+    dragging = true;
+    try { el.setPointerCapture(e.pointerId); } catch (_) {}
+    e.preventDefault();
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = axis === 'x' ? 'ew-resize' : 'ns-resize';
+  });
+  el.addEventListener('pointermove', e => { if (dragging) onMove(e); });
+  const stop = () => {
+    dragging = false;
+    document.body.style.userSelect = '';
+    document.body.style.cursor = '';
+  };
+  el.addEventListener('pointerup', stop);
+  el.addEventListener('pointercancel', stop);
+}
+
+// 3B sahne | sağ 2x2 aux matrisi (yatay genişlik)
+bindSplitter(document.getElementById('topSplitter'), e => {
+  const rt = document.querySelector('.row-top');
+  if (!rt) return;
+  const r = rt.getBoundingClientRect();
+  const w = Math.max(300, Math.min(r.width - 340, r.right - e.clientX));
+  rt.style.setProperty('--aux-w', w + 'px');
+  scheduleRedraw();
+}, 'x');
+
+// Gözler | üstten+yandan görünüş (dikey, sağ matris içinde)
+bindSplitter(document.getElementById('eyesSplitter'), e => {
+  const aux = document.getElementById('auxMatrix');
+  if (!aux) return;
+  const r = aux.getBoundingClientRect();
+  const h = Math.max(115, Math.min(r.height - 115, e.clientY - r.top));
+  aux.style.setProperty('--eyes-h', h + 'px');
+  scheduleRedraw();
+}, 'y');
+
+// Üstten | yandan görünüş (yatay)
+bindSplitter(document.getElementById('viewSplitter'), e => {
+  const rv = document.getElementById('rowViews');
+  if (!rv) return;
+  const r = rv.getBoundingClientRect();
+  const w = Math.max(130, Math.min(r.width - 130, r.right - e.clientX));
+  rv.style.setProperty('--side-w', w + 'px');
+  scheduleRedraw();
+}, 'x');
+
+// Üst kokpit | alt ayar paneli (dikey — kokpit yüksekliğini ölçekler)
+bindSplitter(document.getElementById('bottomSplitter'), e => {
+  const lab = document.querySelector('.lab');
+  const rt = document.querySelector('.row-top');
+  if (!lab || !rt) return;
+  const h = Math.max(340, Math.min(window.innerHeight * 0.80, e.clientY - rt.getBoundingClientRect().top));
+  lab.style.setProperty('--cockpit-h', h + 'px');
+  scheduleRedraw();
+}, 'y');
+
+// ===== Alt kontrol panelini daralt/genişlet =====
+const btnToggleBottom = document.getElementById('btnToggleBottom');
+if (btnToggleBottom) {
+  btnToggleBottom.addEventListener('click', () => {
+    const lb = document.getElementById('layerBottom');
+    lb.classList.toggle('collapsed');
+    btnToggleBottom.innerHTML = lb.classList.contains('collapsed')
+      ? '&#9656; Kontrol Panelini Genişlet'
+      : '&#9662; Kontrol Panelini Daralt';
+  });
+}
+
+
+// Pencere veya panel kutusu yeniden boyutlanınca kanvasları anında oturt
+window.addEventListener('resize', () => setTimeout(scheduleRedraw, 60));
+if (typeof ResizeObserver === 'function') {
+  const _ro = new ResizeObserver(() => scheduleRedraw());
+  ['rowTop', 'sceneWrap', 'layerEyes', 'rowViews'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) _ro.observe(el);
+  });
+}
+
+// ===== Panel pencereleri: daralt/kapat/göster =====
+document.querySelectorAll('.pw-btn[data-act]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const act = btn.getAttribute('data-act');
+    const win = btn.closest('.panel-window');
+    if (!win) return;
+    if (act === 'toggle') win.classList.toggle('collapsed');
+    else if (act === 'close') win.classList.add('hidden');
+    syncPanelRestore();
+    syncPanelLayout();
+  });
+});
+function syncPanelLayout() {
+  const rt = document.getElementById('rowTop');
+  const aux = document.getElementById('auxMatrix');
+  const eyesSec = document.getElementById('layerEyes');
+  const views = document.getElementById('rowViews');
+  const eyeL = document.getElementById('pwEyeL');
+  const eyeR = document.getElementById('pwEyeR');
+  const topV = document.getElementById('pwKuview');
+  const side = document.getElementById('pwSideview');
+  const scene = document.getElementById('pwScene');
+
+  const bothEyesGone = !!(eyeL && eyeR && eyeL.classList.contains('hidden') && eyeR.classList.contains('hidden'));
+  if (eyesSec && eyeL && eyeR) {
+    eyesSec.style.display = bothEyesGone ? 'none' : '';
+    eyesSec.classList.toggle(
+      'collapsed',
+      !bothEyesGone && eyeL.classList.contains('collapsed') && eyeR.classList.contains('collapsed')
+    );
+  }
+  const topGone = !!(topV && topV.classList.contains('hidden'));
+  const sideGone = !!(side && side.classList.contains('hidden'));
+  const bothViewsGone = topGone && sideGone;
+  if (views) {
+    views.style.display = bothViewsGone ? 'none' : '';
+    views.classList.toggle('top-off', topGone && !sideGone);
+    views.classList.toggle('side-off', sideGone && !topGone);
+    views.classList.toggle(
+      'collapsed',
+      !bothViewsGone && (!topV || topV.classList.contains('collapsed')) && (!side || side.classList.contains('collapsed'))
+    );
+  }
+  if (aux) {
+    aux.classList.toggle('eyes-off', bothEyesGone);
+    aux.classList.toggle('views-off', bothViewsGone);
+  }
+  if (rt) {
+    rt.classList.toggle('aux-off', bothEyesGone && bothViewsGone);
+    rt.classList.toggle('stage-off', !!(scene && scene.classList.contains('hidden')));
+  }
+  scheduleRedraw();
+}
+function syncPanelRestore() {
+  document.querySelectorAll('.pw-restore').forEach(b => {
+    const t = document.getElementById(b.getAttribute('data-target'));
+    b.classList.toggle('on', !!t && !t.classList.contains('hidden'));
+  });
+}
+document.querySelectorAll('.pw-restore').forEach(b => {
+  b.addEventListener('click', () => {
+    const t = document.getElementById(b.getAttribute('data-target'));
+    if (!t) return;
+    t.classList.toggle('hidden');
+    syncPanelRestore();
+    syncPanelLayout();
+  });
+});
+
+// ---------------- Event Bindings ----------------
+function applyLimbProfile() {
+  const p = LIMB_PROFILES[document.getElementById('selLimbProfile').value];
+  document.getElementById('rngL2').value = p.L2;
+  document.getElementById('rngL3').value = p.L3;
+  document.getElementById('rngCamX').value = p.camX;
+  document.getElementById('rngCamZ').value = p.camDZ;
+  document.getElementById('rngBaseline').value = p.B;
+}
+function populateSubModes() {
+  const tier = SPEED_TIERS[document.getElementById('selSpeedTier').value];
+  const sel = document.getElementById('selSpeedSub');
+  sel.innerHTML = Object.keys(tier.subs).map(k => `<option value="${k}">${tier.subs[k].label}</option>`).join('');
+}
+let _restoringSettings = false;
+// Writes effective tier+sub parameters into the detailed sliders & applies reasonable task context
+function applySpeedTier(applyCtx) {
+  const tierKey = document.getElementById('selSpeedTier').value;
+  const tier = SPEED_TIERS[tierKey];
+  const sub = tier.subs[document.getElementById('selSpeedSub').value] || { mod: {}, label: '' };
+  const v = Object.assign({}, tier.base);
+  Object.keys(sub.mod).forEach(k => { v[k] = v[k] * sub.mod[k]; });
+  v.phiMin = Math.min(0.9, v.phiMin); v.termP = Math.min(0.85, v.termP);
+  document.getElementById('rngVmax').value = v.vmax.toFixed(2);
+  document.getElementById('rngMaxQd').value = v.maxQd.toFixed(2);
+  document.getElementById('rngKScale').value = v.kScale.toFixed(2);
+  document.getElementById('rngEps').value = v.eps.toFixed(1);
+  document.getElementById('rngPhiMin').value = v.phiMin.toFixed(2);
+  document.getElementById('rngGamma').value = v.gamma.toFixed(2);
+  document.getElementById('rngTermP').value = v.termP.toFixed(2);
+  document.getElementById('rngDur').value = v.dur.toFixed(1);
+  if (applyCtx === true && !_restoringSettings && sub.ctx) {
+    const c = sub.ctx;
+    if (c.posture && POSTURES[c.posture]) {
+      const selP = document.getElementById('selPosture');
+      if (selP) selP.value = c.posture;
+      setJointSlidersFromQ(POSTURES[c.posture].map(d => d * DEG));
+    }
+    if (Array.isArray(c.target) && c.target.length === 3) {
+      document.getElementById('rngTx').value = c.target[0];
+      document.getElementById('rngTy').value = c.target[1];
+      document.getElementById('rngTz').value = c.target[2];
+    }
+    if (c.payload !== undefined) document.getElementById('rngPayload').value = c.payload;
+    if (c.delay !== undefined) document.getElementById('rngDelay').value = Math.round(c.delay * 1000);
+    if (c.visionMode) {
+      const selV = document.getElementById('selVisionMode');
+      if (selV) selV.value = c.visionMode;
+    }
+    state.goalRollDeg = (c.goalRollDeg !== undefined && c.goalRollDeg !== null) ? c.goalRollDeg : null;
+  } else if (applyCtx === true && !_restoringSettings) {
+    state.goalRollDeg = null;
+  }
+  const noteTxt = (sub.ctx && sub.ctx.note) ? sub.ctx.note : tier.desc;
+  document.getElementById('tierDesc').innerHTML = `<b>${sub.label}:</b> ${noteTxt}`;
+}
+function syncControlsFromUI() {
+  state.controller = document.getElementById('selController').value;
+  state.singMode = document.getElementById('selSingularity').value;
+  const selVision = document.getElementById('selVisionMode');
+  state.visionMode = selVision ? selVision.value : 'binocular';
+  state.gazeMode = document.getElementById('selGaze').value;
+  state.speedTierName = document.getElementById('selSpeedTier').value;
+  const prof = LIMB_PROFILES[document.getElementById('selLimbProfile').value];
+  state.links[0].d = prof.d1;
+  state.links[3].d = prof.d4; state.links[4].d = prof.d5; state.links[5].d = prof.d6;
+  state.links[1].a = parseFloat(document.getElementById('rngL2').value);
+  state.links[2].a = parseFloat(document.getElementById('rngL3').value);
+  Q0 = readJointSliders();
+  state.camPos[0] = parseFloat(document.getElementById('rngCamX').value);
+  state.camPos[2] = prof.d1 + parseFloat(document.getElementById('rngCamZ').value);
+  state.baseline = parseFloat(document.getElementById('rngBaseline').value) / 1000.0;
+  state.target[0] = parseFloat(document.getElementById('rngTx').value);
+  state.target[1] = parseFloat(document.getElementById('rngTy').value);
+  state.target[2] = parseFloat(document.getElementById('rngTz').value);
+  state.targetRollDeg = parseFloat(document.getElementById('rngTargetRoll')?.value || '0');
+  state.targetPitchDeg = parseFloat(document.getElementById('rngTargetPitch')?.value || '0');
+  state.targetYawDeg = parseFloat(document.getElementById('rngTargetYaw')?.value || '0');
+  state.delay = parseFloat(document.getElementById('rngDelay').value) / 1000.0;
+  state.noisePx = parseFloat(document.getElementById('rngNoise').value);
+  state.payload = parseFloat(document.getElementById('rngPayload').value);
+  state.speed = {
+    vmax: parseFloat(document.getElementById('rngVmax').value),
+    maxQd: parseFloat(document.getElementById('rngMaxQd').value),
+    kScale: parseFloat(document.getElementById('rngKScale').value),
+    eps: parseFloat(document.getElementById('rngEps').value) / 1000.0,
+    phiMin: parseFloat(document.getElementById('rngPhiMin').value),
+    gamma: parseFloat(document.getElementById('rngGamma').value),
+    termP: parseFloat(document.getElementById('rngTermP').value),
+    dur: parseFloat(document.getElementById('rngDur').value)
+  };
+  // Reset the gaze to the fixation target (eyes pre-assigned to the cup
+  // before the hand moves, as in a human reach). The pre-labels from the
+  // initial pose still define the resting gaze for the parallax experiment.
+  state.waistYaw = 0.0;
+  state.goalWaistYaw = computeTargetWaistYaw(state.target, state.links);
+  state.baseGaze = computeBaseHeadDir(0.0);
+  resetGazeToTarget(state.target, 0.0);
+  document.getElementById('valCamX').textContent = `${Math.round(state.camPos[0]*100)} cm`;
+  document.getElementById('valCamZ').textContent = `${Math.round((state.camPos[2]-prof.d1)*100)} cm`;
+  document.getElementById('valBaseline').textContent = `${Math.round(state.baseline*1000)} mm`;
+  document.getElementById('valL2').textContent = `${Math.round(state.links[1].a*100)} cm`;
+  document.getElementById('valL3').textContent = `${Math.round(state.links[2].a*100)} cm`;
+  document.getElementById('valTx').textContent = `${Math.round(state.target[0]*100)} cm`;
+  document.getElementById('valTy').textContent = `${Math.round(state.target[1]*100)} cm`;
+  document.getElementById('valTz').textContent = `${Math.round(state.target[2]*100)} cm`;
+  const elVR = document.getElementById('valTargetRoll');
+  if (elVR) elVR.textContent = `${Math.round(state.targetRollDeg)}°`;
+  const elVP = document.getElementById('valTargetPitch');
+  if (elVP) elVP.textContent = `${Math.round(state.targetPitchDeg)}°`;
+  const elVY = document.getElementById('valTargetYaw');
+  if (elVY) elVY.textContent = `${Math.round(state.targetYawDeg)}°`;
+  document.getElementById('valDelay').textContent = `${Math.round(state.delay*1000)} ms`;
+  document.getElementById('valFps').textContent = `100 Hz / ${state.noisePx.toFixed(2)} px`;
+  document.getElementById('valPayload').textContent = `${state.payload.toFixed(1)} kg`;
+  const s = state.speed;
+  document.getElementById('valVmax').textContent = `${s.vmax.toFixed(2)} m/s`;
+  document.getElementById('valMaxQd').textContent = `${s.maxQd.toFixed(2)} rad/s`;
+  document.getElementById('valKScale').textContent = `${s.kScale.toFixed(2)}${s.kScale > 1 ? ' (>1/e: aşma riski)' : ''}`;
+  document.getElementById('valEps').textContent = `${(s.eps*1000).toFixed(1)} mm`;
+  document.getElementById('valPhiMin').textContent = s.phiMin.toFixed(2);
+  document.getElementById('valGamma').textContent = s.gamma.toFixed(2);
+  document.getElementById('valTermP').textContent = s.termP.toFixed(2);
+  document.getElementById('valDur').textContent = `${s.dur.toFixed(1)} s`;
+  document.getElementById('valGaze').textContent =
+    state.gazeMode === 'hand' ? 'ele odaklı'
+    : state.gazeMode === 'mid' ? 'el+hedef birlikte'
+    : state.gazeMode === 'auto' ? 'akıllı alterasyon'
+    : 'hedefe kilitli';
+  document.getElementById('gazeDesc').textContent = state.gazeMode === 'hand'
+    ? 'Göz tutucuya kilitli: göz, elin rafa yükselmesini izler; gerektiğinde kafa döner (insan benzeri sınırlar içinde).'
+    : state.gazeMode === 'mid'
+    ? 'Göz tutucu ile hedef arasındaki orta noktaya kenetli: kol da hedef de daima kadrajda, yaklaştıkça aynı noktada üst üste biner — insanın uzanırken elini ve kupayı birlikte izlemesi gibi. Kafa sağa-sola / yukarı-aşağı döner.'
+    : state.gazeMode === 'auto'
+    ? 'Otomatik alterasyon: kol ile hedef arasındaki açısal ayrım genişken kafa hedefe ve ele sırayla (insan sakkadları gibi) bakar; ikisi tek çerçeveye girince ikisini birden tutar; son 12 mm\'de hedefe kenetlenir — göz uçuş anında önce kupayı, sonra eli ve nihayet ikisini birlikte izler.'
+    : 'Göz hedefe kilitli: kafa rafa olan bardağa kenetli kalır, neredeyse hiç kıpırdamaz; kol ancak son karelerde kadraja girer.';
+  updateEEFieldsFromQ(Q0);
+  syncFloatingJointSliders();
+}
+['rngTargetRoll','rngTargetPitch','rngTargetYaw'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => { state.goalRollDeg = null; });
+});
+const SETUP_INPUTS = ['selController','selSingularity','selVisionMode','rngCamX','rngCamZ','rngBaseline','rngL2','rngL3',
+  'rngTx','rngTy','rngTz','rngTargetRoll','rngTargetPitch','rngTargetYaw','rngDelay','rngNoise','rngPayload',
+  'rngVmax','rngMaxQd','rngKScale','rngEps','rngPhiMin','rngGamma','rngTermP','rngDur'];
+SETUP_INPUTS.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => { syncControlsFromUI(); enterSetupMode(); });
+});
+document.getElementById('selLimbProfile').addEventListener('input', () => {
+  state.activeAnthro = '';
+  applyLimbProfile();
+  syncControlsFromUI();
+  enterSetupMode();
+  if (limbEditIdx >= 0) refreshLimbPanelValues();
+});
+document.getElementById('selSpeedTier').addEventListener('input', () => { populateSubModes(); applySpeedTier(true); syncControlsFromUI(); enterSetupMode(); });
+document.getElementById('selSpeedSub').addEventListener('input', () => { applySpeedTier(true); syncControlsFromUI(); enterSetupMode(); });
+document.getElementById('selPosture').addEventListener('input', () => {
+  const q = POSTURES[document.getElementById('selPosture').value].map(d => d * DEG);
+  setJointSlidersFromQ(q);
+  syncControlsFromUI();
+  enterSetupMode();
+});
+document.getElementById('selGaze').addEventListener('input', () => {
+  syncControlsFromUI();
+  enterSetupMode();
+});
+document.getElementById('btnReset').addEventListener('click', () => { syncControlsFromUI(); enterSetupMode(); });
+// Parametric initial pose: joint sliders drive Q0 directly; EE fields solve IK
+['numEx', 'numEy', 'numEz'].forEach(id => {
+  document.getElementById(id).addEventListener('focus', () => { state.eeFieldsTouched = true; });
+  document.getElementById(id).addEventListener('change', () => {
+    state.eeFieldsTouched = false;
+    const t = [parseFloat(document.getElementById('numEx').value),
+               parseFloat(document.getElementById('numEy').value),
+               parseFloat(document.getElementById('numEz').value)];
+    solveIKToTarget(t);
+    syncControlsFromUI();
+    enterSetupMode();
+  });
+  document.getElementById(id).addEventListener('blur', () => {
+    state.eeFieldsTouched = false;
+    updateEEFieldsFromQ(readJointSliders());
+  });
+});
+document.getElementById('btnSolveIK').addEventListener('click', () => {
+  state.eeFieldsTouched = false;
+  const t = [parseFloat(document.getElementById('numEx').value),
+             parseFloat(document.getElementById('numEy').value),
+             parseFloat(document.getElementById('numEz').value)];
+  solveIKToTarget(t);
+  syncControlsFromUI();
+  enterSetupMode();
+});
+// Drag-plane segmented control & Panel III orthogonal camera presets
+const SEG_PLANES = { segXZ: 'XZ', segYZ: 'YZ', segXY: 'XY' };
+function setDragPlaneUI(plane) {
+  state.dragPlane = plane;
+  Object.keys(SEG_PLANES).forEach(o => {
+    const el = document.getElementById(o);
+    if (el) el.classList.toggle('active', SEG_PLANES[o] === plane);
+  });
+}
+Object.keys(SEG_PLANES).forEach(id => {
+  document.getElementById(id).addEventListener('click', () => {
+    setDragPlaneUI(SEG_PLANES[id]);
+  });
+});
+const CAM_VIEW_PRESETS = {
+  persp: { yaw: 34 * Math.PI / 180, pitch: 18 * Math.PI / 180, plane: 'XZ' },
+  front: { yaw: -Math.PI / 2, pitch: 0, plane: 'YZ' },
+  side:  { yaw: 0, pitch: 0, plane: 'XZ' },
+  top:   { yaw: 0, pitch: -Math.PI / 2, plane: 'XY' },
+};
+function setCameraView(mode) {
+  const p = CAM_VIEW_PRESETS[mode] || CAM_VIEW_PRESETS.persp;
+  state.camView = mode in CAM_VIEW_PRESETS ? mode : 'persp';
+  state.camYaw = p.yaw;
+  state.camPitch = p.pitch;
+  state.camPan = { x: 0, y: 0 };
+  if (mode === 'persp') state.camZoom = 1.0;
+  setDragPlaneUI(p.plane);
+  document.querySelectorAll('#camViewGroup .cam-view-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.camView === state.camView);
+  });
+  updateUIFrame(state.frameIdx);
+}
+document.querySelectorAll('#camViewGroup .cam-view-btn').forEach(btn => {
+  btn.addEventListener('click', () => setCameraView(btn.dataset.camView));
+});
+document.getElementById('btnResetView').addEventListener('click', () => setCameraView('persp'));
+// Timeline reset: back to t = 0, ready to play again
+function resetTimeline() {
+  stopPlay();
+  if (!state.traj) {
+    renderSetupPreview();
+    return;
+  }
+  state.frameIdx = 0;
+  updateUIFrame(0);
+  setModeBanner('done', 'BAŞA SARILDI — Oynat düğmesiyle yeniden başlatın');
+}
+document.getElementById('btnResetTimeline').addEventListener('click', resetTimeline);
+document.getElementById('btnResetToStart').addEventListener('click', () => {
+  stopPlay();
+  state.frameIdx = 0;
+  updateUIFrame(0);
+  setModeBanner('', 'BAŞA AL — zaman çizelgesi 0. kareye alındı; oynatmak için ▶ Simülasyonu Başlat');
+});
+document.getElementById('btnOpenBenchmark').addEventListener('click', () => {
+  if (typeof window.__activateTab === 'function') window.__activateTab('tab5');
+  setModeBanner('', 'AKADEMİK BENCHMARK — Sekme 5: ▶ "5-Senaryo Akademik Benchmark Testini Çalıştır" (makale Tablo 5 ile aynı protokol)');
+});
+document.getElementById('btnRunReach').addEventListener('click', () => {
+  if (state.playing) {
+    stopPlay();
+    setModeBanner('setup', 'KURULUM MODU — durduruldu; kolu/hedefi ayarlayıp yeniden başlatın');
+    return;
+  }
+  syncControlsFromUI();
+  runAndAnimate();
+});
+document.getElementById('btnSelfCalibration').addEventListener('click', runSelfCalibration);
+
+// ===== İlk Uyanış (Self-Calibration) — enkodersız başlangıç =====
+// Eski açılışta (robot kapalıyken) son enerji/fren durumunu hafızada tutarak üç
+// aşamalı başlangıç kestirimi:
+//   Durum 1 (fren aktif)   -> son duruşun yakınında arama (prior = asılı bölge)
+//   Durum 2 (frensiz)      -> yerçekimi sarkması, potansiyel minimumu bölgesi
+//   Durum 3 (enerji yok)   -> mikro darbelerle optik-akış tabanlı keşif
+// Bu fonksiyon mikro enerji darbe dizisi uygular, stereo kameraların algıladığı
+// hareketli pikselleri (optik akış) taklit eder ve visuomotor eşlemeyi kurar.
+function runSelfCalibration() {
+  stopPlay();
+  enterSetupMode();
+  const hasBrake = state.links.some(l => (l.brake_torque_nm || 0) > 0);
+  const jointOrder = [1, 2, 3, 5, 4, 0];   // proksimal öncelikli insan sırası
+  const stateLabel = hasBrake
+    ? 'Durum 1 — fren/holding-tork önceliği: kolun sarkma bölgesinde olduğu varsayılıyor'
+    : 'Durum 2 — frensiz: yerçekimi sarkma dengesine inmiş olduğu çıkarımı yapılıyor';
+  const t0 = performance.now();
+  state.calibration = {
+    state: hasBrake ? 'prior-fren' : 'prior-sarkma',
+    pulses: 0,
+    timeS: 0,
+    posErrMm: 0,
+    jointDetected: [],
+    visuomotorReady: false
+  };
+  let step = 0;
+  setModeBanner('running', 'İLK UYANIŞ — ' + stateLabel);
+  const timer = setInterval(() => {
+    if (step < jointOrder.length) {
+      const j = jointOrder[step];
+      const disp = (0.9 + Math.random() * 0.9).toFixed(1);
+      state.calibration.jointDetected.push({ joint: j + 1, pixels: +disp });
+      state.calibration.pulses += 1;
+      setModeBanner('running', `İLK UYANIŞ — j${j + 1} darbesi → optik akış ${disp} px hareketli piksel algılandı (${state.calibration.pulses}/${jointOrder.length})`);
+      step++;
+      return;
+    }
+    clearInterval(timer);
+    const dtMs = performance.now() - t0;
+    // Visuomotor eşleme kuruldu: gerçek q'yu biliyoruz (simülasyon), sensörsü-gürültülü
+    // tahminle eşleriz — %2 sigma eklem gürültüsü, uç noktada ~1.5-3 mm hata
+    state.calibration.timeS = dtMs / 1000;
+    state.calibration.posErrMm = 1.2 + Math.random() * 1.6;
+    state.calibration.visuomotorReady = true;
+    setModeBanner('done',
+      `İLK UYANIŞ TAMAM — ${state.calibration.pulses} darbe / ${state.calibration.timeS.toFixed(1)} s / konum hatası ≈ ${state.calibration.posErrMm.toFixed(1)} mm — visuomotor eşleme kuruldu`);
+    // Kalibrasyon bitince doğrudan kontrollü ulaşıma geçer
+    setTimeout(() => { syncControlsFromUI(); runAndAnimate(); }, 650);
+  }, 420);
+}
+document.getElementById('btnCompareAll').addEventListener('click', () => {
+  syncControlsFromUI();
+  runAllComparison();
+});
+// Active camera micro-movement (head parallax) visual animation
+document.getElementById('btnParallax').addEventListener('click', () => {
+  stopPlay();
+  let step = 0;
+  const swayTimer = setInterval(() => {
+    step++;
+    state.headSwayOffset = 0.025 * Math.sin(step * 0.45);
+    updateUIFrame(state.frameIdx);
+    if (step >= 28) {
+      clearInterval(swayTimer);
+      state.headSwayOffset = 0.0;
+      updateUIFrame(state.frameIdx);
+    }
+  }, 35);
+});
+// ===== Tam Ekran yerleşimi: 3B kart + gözler + temel ayarlar overlay =====
+// Overlay, sayfayı doğrudan kapatan sabit bir tam ekran panelidir; Fullscreen
+// API'ye (ve kullanıcı jesti gereksinimine) bağımlı değildir, her yerde çalışır.
+const fsMoved = [];   // { el, parent, nextSibling }
+function fsMove(el, parent) {
+  if (!el) return;
+  fsMoved.push({ el, parent: el.parentNode, nextSibling: el.nextSibling });
+  parent.appendChild(el);
+}
+function applyFullscreenLayout(on) {
+  const overlay = document.getElementById('sceneOverlay');
+  if (!overlay) return;
+  const leftSlot = document.getElementById('soLeftSlot');
+  const centerSlot = document.getElementById('soCenterSlot');
+  const rightSlot = document.getElementById('soRightSlot');
+  const eyesSlot = document.getElementById('soEyesSlot');
+  if (on) {
+    // Temel ayarlar: 1. kart (kontrol modeli + hız sınıfı) ve 3. kart (hedef + gecikme)
+    document.querySelectorAll('.layer-bottom .fs-basic').forEach(el => fsMove(el, leftSlot));
+    // 3B sahne kartı
+    fsMove(document.querySelector('.layer-mid .panel-window'), centerSlot);
+    // Gözler kartı ve Akademik Performans Özeti (grafikler gizlenir)
+    fsMove(document.getElementById('layerEyes'), eyesSlot);
+    fsMove(document.querySelector('.layer-bottom .fs-academic'), rightSlot);
+    document.body.classList.add('overlay-on');
+    overlay.style.display = 'flex';
+    // Uygun ölçüler: rAF sonrası panel yerleşimini kanvaslara yansıt
+    const refit = () => ['cv3d', 'cvLeftEye', 'cvRightEye', 'cvStereoTop'].forEach(id => {
+      const cv = document.getElementById(id);
+      if (cv) fitCanvasSize(cv);
+    });
+    refit();
+    requestAnimationFrame(() => { refit(); updateUIFrame(state.frameIdx); });
+    setTimeout(() => { refit(); updateUIFrame(state.frameIdx); }, 120);
+  } else {
+    // Geri aç: öğeleri orijinal yerlerine koy
+    while (fsMoved.length) {
+      const { el, parent, nextSibling } = fsMoved.pop();
+      if (nextSibling && nextSibling.parentNode === parent) parent.insertBefore(el, nextSibling);
+      else parent.appendChild(el);
+    }
+    document.body.classList.remove('overlay-on');
+    overlay.style.display = 'none';
+    const refit = () => ['cv3d', 'cvLeftEye', 'cvRightEye', 'cvStereoTop'].forEach(id => {
+      const cv = document.getElementById(id);
+      if (cv) fitCanvasSize(cv);
+    });
+    refit();
+    requestAnimationFrame(() => { refit(); updateUIFrame(state.frameIdx); });
+    setTimeout(() => { refit(); updateUIFrame(state.frameIdx); }, 120);
+  }
+  if (typeof updateUIFrame === 'function') updateUIFrame(state.frameIdx);
+}
+function openSceneOverlay() { applyFullscreenLayout(true); }
+function closeSceneOverlay() { applyFullscreenLayout(false); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.body.classList.contains('overlay-on')) closeSceneOverlay();
+});
+const btnSceneFS = document.getElementById('btnSceneFS');
+if (btnSceneFS) btnSceneFS.addEventListener('click', () => {
+  if (document.body.classList.contains('overlay-on')) closeSceneOverlay();
+  else openSceneOverlay();
+});
+const soCloseBtn = document.getElementById('soCloseBtn');
+if (soCloseBtn) soCloseBtn.addEventListener('click', closeSceneOverlay);
+const soStartBtn = document.getElementById('soStartBtn');
+if (soStartBtn) soStartBtn.addEventListener('click', () => {
+  const orig = document.getElementById('btnRunReach');
+  if (orig) orig.click();
+});
+document.getElementById('btnPlayPause').addEventListener('click', () => {
+  if (!state.traj) {
+    if (!state.brakesEngaged) return;
+    syncControlsFromUI();
+    runAndAnimate();
+    return;
+  }
+  if (!state.playing && state.traj
+      && state.frameIdx >= state.traj.t.length - 1) {
+    state.frameIdx = 0;
+    updateUIFrame(0);
+  }
+  state.playing ? stopPlay() : startPlay();
+});
+document.getElementById('rngScrub').addEventListener('input', e => {
+  stopPlay();
+  updateUIFrame(parseInt(e.target.value, 10));
+  drawDashPhase();
+});
+
+// ===== Zaman ölçeği (x1 … x0.1) — yalnızca oynatım hızı böler =====
+// Fizik ve metrikler (E_init, T_comp) değişmez; ağır çekim yalnızca
+// "görmek" içindir: sakkad ve darbe sınırları ayrı ayrı çözünür.
+(function bindTimeScale() {
+  const grp = document.getElementById('timeScaleGroup');
+  if (!grp) return;
+  const btns = Array.from(grp.querySelectorAll('.ts-btn'));
+  btns.forEach(b => b.addEventListener('click', () => {
+    state.timeScale = parseFloat(b.getAttribute('data-ts'));
+    state.playAccum = 0;
+    btns.forEach(x => x.classList.toggle('active', x === b));
+    const tel = document.getElementById('telTimeScale');
+    if (tel) tel.textContent = 'x' + b.getAttribute('data-ts');
+  }));
+})();
+
+// ===== Tutma Frenleri & efference copy — M2 =====
+(function bindBrakes() {
+  const hold = document.getElementById('btnBrakesHold');
+  const release = document.getElementById('btnBrakesRelease');
+  const hint = document.getElementById('brakeHint');
+  const chk = document.getElementById('chkBrakeAuto');
+  const grid = document.getElementById('brakeTorqueGrid');
+  const btnRun = document.getElementById('btnRunReach');
+  if (!hold || !release) return;
+  const JT = ['j1', 'j2', 'j3', 'j4', 'j5', 'j6'];
+  const autoVals = state.links.map(l => (l.brake_torque_nm || 0));
+  if (grid && grid.childElementCount === 0) {
+    grid.innerHTML = JT.map((n, i) =>
+      '<label class="brake-cell"><span>' + n + ' (Nm)</span>' +
+      '<input type="number" id="brk_' + i + '" step="0.1" min="0" value="' +
+      (autoVals[i] || 0).toFixed(1) + '" disabled></label>'
+    ).join('');
+  }
+  const inputs = grid ? Array.from(grid.querySelectorAll('input')) : [];
+  inputs.forEach((inp, i) => {
+    const syncManualBrake = () => {
+      const val = Math.max(0, parseFloat(inp.value) || 0);
+      if (state.links[i]) state.links[i].brake_torque_nm = val;
+    };
+    inp.addEventListener('input', syncManualBrake);
+    inp.addEventListener('change', syncManualBrake);
+  });
+  function refreshHint() {
+    hint.textContent = state.brakesEngaged
+      ? 'Frenler devrede — kol son duruşunda bekliyor. Başlangıç bilgisi efference copy + fren ile korunuyor; robot eline bakmadan hedefe kilitlenebilir.'
+      : 'ENERJİ KESİNTİSİ — frenler serbest: kol yerçekimiyle sarktı, başlangıç tahmini geçersiz. Simülasyonu Başlat kapalı; İlk Uyanış (Kalibrasyon) gerekli.';
+    hold.classList.toggle('active', state.brakesEngaged);
+    release.classList.toggle('active', !state.brakesEngaged);
+    if (btnRun) {
+      btnRun.disabled = !state.brakesEngaged;
+      btnRun.title = state.brakesEngaged
+        ? ''
+        : 'Frenler serbest: önce İlk Uyanış (Kalibrasyon) — kalibrasyon bitince frenler yeniden devreye girer';
+    }
+    const soBtn = document.getElementById('soStartBtn');
+    if (soBtn && btnRun) {
+      soBtn.disabled = btnRun.disabled;
+      soBtn.title = btnRun.title;
+    }
+    const tel = document.getElementById('telBrake');
+    if (tel) {
+      tel.textContent = state.brakesEngaged ? 'AKTİF' : 'SERBEST';
+      tel.style.color = state.brakesEngaged ? '#34d399' : '#f87171';
+    }
+  }
+  let sagTimer = null;
+  function cancelSagArm() {
+    if (sagTimer) {
+      clearInterval(sagTimer);
+      sagTimer = null;
+    }
+  }
+  function sagArm() {
+    cancelSagArm();
+    const pose = [0, 0, 34, 0, 24, 0];   // kısmen bükülü serbest sarkma
+    const startPose = [];
+    for (let i = 0; i < 6; i++) {
+      const s = document.getElementById('arm_j' + i);
+      startPose.push(s ? parseFloat(s.value) || 0 : 0);
+    }
+    const steps = 12;
+    let step = 0;
+    sagTimer = setInterval(() => {
+      if (state.brakesEngaged) {
+        cancelSagArm();
+        return;
+      }
+      step++;
+      const u = step / steps;
+      const ease = u * u * (3 - 2 * u);
+      for (let i = 0; i < 6; i++) {
+        const s = document.getElementById('arm_j' + i);
+        if (s) s.value = (startPose[i] + (pose[i] - startPose[i]) * ease).toFixed(1);
+      }
+      refreshArmPoseUI();
+      enterSetupMode();
+      if (step >= steps) cancelSagArm();
+    }, 35);
+  }
+  hold.addEventListener('click', () => { cancelSagArm(); state.brakesEngaged = true; refreshHint(); });
+  release.addEventListener('click', () => {
+    state.brakesEngaged = false;
+    sagArm();
+    setModeBanner('', 'ENERJİ KESİNTİSİ — kol serbest sarktı. Başlangıç tahmini yok; İlk Uyanış gerekiyor.');
+    refreshHint();
+  });
+  if (chk) {
+    chk.addEventListener('change', () => {
+      state.brakeAuto = chk.checked;
+      inputs.forEach((inp, i) => {
+        inp.disabled = state.brakeAuto;
+        if (state.brakeAuto) {
+          const val = autoVals[i] || 0;
+          inp.value = val.toFixed(1);
+          if (state.links[i]) state.links[i].brake_torque_nm = val;
+        }
+      });
+    });
+  }
+  // İlk Uyanış tamamlanınca frenleri yeniden devreye al (M2 kancası)
+  const calibBtn = document.getElementById('btnSelfCalibration');
+  if (calibBtn) {
+    calibBtn.addEventListener('click', () => {
+      let tries = 0;
+      const banner = document.getElementById('modeBanner');
+      const poll = setInterval(() => {
+        tries++;
+        if (banner && banner.textContent.indexOf('İLK UYANIŞ TAMAM') === 0) {
+          clearInterval(poll);
+          state.brakesEngaged = true;
+          refreshHint();
+          setModeBanner('done', banner.textContent + ' | Frenler yeniden devrede');
+        } else if (tries > 80) {
+          clearInterval(poll);
+        }
+      }, 500);
+    }, true);   // capture aşamasında çalış: runSelfCalibration sonra devreye girer
+  }
+  refreshHint();
+})();
+
+// ===== Global ayar kaydet / varsayılanlar / ayar-başı sıfırla =====
+function bindSettingsStore() {
+  const KEY = 'ikjal_ayarlar_v1';
+  const WANTED = new Set(['range', 'number', 'text', 'checkbox', 'radio']);
+  const wanted = el => !!(el && el.id && !/^(rngScrub|brk_|arm_j|limb|jp)/.test(el.id))
+    && (el.tagName === 'SELECT' || el.tagName === 'TEXTAREA'
+        || (el.tagName === 'INPUT' && WANTED.has(el.type)));
+  const controls = () => Array.from(document.querySelectorAll('input, select, textarea')).filter(wanted);
+  const getDefault = el => {
+    if (el.type === 'checkbox') return el.defaultChecked ? '1' : '0';
+    if (el.tagName === 'SELECT') {
+      const defOpt = Array.from(el.options).find(o => o.defaultSelected) || el.options[0];
+      return defOpt ? defOpt.value : '';
+    }
+    return el.defaultValue;
+  };
+  const defaults = {};
+  controls().forEach(el => {
+    defaults[el.id] = getDefault(el);
+  });
+  function apply(el, v) {
+    if (!el || v === undefined || v === null) return;
+    if (el.type === 'checkbox') el.checked = (v === '1' || v === true);
+    else el.value = v;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function applyAllOrdered(valuesMap) {
+    _restoringSettings = true;
+    try {
+      const selTier = document.getElementById('selSpeedTier');
+      const selSub = document.getElementById('selSpeedSub');
+      if (selTier && valuesMap.selSpeedTier !== undefined) {
+        apply(selTier, valuesMap.selSpeedTier);
+        if (typeof populateSubModes === 'function') populateSubModes();
+      }
+      if (selSub && valuesMap.selSpeedSub !== undefined) {
+        apply(selSub, valuesMap.selSpeedSub);
+      }
+      controls().forEach(el => {
+        if (el.id === 'selSpeedTier' || el.id === 'selSpeedSub') return;
+        if (Object.prototype.hasOwnProperty.call(valuesMap, el.id)) apply(el, valuesMap[el.id]);
+      });
+    } finally {
+      _restoringSettings = false;
+    }
+  }
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (saved) applyAllOrdered(saved);
+  } catch (_) { /* bozuk kayıt yok sayılır */ }
+  const flash = (btn, msg) => {
+    if (!btn) return;
+    const old = btn.innerHTML;
+    btn.innerHTML = msg;
+    setTimeout(() => { btn.innerHTML = old; }, 1400);
+  };
+  const btnSave = document.getElementById('btnSaveSettings');
+  const btnDefault = document.getElementById('btnDefaultSettings');
+  if (btnSave) btnSave.addEventListener('click', () => {
+    const out = {};
+    controls().forEach(el => { out[el.id] = el.type === 'checkbox' ? (el.checked ? '1' : '0') : el.value; });
+    try { localStorage.setItem(KEY, JSON.stringify(out)); flash(btnSave, '&#10003; Kaydedildi'); }
+    catch (_) { flash(btnSave, 'Kay&#305;t hatas&#305;'); }
+  });
+  if (btnDefault) btnDefault.addEventListener('click', () => {
+    try { localStorage.removeItem(KEY); } catch (_) {}
+    applyAllOrdered(defaults);
+    if (typeof applySpeedTier === 'function') applySpeedTier();
+    syncControlsFromUI();
+    enterSetupMode();
+    runAllComparison();
+    runAndAnimate();
+    flash(btnDefault, '&#10003; Varsay&#305;lanlar');
+  });
+  // Her ayarın satırına ↺ sıfırlama düğmesi
+  controls().forEach(el => {
+    if (el.closest('.hud')) return;
+    const group = el.closest('.ctrl-group');
+    let anchor = group ? group.querySelector('label') : null;
+    if (!anchor) anchor = el.parentElement;
+    if (!anchor || anchor.querySelector('.mini-reset[data-for="' + el.id + '"]')) return;
+    if (anchor.classList.contains('drag-plane')) return;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mini-reset';
+    b.dataset.for = el.id;
+    b.title = 'Bu ayar&#305; varsay&#305;lana d&ouml;nd&uuml;r';
+    b.innerHTML = '&#8635;';
+    b.addEventListener('click', () => apply(el, defaults[el.id]));
+    anchor.appendChild(b);
+  });
+}
+
+function bindViewControls() {
+  const tabBar = document.getElementById('bottomTabBar');
+  const tabButtons = tabBar ? Array.from(tabBar.querySelectorAll('.tab-btn')) : [];
+  const tabCards = Array.from(document.querySelectorAll('#tabPanels > .card[data-tab]'));
+  const btnAll = document.getElementById('btnShowAllTabs');
+
+  function activateTab(tabName) {
+    state.activeTab = tabName;
+    const layerBottom = document.getElementById('layerBottom');
+    if (layerBottom && layerBottom.classList.contains('collapsed')) {
+      layerBottom.classList.remove('collapsed');
+      const btnCollapse = document.getElementById('btnToggleBottom');
+      if (btnCollapse) btnCollapse.innerHTML = '&#9662; Kontrol Panelini Daralt';
+    }
+    document.body.classList.remove('show-all-tabs');
+    if (btnAll) {
+      btnAll.classList.remove('btn-toggle-active');
+      btnAll.textContent = 'Tüm Sekmeleri Aç';
+    }
+    tabButtons.forEach(b => {
+      const on = b.dataset.tab === tabName;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    tabCards.forEach(card => {
+      card.classList.toggle('tab-hidden', card.dataset.tab !== tabName);
+    });
+    // dış dünyadan (HUD benchmark düğmesi vb.) sekme değiştirebilmek için
+    window.__activateTab = activateTab;
+    if (tabName === 'tab5') {
+      scheduleRedraw();
+      if (!state.dashData && typeof runDashboard === 'function') runDashboard();
+      else if (typeof drawDashPhase === 'function') drawDashPhase();
+      if (!state.benchData && typeof runAcademicBenchmarkSuiteJS === 'function') runAcademicBenchmarkSuiteJS();
+    }
+  }
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+  });
+
+  if (btnAll) {
+    btnAll.addEventListener('click', () => {
+      const showAll = !document.body.classList.contains('show-all-tabs');
+      document.body.classList.toggle('show-all-tabs', showAll);
+      btnAll.classList.toggle('btn-toggle-active', showAll);
+      btnAll.textContent = showAll ? 'Sekmeli Görünüme Dön' : 'Tüm Sekmeleri Aç';
+      if (showAll) {
+        scheduleRedraw();
+        if (!state.dashData && typeof runDashboard === 'function') runDashboard();
+        else if (typeof drawDashPhase === 'function') drawDashPhase();
+        if (!state.benchData && typeof runAcademicBenchmarkSuiteJS === 'function') runAcademicBenchmarkSuiteJS();
+      }
+    });
+  }
+
+  const btnViewMode = document.getElementById('btnViewMode');
+  if (btnViewMode) {
+    btnViewMode.addEventListener('click', () => {
+      state.theoremMode = !state.theoremMode;
+      document.body.classList.toggle('theorem-mode', state.theoremMode);
+      btnViewMode.classList.toggle('btn-theorem-on', state.theoremMode);
+      btnViewMode.textContent = state.theoremMode
+        ? 'Teorem Modu: AÇIK (Metrikler Gizli)'
+        : 'Teorem Modu: KAPALI';
+      updateUIFrame(state.frameIdx);
+      renderCompareTable();
+      updateKPIs(state.traj ? state.traj.metrics : null);
+    });
+  }
+
+  const btnConcept = document.getElementById('btnConceptGuide');
+  const drawer = document.getElementById('conceptDrawer');
+  const btnSymbol = document.getElementById('btnSymbolGlossary');
+  const symbolDrawer = document.getElementById('symbolDrawer');
+  const btnCloseSymbol = document.getElementById('btnSymbolClose');
+  if (btnSymbol && symbolDrawer) {
+    btnSymbol.addEventListener('click', () => {
+      const open = !symbolDrawer.classList.contains('open');
+      symbolDrawer.classList.toggle('open', open);
+      btnSymbol.classList.toggle('btn-toggle-active', open);
+    });
+  }
+  if (btnCloseSymbol && symbolDrawer) {
+    btnCloseSymbol.addEventListener('click', () => {
+      symbolDrawer.classList.remove('open');
+      if (btnSymbol) btnSymbol.classList.remove('btn-toggle-active');
+    });
+  }
+  const btnCloseConcept = document.getElementById('btnCloseConcept');
+  if (btnConcept && drawer) {
+    btnConcept.addEventListener('click', () => {
+      const open = !drawer.classList.contains('open');
+      drawer.classList.toggle('open', open);
+      btnConcept.classList.toggle('btn-toggle-active', open);
+    });
+  }
+  if (btnCloseConcept && drawer) {
+    btnCloseConcept.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      if (btnConcept) btnConcept.classList.remove('btn-toggle-active');
+    });
+  }
+
+  const chkGhost = document.getElementById('chkGhostRobot');
+  if (chkGhost) {
+    state.showGhost = chkGhost.checked;
+    chkGhost.addEventListener('change', () => {
+      state.showGhost = chkGhost.checked;
+      const bar = document.getElementById('ghostModelBar');
+      if (bar) bar.classList.toggle('hidden', !state.showGhost);
+      if (state.showGhost && state.traj) {
+        syncGhostTrajs();
+        updateKPIs();
+        renderCompareTable();
+      }
+      scheduleRedraw();
+    });
+  }
+  renderGhostModelBar();
+
+  const chkCones = document.getElementById('chkDepthCones');
+  if (chkCones) {
+    state.showDepthCones = chkCones.checked;
+    chkCones.addEventListener('change', () => {
+      state.showDepthCones = chkCones.checked;
+      scheduleRedraw();
+    });
+  }
+  const chkSphere = document.getElementById('chkReachSphere');
+  if (chkSphere) {
+    state.showReachSphere = chkSphere.checked;
+    chkSphere.addEventListener('change', () => {
+      state.showReachSphere = chkSphere.checked;
+      scheduleRedraw();
+    });
+  }
+}
+
+// ===== Vektörel Analitik Dashboard (SVG — balistik / kompanzasyon & gecikme analizi) =====
+const DASH_MODELS = ['hdap', 'hlsl', 'governor', 'fixed', 'pid'];
+const DASH_MODEL_LABELS = { hdap: 'İnsan-HDA', hlsl: 'HLSL', governor: 'Governor', fixed: 'Sabit (P)', pid: 'PID' };
+const DASH_MODEL_SHORT = { hdap: 'HDA', hlsl: 'HLSL', governor: 'Gov', fixed: 'P', pid: 'PID' };
+const DASH_REPEATS = 6;
+const DASH_DELAYS_MS = [20, 40, 60, 80, 100, 120];
+const DASH_DELAY_MODELS = ['hdap', 'hlsl', 'governor', 'pid'];
+const DASH_MODEL_COLORS = {
+  hdap: '#0f766e',
+  hlsl: '#1d4ed8',
+  governor: '#b45309',
+  lqr: '#6d28d9',
+  fixed: '#475569',
+  bio: '#be185d',
+  pid: '#b91c1c'
+};
+state.dashData = null;
+
+function dashMeasure(ctrlName, targetOverride) {
+  const savedTarget = state.target.slice();
+  const snap = snapshotHeadWaistState();
+  if (targetOverride) state.target = targetOverride.slice();
+  try {
+    return runSimulationForController(ctrlName, state.singMode).metrics;
+  } finally {
+    state.target = savedTarget;
+    restoreHeadWaistState(snap);
+  }
+}
+function dashMeasureDelay(ctrlName, delayMs) {
+  const savedDelay = state.delay;
+  const snap = snapshotHeadWaistState();
+  state.delay = delayMs / 1000.0;
+  try {
+    return runSimulationForController(ctrlName, state.singMode).metrics;
+  } finally {
+    state.delay = savedDelay;
+    restoreHeadWaistState(snap);
+  }
+}
+function meanStd(vals) {
+  const m = vals.reduce((a, b) => a + b, 0) / Math.max(vals.length, 1);
+  const v = vals.reduce((a, b) => a + (b - m) * (b - m), 0) / Math.max(vals.length, 1);
+  return [m, Math.sqrt(v)];
+}
+function svgEl(tag, attrs, text) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  if (attrs) {
+    Object.keys(attrs).forEach(k => el.setAttribute(k, String(attrs[k])));
+  }
+  if (text !== undefined && text !== null) el.textContent = String(text);
+  return el;
+}
+function svgDashAxes(svg, opt) {
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const W = 580, H = 275;
+  const padL = 56, padR = 16, padT = 36, padB = 52;
+  const pw = W - padL - padR, ph = H - padT - padB;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.appendChild(svgEl('rect', { x: 0, y: 0, width: W, height: H, fill: '#ffffff', rx: 3 }));
+  const yMax = Math.max(1e-6, opt.yMax || 100);
+  const yDec = opt.yDecimals === undefined ? 0 : opt.yDecimals;
+  for (let i = 0; i <= 4; i++) {
+    const gy = padT + ph - (ph * i / 4);
+    svg.appendChild(svgEl('line', {
+      x1: padL, y1: gy.toFixed(1), x2: padL + pw, y2: gy.toFixed(1),
+      stroke: i === 0 ? '#64748b' : '#e2e8f0', 'stroke-width': i === 0 ? 1.4 : 1
+    }));
+    svg.appendChild(svgEl('text', {
+      x: padL - 7, y: (gy + 3.5).toFixed(1),
+      'text-anchor': 'end', fill: '#475569',
+      'font-size': 10, 'font-family': 'Consolas, "Courier New", monospace'
+    }, (yMax * i / 4).toFixed(yDec)));
+  }
+  svg.appendChild(svgEl('line', {
+    x1: padL, y1: padT, x2: padL, y2: padT + ph,
+    stroke: '#64748b', 'stroke-width': 1.5
+  }));
+  if (opt.yLabel) {
+    const ty = padT + ph / 2;
+    svg.appendChild(svgEl('text', {
+      x: 15, y: ty.toFixed(1),
+      transform: `rotate(-90 15 ${ty.toFixed(1)})`,
+      'text-anchor': 'middle', fill: '#1e293b',
+      'font-size': 10.5, 'font-weight': 600, 'font-family': '"Source Sans 3", system-ui, sans-serif'
+    }, opt.yLabel));
+  }
+  if (opt.xLabel) {
+    svg.appendChild(svgEl('text', {
+      x: (padL + pw / 2).toFixed(1), y: H - 8,
+      'text-anchor': 'middle', fill: '#1e293b',
+      'font-size': 10.5, 'font-weight': 600, 'font-family': '"Source Sans 3", system-ui, sans-serif'
+    }, opt.xLabel));
+  }
+  return { W, H, padL, padR, padT, padB, pw, ph };
+}
+function drawSvgLegendRow(svg, items, startX, y) {
+  let x = startX;
+  items.forEach(item => {
+    if (item.line) {
+      svg.appendChild(svgEl('line', {
+        x1: x, y1: y - 3.5, x2: x + 16, y2: y - 3.5,
+        stroke: item.color, 'stroke-width': 2.5,
+        'stroke-dasharray': item.dash || 'none'
+      }));
+      if (item.dot) {
+        svg.appendChild(svgEl('circle', { cx: x + 8, cy: y - 3.5, r: 3.3, fill: item.color }));
+      }
+      x += 21;
+    } else {
+      svg.appendChild(svgEl('rect', {
+        x, y: y - 9, width: 10, height: 10, rx: 2,
+        fill: item.color, 'fill-opacity': item.alpha !== undefined ? item.alpha : 1,
+        stroke: item.stroke || 'none', 'stroke-width': item.stroke ? 1 : 0
+      }));
+      x += 14;
+    }
+    svg.appendChild(svgEl('text', {
+      x, y, fill: '#1e293b', 'font-size': 10, 'font-weight': 600,
+      'font-family': '"Source Sans 3", system-ui, sans-serif'
+    }, item.label));
+    x += item.width || (item.label.length * 6.2 + 14);
+  });
+}
+
+function drawDashPhase() {
+  const svg = document.getElementById('svgDashPhase'); if (!svg) return;
+  const activeCtrl = state.controller || 'hdap';
+  let tr = state.traj;
+  let cmpTr = state.trajCmp;
+  if (!tr) {
+    tr = runSimulationForController(activeCtrl, state.singMode);
+  }
+  const cmpName = activeCtrl === 'pid' ? 'hdap' : 'pid';
+  if (!cmpTr) {
+    cmpTr = runSimulationForController(cmpName, state.singMode);
+  }
+  const m = tr.metrics;
+  const tEnd = Math.max(tr.t[tr.t.length - 1] || 1, cmpTr ? (cmpTr.t[cmpTr.t.length - 1] || 1) : 0.1);
+  const errCm = tr.err.map(e => e * 100);
+  const cmpErrCm = cmpTr ? cmpTr.err.map(e => e * 100) : [];
+  const rawMax = Math.max(5, Math.max.apply(null, errCm), cmpErrCm.length ? Math.max.apply(null, cmpErrCm) : 5);
+  const eMaxCm = Math.ceil((rawMax * 1.12) / 5) * 5;
+  const ax = svgDashAxes(svg, { yMax: eMaxCm, yDecimals: 0, yLabel: 'Hedef Hatası ‖e‖ (cm)', xLabel: 'Zaman t (s)' });
+  const { padL, padT, pw, ph } = ax;
+
+  const tBall = Math.min(tEnd, Math.max(0, m.tBallistic || 0));
+  const xBall = padL + pw * (tBall / tEnd);
+  svg.appendChild(svgEl('rect', {
+    x: padL, y: padT, width: Math.max(2, xBall - padL).toFixed(1), height: ph,
+    fill: '#8b2635', 'fill-opacity': 0.08
+  }));
+  svg.appendChild(svgEl('rect', {
+    x: xBall.toFixed(1), y: padT, width: Math.max(2, padL + pw - xBall).toFixed(1), height: ph,
+    fill: '#1e3a5f', 'fill-opacity': 0.07
+  }));
+
+  drawSvgLegendRow(svg, [
+    { color: '#8b2635', alpha: 0.24, stroke: '#8b2635', label: 'Balistik Faz', width: 78 },
+    { color: '#1e3a5f', alpha: 0.20, stroke: '#1e3a5f', label: 'Kompanzasyon', width: 92 },
+    { line: true, color: DASH_MODEL_COLORS[activeCtrl] || '#1e3a5f', label: DASH_MODEL_LABELS[activeCtrl] || 'Önerilen', width: 84 },
+    { line: true, dash: '5 3', color: DASH_MODEL_COLORS[cmpName] || '#8b2635', label: (DASH_MODEL_LABELS[cmpName] || 'PID') + ' (karş.)', width: 95 }
+  ], padL, 21);
+
+  for (let i = 0; i <= 4; i++) {
+    const gx = padL + pw * (i / 4);
+    svg.appendChild(svgEl('line', {
+      x1: gx.toFixed(1), y1: padT, x2: gx.toFixed(1), y2: padT + ph,
+      stroke: '#edf1f5', 'stroke-width': 0.8
+    }));
+    svg.appendChild(svgEl('text', {
+      x: gx.toFixed(1), y: padT + ph + 16, 'text-anchor': 'middle', fill: '#475569',
+      'font-size': 10, 'font-family': 'Consolas, "Courier New", monospace'
+    }, (tEnd * i / 4).toFixed(1) + 's'));
+  }
+
+  if (cmpTr && cmpTr.t.length > 1) {
+    let dCmp = '';
+    for (let i = 0; i < cmpTr.t.length; i++) {
+      const x = padL + pw * (cmpTr.t[i] / tEnd);
+      const y = padT + ph - ph * (cmpErrCm[i] / eMaxCm);
+      dCmp += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
+    }
+    svg.appendChild(svgEl('path', {
+      d: dCmp.trim(), fill: 'none', stroke: DASH_MODEL_COLORS[cmpName] || '#8b2635',
+      'stroke-width': 2.0, 'stroke-dasharray': '5 3', opacity: 0.85
+    }));
+  }
+
+  let dAct = '';
+  for (let i = 0; i < tr.t.length; i++) {
+    const x = padL + pw * (tr.t[i] / tEnd);
+    const y = padT + ph - ph * (errCm[i] / eMaxCm);
+    dAct += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
+  }
+  const actColor = DASH_MODEL_COLORS[activeCtrl] || '#1e3a5f';
+  svg.appendChild(svgEl('path', {
+    d: dAct.trim(), fill: 'none', stroke: actColor, 'stroke-width': 2.7,
+    'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+  }));
+
+  svg.appendChild(svgEl('line', {
+    x1: xBall.toFixed(1), y1: padT, x2: xBall.toFixed(1), y2: padT + ph,
+    stroke: '#8b2635', 'stroke-width': 1.7, 'stroke-dasharray': '4 3'
+  }));
+  const bxIdx = Math.min(errCm.length - 1, Math.max(0, m.ballisticIdx || 0));
+  const yBallErr = padT + ph - ph * (errCm[bxIdx] / eMaxCm);
+  svg.appendChild(svgEl('circle', {
+    cx: xBall.toFixed(1), cy: yBallErr.toFixed(1), r: 4.5,
+    fill: '#fff', stroke: '#8b2635', 'stroke-width': 2.2
+  }));
+  const tagX = Math.min(Math.max(xBall + 6, padL + 4), padL + pw - 118);
+  svg.appendChild(svgEl('rect', {
+    x: tagX, y: padT + 6, width: 112, height: 18, rx: 3,
+    fill: '#ffffff', 'fill-opacity': 0.94, stroke: '#cbd5e1', 'stroke-width': 1
+  }));
+  svg.appendChild(svgEl('text', {
+    x: tagX + 6, y: padT + 18.5, fill: '#8b2635',
+    'font-size': 9.5, 'font-weight': 700, 'font-family': 'Consolas, "Courier New", monospace'
+  }, `t_bal=${tBall.toFixed(2)}s (${Math.round(m.eInitMm || 0)}mm)`));
+}
+
+function drawDashEInit() {
+  const svg = document.getElementById('svgDashEInit'); if (!svg) return;
+  const data = state.dashData && state.dashData.einit;
+  const yMax = data ? data.yMax : 100;
+  const ax = svgDashAxes(svg, { yMax, yDecimals: 0, yLabel: 'İlk Yaklaşım Hatası E_init (mm)', xLabel: 'Kontrol Modeli (ort ± 1σ)' });
+  const { padL, padT, pw, ph } = ax;
+  drawSvgLegendRow(svg, [
+    { color: '#1e3a5f', alpha: 0.88, stroke: '#1e293b', label: 'Önerilen (HDA / HLSL) — düşük E_init', width: 220 },
+    { line: true, color: '#0f172a', label: '±1σ (6 tekrar)', width: 110 }
+  ], padL, 21);
+  if (!data) {
+    svg.appendChild(svgEl('text', { x: padL + 12, y: padT + ph / 2, fill: '#64748b', 'font-size': 11 }, 'Hesaplamak için Grafikleri Yenile düğmesine basın'));
+    return;
+  }
+  const n = DASH_MODELS.length, slot = pw / n, bw = 48;
+  DASH_MODELS.forEach((mdl, i) => {
+    const [mean, sd] = data.means[i];
+    const cx = padL + slot * i + slot / 2;
+    const barH = Math.max(2, ph * (mean / yMax));
+    const yBar = padT + ph - barH;
+    svg.appendChild(svgEl('rect', {
+      x: (cx - bw / 2).toFixed(1), y: yBar.toFixed(1), width: bw, height: barH.toFixed(1),
+      fill: DASH_MODEL_COLORS[mdl], 'fill-opacity': 0.88, stroke: '#1e293b', 'stroke-width': 1.1, rx: 2
+    }));
+    const yHi = Math.max(padT + 18, padT + ph - ph * ((mean + sd) / yMax));
+    const yLo = Math.min(padT + ph, padT + ph - ph * (Math.max(0.5, mean - sd) / yMax));
+    svg.appendChild(svgEl('line', { x1: cx.toFixed(1), y1: yHi.toFixed(1), x2: cx.toFixed(1), y2: yLo.toFixed(1), stroke: '#0f172a', 'stroke-width': 1.8 }));
+    svg.appendChild(svgEl('line', { x1: (cx - 6).toFixed(1), y1: yHi.toFixed(1), x2: (cx + 6).toFixed(1), y2: yHi.toFixed(1), stroke: '#0f172a', 'stroke-width': 1.8 }));
+    svg.appendChild(svgEl('line', { x1: (cx - 6).toFixed(1), y1: yLo.toFixed(1), x2: (cx + 6).toFixed(1), y2: yLo.toFixed(1), stroke: '#0f172a', 'stroke-width': 1.8 }));
+    const yLbl = Math.max(padT + 13, Math.min(yHi, yBar) - 6);
+    svg.appendChild(svgEl('rect', {
+      x: (cx - 24).toFixed(1), y: (yLbl - 11).toFixed(1), width: 48, height: 14, rx: 2,
+      fill: '#ffffff', 'fill-opacity': 0.94, stroke: '#cbd5e1', 'stroke-width': 0.8
+    }));
+    svg.appendChild(svgEl('text', {
+      x: cx.toFixed(1), y: (yLbl - 0.5).toFixed(1), 'text-anchor': 'middle', fill: '#0f172a',
+      'font-size': 9.5, 'font-weight': 700, 'font-family': 'Consolas, "Courier New", monospace'
+    }, mean.toFixed(0) + ' mm'));
+    svg.appendChild(svgEl('text', {
+      x: cx.toFixed(1), y: padT + ph + 17, 'text-anchor': 'middle', fill: '#1e293b',
+      'font-size': 10.5, 'font-weight': 600, 'font-family': '"Source Sans 3", system-ui, sans-serif'
+    }, DASH_MODEL_LABELS[mdl]));
+  });
+}
+
+function drawDashComp() {
+  const svg = document.getElementById('svgDashComp'); if (!svg) return;
+  const data = state.dashData && state.dashData.comp;
+  const ax = svgDashAxes(svg, { yMax: 100, yDecimals: 0, yLabel: 'Hareket Süresi Payı (%)', xLabel: 'Hedef Erişim Mesafesi × Kontrol Modeli' });
+  const { padL, padT, pw, ph } = ax;
+  drawSvgLegendRow(svg, [
+    { color: '#8b2635', label: 'Balistik İtki (%T_ballistic)', width: 175 },
+    { color: '#1e3a5f', label: 'Görsel Kompanzasyon (%T_comp)', width: 205 }
+  ], padL, 21);
+  if (!data || !data.rows || !data.rows.length) {
+    svg.appendChild(svgEl('text', { x: padL + 12, y: padT + ph / 2, fill: '#64748b', 'font-size': 11 }, 'Hesaplanıyor…'));
+    return;
+  }
+  const models3 = ['hdap', 'hlsl', 'governor'];
+  const groupW = pw / data.rows.length;
+  const bw = 27, gap = 6;
+  data.rows.forEach((row, gi) => {
+    const gx = padL + groupW * gi + groupW / 2;
+    const totalW = models3.length * bw + (models3.length - 1) * gap;
+    const startX = gx - totalW / 2;
+    models3.forEach((mdl, mi) => {
+      const cell = row.cells[mi];
+      const x = startX + mi * (bw + gap);
+      const hBall = ph * (cell.ball / 100);
+      const hComp = ph * (cell.comp / 100);
+      const yBall = padT + ph - hBall;
+      const yComp = yBall - hComp;
+      if (hBall > 0.5) {
+        svg.appendChild(svgEl('rect', { x: x.toFixed(1), y: yBall.toFixed(1), width: bw, height: hBall.toFixed(1), fill: '#8b2635' }));
+      }
+      if (hComp > 0.5) {
+        svg.appendChild(svgEl('rect', { x: x.toFixed(1), y: yComp.toFixed(1), width: bw, height: hComp.toFixed(1), fill: '#1e3a5f' }));
+      }
+      svg.appendChild(svgEl('rect', { x: x.toFixed(1), y: padT, width: bw, height: ph, fill: 'none', stroke: '#1e293b', 'stroke-width': 0.8, opacity: 0.45 }));
+      if (hComp >= 18) {
+        svg.appendChild(svgEl('text', {
+          x: (x + bw / 2).toFixed(1), y: (yComp + hComp / 2 + 3.5).toFixed(1),
+          'text-anchor': 'middle', fill: '#ffffff',
+          'font-size': 9, 'font-weight': 700, 'font-family': 'Consolas, "Courier New", monospace'
+        }, Math.round(cell.comp) + '%'));
+      }
+      if (hBall >= 18) {
+        svg.appendChild(svgEl('text', {
+          x: (x + bw / 2).toFixed(1), y: (yBall + hBall / 2 + 3.5).toFixed(1),
+          'text-anchor': 'middle', fill: '#ffffff',
+          'font-size': 9, 'font-weight': 700, 'font-family': 'Consolas, "Courier New", monospace'
+        }, Math.round(cell.ball) + '%'));
+      }
+      svg.appendChild(svgEl('text', {
+        x: (x + bw / 2).toFixed(1), y: padT + ph + 13, 'text-anchor': 'middle', fill: '#475569',
+        'font-size': 8.5, 'font-weight': 600, 'font-family': 'Consolas, "Courier New", monospace'
+      }, DASH_MODEL_SHORT[mdl]));
+    });
+    svg.appendChild(svgEl('text', {
+      x: gx.toFixed(1), y: padT + ph + 28, 'text-anchor': 'middle', fill: '#0f172a',
+      'font-size': 10, 'font-weight': 700, 'font-family': '"Source Sans 3", system-ui, sans-serif'
+    }, row.label));
+  });
+}
+
+function drawDashPulse() {
+  const svg = document.getElementById('svgDashPulse'); if (!svg) return;
+  const data = state.dashData && state.dashData.delaySweep;
+  const yMax = data ? data.yMax : 25;
+  const ax = svgDashAxes(svg, { yMax, yDecimals: 0, yLabel: 'Hedefi Aşma (% Overshoot)', xLabel: 'Görsel Döngü Gecikmesi τ_d (ms)' });
+  const { padL, padT, pw, ph } = ax;
+  drawSvgLegendRow(svg, [
+    { line: true, dot: true, color: DASH_MODEL_COLORS.hdap, label: 'İnsan-HDA', width: 88 },
+    { line: true, dot: true, color: DASH_MODEL_COLORS.hlsl, label: 'HLSL', width: 62 },
+    { line: true, dot: true, color: DASH_MODEL_COLORS.governor, label: 'Governor', width: 84 },
+    { line: true, dot: true, color: DASH_MODEL_COLORS.pid, label: 'Klasik PID', width: 92 }
+  ], padL, 21);
+  const xMin = 15, xMax = 128;
+  const toX = ms => padL + pw * ((ms - xMin) / (xMax - xMin));
+  DASH_DELAYS_MS.forEach(d => {
+    const gx = toX(d);
+    svg.appendChild(svgEl('line', { x1: gx.toFixed(1), y1: padT, x2: gx.toFixed(1), y2: padT + ph, stroke: '#edf1f5', 'stroke-width': 0.9 }));
+    svg.appendChild(svgEl('text', {
+      x: gx.toFixed(1), y: padT + ph + 16, 'text-anchor': 'middle', fill: '#475569',
+      'font-size': 10, 'font-family': 'Consolas, "Courier New", monospace'
+    }, d + ' ms'));
+  });
+  const activeMs = Math.round((state.delay || 0.06) * 1000);
+  if (activeMs >= 20 && activeMs <= 120) {
+    const axX = toX(activeMs);
+    svg.appendChild(svgEl('line', {
+      x1: axX.toFixed(1), y1: padT, x2: axX.toFixed(1), y2: padT + ph,
+      stroke: '#1e3a5f', 'stroke-width': 1.4, 'stroke-dasharray': '3 3', opacity: 0.75
+    }));
+    svg.appendChild(svgEl('text', {
+      x: Math.min(axX + 4, padL + pw - 68).toFixed(1), y: padT + 13, fill: '#1e3a5f',
+      'font-size': 9, 'font-weight': 700, 'font-family': 'Consolas, "Courier New", monospace'
+    }, `Aktif: ${activeMs}ms`));
+  }
+  const yLim5 = padT + ph - ph * Math.min(1, 5 / yMax);
+  svg.appendChild(svgEl('line', {
+    x1: padL, y1: yLim5.toFixed(1), x2: padL + pw, y2: yLim5.toFixed(1),
+    stroke: '#1e5631', 'stroke-width': 1.3, 'stroke-dasharray': '5 3', opacity: 0.75
+  }));
+  svg.appendChild(svgEl('text', {
+    x: padL + pw - 4, y: (yLim5 - 4).toFixed(1), 'text-anchor': 'end', fill: '#1e5631',
+    'font-size': 9, 'font-weight': 700, 'font-family': '"Source Sans 3", system-ui, sans-serif'
+  }, '%5 kararlılık sınırı'));
+  if (!data) {
+    svg.appendChild(svgEl('text', { x: padL + 12, y: padT + ph / 2, fill: '#64748b', 'font-size': 11 }, 'Grafikleri Yenile ile gecikme taraması çalıştırın'));
+    return;
+  }
+  DASH_DELAY_MODELS.forEach(mdl => {
+    const vals = data.series[mdl] || [];
+    const col = DASH_MODEL_COLORS[mdl];
+    let dPath = '';
+    vals.forEach((v, i) => {
+      const x = toX(DASH_DELAYS_MS[i]);
+      const y = padT + ph - ph * (v / yMax);
+      dPath += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
+    });
+    svg.appendChild(svgEl('path', {
+      d: dPath.trim(), fill: 'none', stroke: col, 'stroke-width': 2.5,
+      'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+    }));
+    vals.forEach((v, i) => {
+      svg.appendChild(svgEl('circle', {
+        cx: toX(DASH_DELAYS_MS[i]).toFixed(1), cy: (padT + ph - ph * (v / yMax)).toFixed(1),
+        r: 3.6, fill: col, stroke: '#ffffff', 'stroke-width': 1.2
+      }));
+    });
+  });
+}
+
+function runDashboard() {
+  const status = document.getElementById('dashStatus');
+  if (status) status.textContent = 'Hesaplanıyor…';
+  // B: model × 6 repeats E_init
+  const einitMeans = [], einitAll = [];
+  let eMax = 10;
+  DASH_MODELS.forEach(mdl => {
+    const vals = [];
+    for (let k = 0; k < DASH_REPEATS; k++) vals.push(dashMeasure(mdl).eInitMm || 0);
+    const [m, sd] = meanStd(vals);
+    einitMeans.push([m, sd]); einitAll.push(vals);
+    eMax = Math.max(eMax, m + sd);
+  });
+  const eYMax = Math.max(30, Math.ceil((eMax * 1.22) / 20) * 20);
+
+  // C: 4 reachable distances (relative to active shoulder & safe reach) × 3 models
+  const shPos = forwardKinematics(Q0, state.links).origins[1];
+  const pre = computePreReachAssessment();
+  const maxReachM = Math.max(0.32, Math.min(0.68, (pre.maxSafeCm || 58) / 100));
+  const fracs = [
+    { frac: 0.28, name: 'Yakın' },
+    { frac: 0.46, name: 'Orta' },
+    { frac: 0.66, name: 'Uzak' },
+    { frac: 0.86, name: 'Sınır' }
+  ];
+  const compRows = fracs.map(f => {
+    const dist = Math.max(0.14, f.frac * maxReachM);
+    const target = [shPos[0] + dist * 0.92, shPos[1] + 0.08, Math.max(0.65, shPos[2] - 0.14)];
+    const cells = ['hdap', 'hlsl', 'governor'].map(mdl => {
+      const mm = dashMeasure(mdl, target);
+      const total = Math.max(mm.mt || 1, 1e-4);
+      const compPct = Math.min(100, Math.max(0, (mm.tComp / total) * 100));
+      const ballPct = Math.max(0, 100 - compPct);
+      return { ball: ballPct, comp: compPct };
+    });
+    return { dist, label: `${f.name} ${Math.round(dist * 100)} cm`, cells };
+  });
+
+  // D: closed-loop visual delay sweep (20–120 ms) across models
+  const delaySeries = {};
+  let ovMax = 8;
+  DASH_DELAY_MODELS.forEach(mdl => {
+    delaySeries[mdl] = DASH_DELAYS_MS.map(ms => {
+      const mm = dashMeasureDelay(mdl, ms);
+      const ov = Math.max(0, mm.overshootPct || 0);
+      ovMax = Math.max(ovMax, ov);
+      return ov;
+    });
+  });
+  const delayYMax = Math.max(12, Math.ceil((ovMax * 1.18) / 5) * 5);
+
+  state.dashData = {
+    einit: { means: einitMeans, all: einitAll, yMax: eYMax },
+    comp: { rows: compRows },
+    delaySweep: { series: delaySeries, yMax: delayYMax }
+  };
+  drawDashPhase(); drawDashEInit(); drawDashComp(); drawDashPulse();
+  if (status) status.textContent = 'Güncel — 4 vektörel grafik aktif (saat ' + new Date().toLocaleTimeString('tr-TR') + ')';
+}
+
+function buildCombinedDashboardSvgMarkup() {
+  const specs = [
+    { id: 'svgDashPhase', title: 'A. Zaman–Hata Yakınsaması ve Faz Ayrımı' },
+    { id: 'svgDashEInit', title: 'B. Balistik İlk Yaklaşım Hatası E_init (ort ± 1σ)' },
+    { id: 'svgDashComp', title: 'C. Erişim Mesafesine Göre Balistik vs Kompanzasyon (%T)' },
+    { id: 'svgDashPulse', title: 'D. Görsel Gecikme Dayanımı (20–120 ms) — Hedefi Aşma (%)' }
+  ];
+  const ser = new XMLSerializer();
+  const cellW = 580, cellH = 295, pad = 16, headH = 44;
+  const W = cellW * 2 + pad * 3, H = headH + cellH * 2 + pad * 3;
+  const parts = [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`,
+    `<rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>`,
+    `<text x="${pad}" y="28" fill="#0f172a" font-size="16" font-weight="700" font-family="Source Sans 3, system-ui, sans-serif">Vektörel Analitik Dashboard — XYZ'siz Balistik / Görsel Kompanzasyon Analizi</text>`
+  ];
+  specs.forEach((sp, idx) => {
+    const el = document.getElementById(sp.id);
+    const gx = pad + (idx % 2) * (cellW + pad);
+    const gy = headH + pad + Math.floor(idx / 2) * (cellH + pad);
+    parts.push(`<g transform="translate(${gx}, ${gy})">`);
+    parts.push(`<text x="4" y="13" fill="#0f172a" font-size="11.5" font-weight="700" font-family="Source Sans 3, system-ui, sans-serif">${sp.title}</text>`);
+    if (el) {
+      let inner = '';
+      Array.from(el.childNodes).forEach(ch => { inner += ser.serializeToString(ch); });
+      parts.push(`<g transform="translate(0, 20)">${inner}</g>`);
+    }
+    parts.push(`</g>`);
+  });
+  parts.push(`</svg>`);
+  return { markup: parts.join('\n'), width: W, height: H };
+}
+
+document.getElementById('btnDashRefresh').addEventListener('click', runDashboard);
+document.getElementById('btnDashSvg')?.addEventListener('click', () => {
+  if (!state.dashData) runDashboard();
+  const { markup } = buildCombinedDashboardSvgMarkup();
+  const blob = new Blob([markup], { type: 'image/svg+xml;charset=utf-8' });
+  const a = document.createElement('a');
+  a.download = 'analitik_dashboard.svg';
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+document.getElementById('btnDashPng').addEventListener('click', () => {
+  if (!state.dashData) runDashboard();
+  const { markup, width, height } = buildCombinedDashboardSvgMarkup();
+  const blob = new Blob([markup], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    const out = document.createElement('canvas');
+    out.width = width * 2; out.height = height * 2;
+    const ctx = out.getContext('2d');
+    ctx.scale(2, 2);
+    ctx.drawImage(img, 0, 0, width, height);
+    const a = document.createElement('a');
+    a.download = 'analitik_dashboard_hidpi.png';
+    a.href = out.toDataURL('image/png');
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+});
+document.getElementById('btnDashCsv').addEventListener('click', () => {
+  if (!state.dashData) runDashboard();
+  const rows = ['section,model,param,mt_s,e_init_mm,t_ballistic_s,t_comp_s,value_pct'];
+  if (state.dashData) {
+    DASH_MODELS.forEach((mdl, i) => {
+      const m = state.compareResults[mdl];
+      const [mean] = state.dashData.einit.means[i];
+      rows.push(['E_INIT', DASH_MODEL_LABELS[mdl], '', m ? m.mt.toFixed(3) : '', mean.toFixed(3), m ? (m.tBallistic || 0).toFixed(3) : '', m ? (m.tComp || 0).toFixed(3) : '', m ? (m.tCompPct || 0).toFixed(2) : ''].join(','));
+    });
+    state.dashData.comp.rows.forEach(row => {
+      ['hdap', 'hlsl', 'governor'].forEach((mdl, mi) => {
+        const cell = row.cells[mi];
+        rows.push(['T_COMP', DASH_MODEL_LABELS[mdl], row.dist.toFixed(3) + 'm', '', '', '', '', cell.comp.toFixed(1)].join(','));
+      });
+    });
+    DASH_DELAY_MODELS.forEach(mdl => {
+      DASH_DELAYS_MS.forEach((ms, i) => {
+        rows.push(['DELAY_OVERSHOOT', DASH_MODEL_LABELS[mdl], ms + 'ms', '', '', '', '', state.dashData.delaySweep.series[mdl][i].toFixed(3)].join(','));
+      });
+    });
+  }
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.download = 'analitik_dashboard.csv';
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+// ===== Standart Akademik Benchmark Paketi (5 Senaryo × 6 Kontrolcü) =====
+const BENCHMARK_SCENARIOS_JS = [
+  {
+    id: 'S1',
+    name: 'S1: Nominal Binoküler (60 ms)',
+    target: [0.45, 0.12, 0.88],
+    delayS: 0.06,
+    noisePx: 0.25,
+    visionMode: 'binocular',
+    durS: 3.0,
+    waistSync: true
+  },
+  {
+    id: 'S2',
+    name: 'S2: Yüksek Gecikme 120 ms (Lambert-W)',
+    target: [0.45, 0.12, 0.88],
+    delayS: 0.12,
+    noisePx: 0.35,
+    visionMode: 'binocular',
+    durS: 3.5,
+    waistSync: true
+  },
+  {
+    id: 'S3',
+    name: 'S3: Sınır / Tekillik Yakını (human_wdls vs plain_dls)',
+    target: [0.56, 0.08, 0.96],
+    delayS: 0.06,
+    noisePx: 0.25,
+    visionMode: 'binocular',
+    durS: 4.2,
+    waistSync: false
+  },
+  {
+    id: 'S4',
+    name: 'S4: Tek-Göz Boyun Paralaksı vs Sabit (+%28 Ölçek)',
+    target: [0.45, 0.12, 0.88],
+    delayS: 0.06,
+    noisePx: 0.20,
+    visionMode: 'mono_left',
+    durS: 4.0,
+    waistSync: true
+  },
+  {
+    id: 'S5',
+    name: 'S5: Yanal Küre-Dışı Senkron Bel + Kol ([0.42, -0.42, 0.86])',
+    target: [0.42, -0.42, 0.86],
+    delayS: 0.06,
+    noisePx: 0.25,
+    visionMode: 'binocular',
+    durS: 3.5,
+    waistSync: true
+  }
+];
+const BENCHMARK_CTRL_LABELS = {
+  hdap: 'İnsan-HDA',
+  hlsl: 'HLSL (Önerilen)',
+  governor: 'Governor',
+  pid: 'Klasik PID',
+  lqr: 'LQR',
+  fixed: 'Sabit Kazanç (P)',
+  hdap_mono_static: 'İnsan-HDA (Sabit Tek-Göz)',
+  hdap_no_waist: 'İnsan-HDA (Sabit Bel θ=0°)'
+};
+
+function renderAcademicBenchmarkTable() {
+  const tbody = document.getElementById('tbodyAcademicBenchmark');
+  if (!tbody) return;
+  const rows = (state.benchData && state.benchData.rows) ? state.benchData.rows : [];
+  const filt = (document.getElementById('selBenchScenarioFilter') || {}).value || 'all';
+  const filtered = filt === 'all' ? rows : rows.filter(r => r.scenarioId === filt);
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:var(--ink-muted);">Henüz benchmark sonucu yok — yukarıdaki düğmeye tıklayın.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(r => {
+    const isProposed = (r.ctrlKey === 'hdap' || r.ctrlKey === 'hlsl');
+    const rowCls = isProposed ? ' class="active-row"' : '';
+    const errBadge = r.finalErrMm <= 6.0
+      ? `<span class="bench-badge-ok">${r.finalErrMm.toFixed(1)}</span>`
+      : `<span class="bench-badge-warn">${r.finalErrMm.toFixed(1)}</span>`;
+    const osBadge = r.overshootPct <= 2.5
+      ? `${r.overshootPct.toFixed(1)}%`
+      : `<span style="color:#b91c1c;font-weight:700;">${r.overshootPct.toFixed(1)}%</span>`;
+    const tsTxt = r.settledWithin ? `${r.mt.toFixed(2)}` : `&gt;${r.durS.toFixed(1)} (N/A)`;
+    const auxTxt = `θ=${r.maxWaistDeg >= 0 ? '+' : ''}${r.maxWaistDeg.toFixed(1)}° / B=${r.maxNeckMm.toFixed(1)}mm`;
+    return `<tr${rowCls}>
+      <td style="font-size:10px;">${r.scenarioShort}</td>
+      <td>${r.ctrlLabel}</td>
+      <td>${errBadge}</td>
+      <td>${osBadge}</td>
+      <td>${tsTxt}</td>
+      <td>${r.fittsTpBps.toFixed(2)}</td>
+      <td>${r.eInitMm.toFixed(1)}</td>
+      <td>${r.tCompPct.toFixed(0)}%</td>
+      <td>${r.minW.toFixed(4)}</td>
+      <td>${r.peakTau.toFixed(1)}</td>
+      <td style="font-size:10px;">${auxTxt}</td>
+    </tr>`;
+  }).join('');
+}
+
+function updateAcademicBenchmarkKpis(rows) {
+  const find = (scId, ck) => rows.find(r => r.scenarioId === scId && r.ctrlKey === ck);
+  const s2Hda = find('S2', 'hdap'), s2Pid = find('S2', 'pid');
+  const elS2 = document.getElementById('bkS2Os');
+  if (elS2 && s2Hda && s2Pid) {
+    elS2.textContent = `%${s2Hda.overshootPct.toFixed(1)} vs %${s2Pid.overshootPct.toFixed(1)}`;
+    const sub = document.getElementById('bkS2OsSub');
+    if (sub) sub.textContent = `120 ms gecikmede HDA (${s2Hda.finalErrMm.toFixed(1)} mm) vs PID (${s2Pid.finalErrMm.toFixed(1)} mm)`;
+  }
+  const s1Hda = find('S1', 'hdap'), s1Hlsl = find('S1', 'hlsl');
+  const elTp = document.getElementById('bkS1Tp');
+  if (elTp && s1Hda && s1Hlsl) {
+    elTp.textContent = `${s1Hda.fittsTpBps.toFixed(2)} / ${s1Hlsl.fittsTpBps.toFixed(2)} b/s`;
+    const sub = document.getElementById('bkS1TpSub');
+    if (sub) sub.textContent = `S1 Nominal ID_e = ${s1Hda.fittsIdeBits.toFixed(2)} bit (HDA / HLSL)`;
+  }
+  const s4Act = find('S4', 'hdap'), s4Stat = find('S4', 'hdap_mono_static');
+  const elMono = document.getElementById('bkS4Mono');
+  if (elMono && s4Act && s4Stat) {
+    const ratio = s4Stat.finalErrMm / Math.max(s4Act.finalErrMm, 0.1);
+    elMono.textContent = `${s4Act.finalErrMm.toFixed(1)} vs ${s4Stat.finalErrMm.toFixed(1)} mm`;
+    const sub = document.getElementById('bkS4MonoSub');
+    if (sub) sub.textContent = `Boyun B_boy=${s4Act.maxNeckMm.toFixed(1)} mm ile ${ratio.toFixed(1)}× ölçek iyileşmesi`;
+  }
+  const s5Sync = find('S5', 'hdap'), s5Fix = find('S5', 'hdap_no_waist');
+  const elW = document.getElementById('bkS5Waist');
+  if (elW && s5Sync && s5Fix) {
+    elW.textContent = `${s5Sync.finalErrMm.toFixed(1)} vs ${s5Fix.finalErrMm.toFixed(1)} mm`;
+    const sub = document.getElementById('bkS5WaistSub');
+    if (sub) sub.textContent = `Bel θ_bel=${s5Sync.maxWaistDeg.toFixed(1)}° dönünce küre-dışı hedefe varış`;
+  }
+}
+
+function runAcademicBenchmarkSuiteJS() {
+  const statusEl = document.getElementById('benchStatus');
+  if (statusEl) statusEl.textContent = 'Hesaplanıyor (5 senaryo × 6 kontrolcü)…';
+  const tStart = performance.now();
+  const snapHead = snapshotHeadWaistState();
+  const snapQ0 = Q0.slice();
+  const snapTgt = state.target.slice();
+  const snapDelay = state.delay;
+  const snapNoise = state.noisePx;
+  const snapVision = state.visionMode;
+  const snapSing = state.singMode;
+  const snapGaze = state.gazeMode;
+  const snapSpeed = Object.assign({}, state.speed);
+  const snapTier = state.speedTierName;
+  const snapRoll = state.goalRollDeg;
+  const snapTgtRoll = state.targetRollDeg;
+  const snapTgtPitch = state.targetPitchDeg;
+  const snapTgtYaw = state.targetYawDeg;
+  const rows = [];
+  const compactQ = (POSTURES.retracted_compact || [0, 20, 95, 0, 25, 0]).map(d => d * DEG);
+  try {
+    Q0 = compactQ.slice();
+    state.gazeMode = 'mid';
+    state.speedTierName = 'normal';
+    state.goalRollDeg = 0;
+    state.targetRollDeg = 0;
+    state.targetPitchDeg = 0;
+    state.targetYawDeg = 0;
+    const ctrls = ['hdap', 'hlsl', 'governor', 'pid', 'lqr', 'fixed'];
+    BENCHMARK_SCENARIOS_JS.forEach(sc => {
+      state.target = sc.target.slice();
+      state.delay = sc.delayS;
+      state.noisePx = sc.noisePx;
+      state.speed = {
+        vmax: 0.55,
+        maxQd: 1.80,
+        kScale: 1.00,
+        eps: 0.004,
+        phiMin: 0.28,
+        gamma: 0.55,
+        termP: 0.45,
+        dur: sc.durS
+      };
+      ctrls.forEach(c => {
+        state.visionMode = sc.visionMode;
+        const sing = (sc.id === 'S3' && (c === 'pid' || c === 'lqr' || c === 'fixed')) ? 'plain_dls' : 'human_wdls';
+        state.singMode = sing;
+        const rec = runSimulationForController(c, sing, { isGhost: true, disableWaistSync: !sc.waistSync });
+        const m = rec.metrics;
+        rows.push({
+          scenarioId: sc.id,
+          scenarioShort: sc.id + ' (' + sc.visionMode.replace('binocular', 'Binok').replace('mono_left', 'Mono') + ')',
+          scenarioName: sc.name,
+          durS: sc.durS,
+          ctrlKey: c,
+          ctrlLabel: BENCHMARK_CTRL_LABELS[c] || c,
+          finalErrMm: m.finalErrMm,
+          overshootPct: m.overshootPct,
+          mt: m.mt,
+          settledWithin: m.settledWithin,
+          fittsIdeBits: m.fittsIdeBits,
+          fittsTpBps: m.fittsTpBps,
+          eInitMm: m.eInitMm,
+          tCompPct: m.tCompPct,
+          minW: m.minW,
+          peakTau: m.peakTau,
+          maxWaistDeg: m.maxWaistDeg,
+          maxNeckMm: m.maxNeckMm
+        });
+      });
+      if (sc.id === 'S4') {
+        state.visionMode = 'mono_static';
+        state.singMode = 'human_wdls';
+        const recS = runSimulationForController('hdap', 'human_wdls', { isGhost: true, disableWaistSync: true });
+        const ms = recS.metrics;
+        rows.push({
+          scenarioId: 'S4',
+          scenarioShort: 'S4 (Mono-Sabit)',
+          scenarioName: sc.name,
+          durS: sc.durS,
+          ctrlKey: 'hdap_mono_static',
+          ctrlLabel: BENCHMARK_CTRL_LABELS.hdap_mono_static,
+          finalErrMm: ms.finalErrMm,
+          overshootPct: ms.overshootPct,
+          mt: ms.mt,
+          settledWithin: ms.settledWithin,
+          fittsIdeBits: ms.fittsIdeBits,
+          fittsTpBps: ms.fittsTpBps,
+          eInitMm: ms.eInitMm,
+          tCompPct: ms.tCompPct,
+          minW: ms.minW,
+          peakTau: ms.peakTau,
+          maxWaistDeg: ms.maxWaistDeg,
+          maxNeckMm: ms.maxNeckMm
+        });
+      }
+      if (sc.id === 'S5') {
+        state.visionMode = 'binocular';
+        state.singMode = 'human_wdls';
+        const recNW = runSimulationForController('hdap', 'human_wdls', { isGhost: true, disableWaistSync: true });
+        const mnw = recNW.metrics;
+        rows.push({
+          scenarioId: 'S5',
+          scenarioShort: 'S5 (Sabit Bel)',
+          scenarioName: sc.name,
+          durS: sc.durS,
+          ctrlKey: 'hdap_no_waist',
+          ctrlLabel: BENCHMARK_CTRL_LABELS.hdap_no_waist,
+          finalErrMm: mnw.finalErrMm,
+          overshootPct: mnw.overshootPct,
+          mt: mnw.mt,
+          settledWithin: mnw.settledWithin,
+          fittsIdeBits: mnw.fittsIdeBits,
+          fittsTpBps: mnw.fittsTpBps,
+          eInitMm: mnw.eInitMm,
+          tCompPct: mnw.tCompPct,
+          minW: mnw.minW,
+          peakTau: mnw.peakTau,
+          maxWaistDeg: 0.0,
+          maxNeckMm: mnw.maxNeckMm
+        });
+      }
+    });
+  } finally {
+    Q0 = snapQ0;
+    state.target = snapTgt;
+    state.delay = snapDelay;
+    state.noisePx = snapNoise;
+    state.visionMode = snapVision;
+    state.singMode = snapSing;
+    state.gazeMode = snapGaze;
+    state.speed = snapSpeed;
+    state.speedTierName = snapTier;
+    state.goalRollDeg = snapRoll;
+    state.targetRollDeg = snapTgtRoll;
+    state.targetPitchDeg = snapTgtPitch;
+    state.targetYawDeg = snapTgtYaw;
+    restoreHeadWaistState(snapHead);
+  }
+  const elapsedMs = Math.round(performance.now() - tStart);
+  state.benchData = { rows, elapsedMs, timestamp: new Date().toLocaleTimeString('tr-TR') };
+  updateAcademicBenchmarkKpis(rows);
+  renderAcademicBenchmarkTable();
+  if (statusEl) {
+    statusEl.textContent = `Tamamlandı (${rows.length} koşu, ${elapsedMs} ms — saat ${state.benchData.timestamp})`;
+  }
+  return state.benchData;
+}
+
+document.getElementById('btnRunAcademicBenchmark')?.addEventListener('click', runAcademicBenchmarkSuiteJS);
+document.getElementById('selBenchScenarioFilter')?.addEventListener('change', renderAcademicBenchmarkTable);
+document.getElementById('btnExportBenchMd')?.addEventListener('click', () => {
+  if (!state.benchData) runAcademicBenchmarkSuiteJS();
+  const rows = (state.benchData && state.benchData.rows) || [];
+  const lines = [
+    '# Tarayıcı Etkileşimli Akademik Benchmark Sonuçları (5 Senaryo × 6 Kontrolcü)',
+    '',
+    '| Senaryo | Kontrolcü | e_f (mm) | Aşma (%) | T_s (s) | Fitts TP (bit/s) | E_init (mm) | %T_comp | w_min | Peak Tau (Nm) | Bel (deg) / B_boy (mm) |',
+    '|---|---|---|---|---|---|---|---|---|---|---|'
+  ];
+  rows.forEach(r => {
+    const ts = r.settledWithin ? r.mt.toFixed(2) : `>${r.durS.toFixed(1)} (N/A)`;
+    lines.push(`| ${r.scenarioId} | ${r.ctrlLabel} | ${r.finalErrMm.toFixed(1)} | ${r.overshootPct.toFixed(1)}% | ${ts} | ${r.fittsTpBps.toFixed(2)} | ${r.eInitMm.toFixed(1)} | ${r.tCompPct.toFixed(0)}% | ${r.minW.toFixed(4)} | ${r.peakTau.toFixed(1)} | ${r.maxWaistDeg.toFixed(1)}° / ${r.maxNeckMm.toFixed(1)}mm |`);
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+  const a = document.createElement('a');
+  a.download = 'akademik_benchmark_tarayici.md';
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+document.getElementById('btnExportBenchCsv')?.addEventListener('click', () => {
+  if (!state.benchData) runAcademicBenchmarkSuiteJS();
+  const rows = (state.benchData && state.benchData.rows) || [];
+  const header = 'scenario_id,controller,final_err_mm,overshoot_pct,settling_time_s,settled,fitts_ide_bits,fitts_tp_bps,e_init_mm,t_comp_pct,min_w,peak_tau_nm,waist_deg,neck_baseline_mm';
+  const lines = [header].concat(rows.map(r => [
+    r.scenarioId, r.ctrlKey, r.finalErrMm.toFixed(2), r.overshootPct.toFixed(2),
+    r.mt.toFixed(3), r.settledWithin ? 1 : 0, r.fittsIdeBits.toFixed(3), r.fittsTpBps.toFixed(3),
+    r.eInitMm.toFixed(2), r.tCompPct.toFixed(1), r.minW.toFixed(4), r.peakTau.toFixed(2),
+    r.maxWaistDeg.toFixed(2), r.maxNeckMm.toFixed(2)
+  ].join(',')));
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.download = 'akademik_benchmark_tarayici.csv';
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+// Presets
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const p = btn.getAttribute('data-preset');
+    const setv = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+    document.getElementById('selLimbProfile').value = 'adult_avg';
+    applyLimbProfile();
+    setv('rngDelay', 60);
+    setv('selVisionMode', 'binocular');
+    if (p === 'nominal') {
+      setv('rngTx', 0.45); setv('rngTy', 0.10); setv('rngTz', 0.85);
+      syncControlsFromUI();
+      enterSetupMode();
+      return;
+    } else if (p === 'extended') {
+      setv('rngTx', 0.60); setv('rngTy', 0.05); setv('rngTz', 1.00);
+    } else if (p === 'unreachable') {
+      document.getElementById('selLimbProfile').value = 'compact_youth';
+      applyLimbProfile();
+      setv('rngTx', 0.75); setv('rngTy', 0.15); setv('rngTz', 1.10);
+    } else if (p === 'highdelay') {
+      setv('rngTx', 0.45); setv('rngTy', 0.10); setv('rngTz', 0.85);
+      setv('rngDelay', 120);
+    } else if (p === 'mononeck') {
+      if (POSTURES.ready_desk) {
+        setv('selPosture', 'ready_desk');
+        setJointSlidersFromQ(POSTURES.ready_desk.map(d => d * DEG));
+      }
+      setv('selSpeedTier', 'normal');
+      populateSubModes();
+      setv('selSpeedSub', 'mono_reach');
+      applySpeedTier(false);
+      setv('selVisionMode', 'mono_left');
+      setv('rngTx', 0.44); setv('rngTy', 0.08); setv('rngTz', 0.88);
+      setv('rngDelay', 60);
+      setv('rngPayload', 0.2);
+      const chkCones = document.getElementById('chkDepthCones');
+      if (chkCones) { chkCones.checked = true; state.showDepthCones = true; }
+      syncControlsFromUI();
+      runAllComparison();
+      runAndAnimate();
+      return;
+    } else if (p === 'waist_sync') {
+      if (POSTURES.ready_desk) {
+        setv('selPosture', 'ready_desk');
+        setJointSlidersFromQ(POSTURES.ready_desk.map(d => d * DEG));
+      }
+      setv('selSpeedTier', 'normal');
+      populateSubModes();
+      setv('selSpeedSub', 'normal_std');
+      applySpeedTier(false);
+      setv('rngTx', 0.52); setv('rngTy', -0.26); setv('rngTz', 0.86);
+      setv('rngDelay', 60);
+      setv('rngPayload', 0.2);
+      syncControlsFromUI();
+      runAllComparison();
+      runAndAnimate();
+      return;
+    }
+    syncControlsFromUI();
+    enterSetupMode();
+  });
+});
+// Senaryo diyagram modu butonları (#diagModeBar)
+document.querySelectorAll('#diagModeBar .diag-mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.getAttribute('data-diag-mode');
+    const setv = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+    const curTy = parseFloat((document.getElementById('rngTy') || {}).value || '0.10');
+    if (mode === 'binocular') {
+      setv('selVisionMode', 'binocular');
+      if (Math.abs(curTy) > 0.18) { setv('rngTx', 0.45); setv('rngTy', 0.10); setv('rngTz', 0.85); }
+    } else if (mode === 'mono_left') {
+      setv('selVisionMode', 'mono_left');
+      if (Math.abs(curTy) > 0.18) { setv('rngTx', 0.44); setv('rngTy', 0.08); setv('rngTz', 0.88); }
+    } else if (mode === 'mono_static') {
+      setv('selVisionMode', 'mono_static');
+      if (Math.abs(curTy) > 0.18) { setv('rngTx', 0.44); setv('rngTy', 0.08); setv('rngTz', 0.88); }
+    } else if (mode === 'waist_sync') {
+      setv('selVisionMode', 'binocular');
+      setv('rngTx', 0.52); setv('rngTy', -0.26); setv('rngTz', 0.86);
+    }
+    syncControlsFromUI();
+    enterSetupMode();
+  });
+});
+// Interactive 3D: orbit drag + setup-mode drag of target & gripper
+{
+  const cv = document.getElementById('cv3d');
+  let dragMode = null;      // 'orbit' | 'target' | 'gripper'
+  let dragMoved = false;
+  let last = { x: 0, y: 0 };
+  let dragConst = 0;        // fixed plane coordinate at drag start
+  const planeAxis = () => (state.dragPlane === 'XZ' ? 1 : state.dragPlane === 'YZ' ? 0 : 2);
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const canvasXY = (e) => {
+    const r = cv.getBoundingClientRect();
+    return {
+      mx: (e.clientX - r.left) * (cv.width / r.width),
+      my: (e.clientY - r.top) * (cv.height / r.height)
+    };
+  };
+  const screenToWorldOnPlane = (mx, my, plane, constVal, prev) => {
+    const W = cv.width, H = cv.height;
+    const s = Math.min(H * 0.55, W * 0.48) * state.camZoom;
+    const xr = (mx - W * 0.50 - state.camPan.x) / s;
+    const zr = (H * 0.47 + state.camPan.y - my) / s;
+    const cy = Math.cos(state.camYaw), sy = Math.sin(state.camYaw);
+    const cp = Math.cos(state.camPitch), sp = Math.sin(state.camPitch);
+    if (plane === 'XZ') {
+      const y = constVal;
+      let x0 = prev ? prev[0] - 0.22 : 0;
+      if (Math.abs(cy) > 0.05) x0 = (xr + sy * y) / cy;
+      const yr = sy * x0 + cy * y;
+      const z = (zr + sp * yr) / cp;
+      return [x0 + 0.22, y, z + 0.62];
+    }
+    if (plane === 'YZ') {
+      const x0 = constVal - 0.22;
+      let y = prev ? prev[1] : 0;
+      if (Math.abs(sy) > 0.05) y = (cy * x0 - xr) / sy;
+      const yr = sy * x0 + cy * y;
+      const z = (zr + sp * yr) / cp;
+      return [constVal, y, z + 0.62];
+    }
+    const z0 = constVal - 0.62;
+    let yr = 0;
+    if (Math.abs(sp) > 0.05) yr = (cp * z0 - zr) / sp;
+    const x0 = cy * xr + sy * yr;
+    const y = -sy * xr + cy * yr;
+    return [x0 + 0.22, y, constVal];
+  };
+  const hitHandle = (mx, my) => {
+    if (!state.screenTarget || !state.screenGripper) return null;
+    const dT = Math.hypot(mx - state.screenTarget[0], my - state.screenTarget[1]);
+    const dG = Math.hypot(mx - state.screenGripper[0], my - state.screenGripper[1]);
+    if (dT < 15) return 'target';
+    if (dG < 15) return 'gripper';
+    return null;
+  };
+  cv.addEventListener('contextmenu', e => e.preventDefault());
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    const dir = e.deltaY > 0 ? 0.9 : 1.1;
+    state.camZoom = Math.min(2.8, Math.max(0.45, state.camZoom * dir));
+    updateUIFrame(state.frameIdx);
+  }, { passive: false });
+  const distToSegment = (px, a, b) => {
+    const vx = b[0] - a[0], vy = b[1] - a[1];
+    const wx = px[0] - a[0], wy = px[1] - a[1];
+    const c1 = vx * wx + vy * wy;
+    if (c1 <= 0) return Math.hypot(wx, wy);
+    const c2 = vx * vx + vy * vy;
+    if (c2 <= c1) return Math.hypot(px[0] - b[0], px[1] - b[1]);
+    const t = c1 / c2;
+    return Math.hypot(px[0] - (a[0] + t * vx), px[1] - (a[1] + t * vy));
+  };
+  const nearestLimb = (mx, my) => {
+    const fk = forwardKinematics(Q0, state.links);
+    const sh3d = fk.origins[1];
+    const shZ = sh3d[2];
+    let best = -1, bestD = 16;
+    // Check visible trunk + clavicle for link 0
+    const dTrunk = distToSegment([mx, my], project3D([0, 0, 0.02], cv.width, cv.height), project3D([0, 0, shZ], cv.width, cv.height));
+    const dClav = distToSegment([mx, my], project3D([0, 0, shZ], cv.width, cv.height), project3D(sh3d, cv.width, cv.height));
+    if (Math.min(dTrunk, dClav) < bestD) { bestD = Math.min(dTrunk, dClav); best = 0; }
+    for (let i = 1; i < fk.origins.length - 1; i++) {
+      if (i === 3 || i === 4) continue;
+      const a = project3D(fk.origins[i], cv.width, cv.height);
+      const b = project3D(fk.origins[i + 1], cv.width, cv.height);
+      const d = distToSegment([mx, my], a, b);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    return best;
+  };
+  const armJointFreeDrag = (jIdx, mx, my) => {
+    const fkCur = forwardKinematics(Q0, state.links);
+    dragMode = 'joint-free';
+    state.jointDragIdx = jIdx;
+    state.jointStartFocus = fkCur.origins[effectiveFocusOriginIdx(jIdx)].slice();
+    state.jointIKQ = Q0.slice();
+    state.jointDragStartScreen = [mx, my];
+    dragMoved = false;
+    last = { x: mx, y: my };
+    state.dragInfo = null;
+    cv.style.cursor = 'grabbing';
+  };
+  cv.addEventListener('mousedown', e => {
+    e.preventDefault();
+    const { mx, my } = canvasXY(e);
+    if (e.button === 2) {
+      dragMode = 'pan';
+      last = { x: mx, y: my };
+      cv.style.cursor = 'grabbing';
+      return;
+    }
+    if (e.button !== 0) return;
+    // 1) Active joint gizmo: central round sphere (composite move) OR closest X/Y/Z arrow/ring
+    if (state.gizmoScreen && state.selectedJoint >= 0) {
+      const centerBase = state.gizmoScreen[0] ? state.gizmoScreen[0].base : state.jointScreen[state.selectedJoint];
+      if (state.gizmoMode === 'translate' && centerBase && Math.hypot(mx - centerBase[0], my - centerBase[1]) <= 13) {
+        state.jointWasAlreadySelected = false;
+        armJointFreeDrag(state.selectedJoint, mx, my);
+        return;
+      }
+      let bestGizmo = null, bestGD = 14;
+      for (const t of state.gizmoScreen) {
+        const d = (state.gizmoMode === 'rotate' && t.ring)
+          ? Math.abs(Math.hypot(mx - t.ringCenter[0], my - t.ringCenter[1]) - t.ring)
+          : distToSegment([mx, my], t.shaftStart || t.base, t.tip);
+        if (d < bestGD) { bestGD = d; bestGizmo = t; }
+      }
+      if (bestGizmo) {
+        const t = bestGizmo;
+        const qSel = Q0.slice();
+        const fkSel = forwardKinematics(qSel, state.links);
+        const ax = t.axis;
+        const axisVecWorld = (t.worldAxis ? t.worldAxis.slice()
+          : (ax === 'x' ? fkSel.xAxes[state.selectedJoint].slice()
+            : ax === 'y' ? fkSel.yAxes[state.selectedJoint].slice()
+            : fkSel.zAxes[state.selectedJoint].slice()));
+        const focusIdx = effectiveFocusOriginIdx(state.selectedJoint);
+        const jPivot = getJointWorldPositions(fkSel)[state.selectedJoint] || fkSel.origins[state.selectedJoint];
+        const cyCam = Math.cos(state.camYaw), syCam = Math.sin(state.camYaw);
+        const cpCam = Math.cos(state.camPitch), spCam = Math.sin(state.camPitch);
+        const camOut = [-cpCam * syCam, -cpCam * cyCam, -spCam];
+        const facing = axisVecWorld[0] * camOut[0] + axisVecWorld[1] * camOut[1] + axisVecWorld[2] * camOut[2];
+        const pTip = project3D(add3(jPivot, scale3(axisVecWorld, 0.20)), cv.width, cv.height);
+        const dxTip = pTip[0] - t.base[0], dyTip = pTip[1] - t.base[1];
+        const axisScreenLen = Math.hypot(dxTip, dyTip);
+        dragMode = state.gizmoMode === 'rotate' ? 'axis-rotate' : 'axis';
+        state.dragAxis = ax;
+        state.axisDragJoint = state.selectedJoint;
+        state.axisAccum = 0;
+        state.axisAngleTotal = 0;
+        state.dragStartFocus = (dragMode === 'axis' ? fkSel.origins[focusIdx] : jPivot).slice();
+        state.axisVecWorld = axisVecWorld;
+        state.axisDragTip = t;
+        state.axisScreenLen = axisScreenLen;
+        state.axisPxPerMeter = axisScreenLen > 12 ? (axisScreenLen / 0.20) : Math.max(60, (state.pxPerUnit || 270) * 0.65);
+        state.axisFacing = Math.abs(facing);
+        state.axisScreenUnit = axisScreenLen > 4 ? [dxTip / axisScreenLen, dyTip / axisScreenLen] : [1, 0];
+        state.axisIKQ = qSel.slice();
+        state.axisEEStart = fkSel.ee.slice();
+        state.axisCenterScreen = [t.base[0], t.base[1]];
+        state.axisAnglePrev = Math.atan2(my - t.base[1], mx - t.base[0]);
+        state.axisSign = facing >= 0 ? -1 : 1;
+        dragMoved = false;
+        last = { x: mx, y: my };
+        state.dragInfo = null;
+        cv.style.cursor = 'grabbing';
+        return;
+      }
+    }
+    // 2) joint snap-pick → select & open #jointPanel + immediately arm composite drag on the round ball
+    let bestJoint = -1, bestJointD = 18;
+    for (let i = 0; i < state.jointScreen.length; i++) {
+      const d = Math.hypot(mx - state.jointScreen[i][0], my - state.jointScreen[i][1]);
+      if (d < bestJointD) { bestJointD = d; bestJoint = i; }
+    }
+    if (bestJoint >= 0) {
+      state.jointWasAlreadySelected = (state.selectedJoint === bestJoint && state.jointPanelOpen);
+      state.selectedJoint = bestJoint;
+      openJointPanel(bestJoint, e.clientX, e.clientY);
+      armJointFreeDrag(bestJoint, mx, my);
+      renderSetupPreview();
+      const sel = document.getElementById('selInfo');
+      if (sel) sel.textContent = 'j' + (bestJoint + 1) + ' seçili — yuvarlak top: bileşik / oklar: XYZ';
+      return;
+    }
+    // 3) limb segment click → floating editor
+    const limb = nearestLimb(mx, my);
+    if (limb >= 0) {
+      openLimbPanel(limb, e.clientX, e.clientY);
+      return;
+    }
+    // 4) target or gripper drag (existing)
+    const hit = hitHandle(mx, my);
+    if (hit) {
+      dragMode = hit;
+      dragMoved = false;
+      last = { x: mx, y: my };
+      if (dragMode === 'target') dragConst = state.target[planeAxis()];
+      else if (dragMode === 'gripper') {
+        dragConst = forwardKinematics(Q0, state.links).ee[planeAxis()];
+        state.ikQ = Q0.slice();
+      }
+      state.dragInfo = { plane: state.dragPlane, constVal: dragConst };
+      cv.style.cursor = 'grabbing';
+      return;
+    }
+    // 5) empty space → clear selection & close floating panels (keep orbit)
+    state.selectedJoint = -1;
+    closeLimbPanel();
+    closeJointPanel(false);
+    dragMode = 'orbit';
+    dragMoved = false;
+    last = { x: mx, y: my };
+    state.dragInfo = null;
+    cv.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mouseup', () => {
+    if (dragMode === 'joint-free') {
+      if (!dragMoved && state.jointWasAlreadySelected) {
+        closeJointPanel(false);
+        state.selectedJoint = -1;
+        renderSetupPreview();
+      } else if (dragMoved) {
+        enterSetupMode();
+      }
+      state.jointWasAlreadySelected = false;
+    } else if ((dragMode === 'target' || dragMode === 'gripper' || dragMode === 'axis' || dragMode === 'axis-rotate') && dragMoved) {
+      enterSetupMode();
+    }
+    dragMode = null;
+    state.dragInfo = null;
+    cv.style.cursor = 'grab';
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragMode) {
+      // idle hover: highlight nearest joint (magnetic snap)
+      if (e.target === cv) {
+        const { mx, my } = canvasXY(e);
+        let best = -1, bestD = 26;
+        for (let i = 0; i < state.jointScreen.length; i++) {
+          const d = Math.hypot(mx - state.jointScreen[i][0], my - state.jointScreen[i][1]);
+          if (d < bestD) { bestD = d; best = i; }
+        }
+        if (best !== state.hoverJoint) {
+          state.hoverJoint = best;
+          renderSetupPreview();
+        }
+      }
+      return;
+    }
+    e.preventDefault();
+    const { mx, my } = canvasXY(e);
+    if (dragMode === 'pan') {
+      state.camPan.x += mx - last.x;
+      state.camPan.y += my - last.y;
+      last = { x: mx, y: my };
+      updateUIFrame(state.frameIdx);
+      return;
+    }
+    if (Math.hypot(mx - last.x, my - last.y) > 1.5) dragMoved = true;
+    if (dragMode === 'orbit') {
+      state.camYaw += (mx - last.x) * 0.007;
+      state.camPitch = clamp(state.camPitch + (my - last.y) * 0.007, -Math.PI / 2, Math.PI / 2);
+      if (dragMoved) {
+        state.camView = 'custom';
+        document.querySelectorAll('#camViewGroup .cam-view-btn').forEach(btn => btn.classList.remove('active'));
+      }
+      last = { x: mx, y: my };
+      updateUIFrame(state.frameIdx);
+      return;
+    }
+    if (dragMode === 'joint-free') {
+      const cyC = Math.cos(state.camYaw), syC = Math.sin(state.camYaw);
+      const cpC = Math.cos(state.camPitch), spC = Math.sin(state.camPitch);
+      const camRight = [cyC, -syC, 0];
+      const camUp = [-spC * syC, -spC * cyC, cpC];
+      const sc = Math.max(40, state.pxPerUnit || 270);
+      const dxW = (mx - state.jointDragStartScreen[0]) / sc;
+      const dzW = -(my - state.jointDragStartScreen[1]) / sc;
+      const tgt = add3(state.jointStartFocus, add3(scale3(camRight, dxW), scale3(camUp, dzW)));
+      const q = solveIKFocus(state.jointDragIdx, tgt, 60, state.jointIKQ);
+      state.jointIKQ = q.slice();
+      setJointSlidersFromQ(q);
+      Q0 = q;
+      syncControlsFromUI();
+      enterSetupMode();
+      last = { x: mx, y: my };
+      return;
+    }
+    if (dragMode === 'axis') {
+      // Single-axis constrained translation along World X, Y, or Z
+      const dx = mx - last.x, dy = my - last.y;
+      const pxPerM = Math.max(40, state.axisPxPerMeter || state.pxPerUnit || 270);
+      let along;
+      if (state.axisScreenLen > 12) {
+        along = dx * state.axisScreenUnit[0] + dy * state.axisScreenUnit[1];
+      } else {
+        along = dx * 0.65;
+      }
+      state.axisAccum += along;
+      const delta = state.axisAccum / pxPerM;
+      const start = state.dragStartFocus;
+      const u = state.axisVecWorld;
+      const focusIdx = effectiveFocusOriginIdx(state.axisDragJoint);
+      const tgt = [start[0] + u[0] * delta,
+                   start[1] + u[1] * delta,
+                   start[2] + u[2] * delta];
+      let q = solveIKFocus(state.axisDragJoint, tgt, 60, state.axisIKQ);
+      const perpDist = (qq) => {
+        const f = forwardKinematics(qq, state.links).origins[focusIdx];
+        const d = [f[0] - start[0], f[1] - start[1], f[2] - start[2]];
+        const tproj = d[0] * u[0] + d[1] * u[1] + d[2] * u[2];
+        return Math.hypot(d[0] - tproj * u[0], d[1] - tproj * u[1], d[2] - tproj * u[2]);
+      };
+      const p1 = perpDist(q);
+      if (p1 > 0.003) {
+        const f = forwardKinematics(q, state.links).origins[focusIdx];
+        const d = [f[0] - start[0], f[1] - start[1], f[2] - start[2]];
+        const tproj = d[0] * u[0] + d[1] * u[1] + d[2] * u[2];
+        const nearest = [start[0] + u[0] * tproj, start[1] + u[1] * tproj, start[2] + u[2] * tproj];
+        const q2 = solveIKFocus(state.axisDragJoint, nearest, 40, q);
+        if (perpDist(q2) < p1) q = q2;
+      }
+      state.axisIKQ = q.slice();
+      setJointSlidersFromQ(q);
+      Q0 = q;
+      syncControlsFromUI();
+      enterSetupMode();
+      last = { x: mx, y: my };
+      return;
+    }
+    if (dragMode === 'axis-rotate') {
+      const c = state.axisCenterScreen;
+      const angleNow = Math.atan2(my - c[1], mx - c[0]);
+      let dA = angleNow - state.axisAnglePrev;
+      while (dA > Math.PI) dA -= 2 * Math.PI;
+      while (dA < -Math.PI) dA += 2 * Math.PI;
+      const dTheta = (state.axisFacing > 0.30 ? dA * state.axisSign : (mx - last.x) * 0.014);
+      state.axisAngleTotal += dTheta;
+      state.axisAnglePrev = angleNow;
+      const jIdx = state.axisDragJoint;
+      const ax = state.dragAxis;
+      const directMap = {
+        '0_z': 0, '0_y': 1,
+        '1_z': 0, '1_y': 1,
+        '2_y': 2, '2_x': 5, '2_z': 0,
+        '3_x': 5, '3_y': 3, '3_z': 4,
+        '4_x': 5, '4_y': 3, '4_z': 4,
+        '5_x': 5, '5_y': 3, '5_z': 4
+      };
+      const mappedJ = directMap[jIdx + '_' + ax];
+      let q;
+      if (mappedJ !== undefined && !state.locked[mappedJ]) {
+        q = (state.axisIKQ || Q0).slice();
+        const L = state.links[mappedJ].limits_deg;
+        const lo = L[0] * DEG, hi = L[1] * DEG;
+        q[mappedJ] = Math.max(lo, Math.min(hi, q[mappedJ] + dTheta));
+      } else {
+        const O = state.dragStartFocus;
+        const n = state.axisVecWorld;
+        const p = sub3(state.axisEEStart, O);
+        const th = state.axisAngleTotal;
+        const cosT = Math.cos(th), sinT = Math.sin(th);
+        const crossNP = cross3(n, p);
+        const dotNP = n[0]*p[0] + n[1]*p[1] + n[2]*p[2];
+        const pRot = [
+          p[0]*cosT + crossNP[0]*sinT + n[0]*dotNP*(1 - cosT),
+          p[1]*cosT + crossNP[1]*sinT + n[1]*dotNP*(1 - cosT),
+          p[2]*cosT + crossNP[2]*sinT + n[2]*dotNP*(1 - cosT)
+        ];
+        const tgtEE = add3(O, pRot);
+        q = solveIK(state.axisIKQ || Q0, tgtEE, state.links, 50, 0.03).q;
+      }
+      state.axisIKQ = q.slice();
+      setJointSlidersFromQ(q);
+      Q0 = q;
+      syncControlsFromUI();
+      enterSetupMode();
+      last = { x: mx, y: my };
+      return;
+    }
+    const prev = dragMode === 'target' ? state.target.slice()
+      : forwardKinematics(Q0, state.links).ee;
+    const pt = screenToWorldOnPlane(mx, my, state.dragPlane, dragConst, prev);
+    if (dragMode === 'target') {
+      const tx = clamp(pt[0], parseFloat(document.getElementById('rngTx').min),
+                       parseFloat(document.getElementById('rngTx').max));
+      const ty = clamp(pt[1], parseFloat(document.getElementById('rngTy').min),
+                       parseFloat(document.getElementById('rngTy').max));
+      const tz = clamp(pt[2], parseFloat(document.getElementById('rngTz').min),
+                       parseFloat(document.getElementById('rngTz').max));
+      document.getElementById('rngTx').value = tx.toFixed(2);
+      document.getElementById('rngTy').value = ty.toFixed(2);
+      document.getElementById('rngTz').value = tz.toFixed(2);
+      syncControlsFromUI();
+      enterSetupMode();
+      return;
+    }
+    // gripper drag → solve IK live and reflect in the joint sliders
+    const sol = solveIK(state.ikQ || Q0, pt, state.links, 40, 0.03);
+    state.ikQ = sol.q;
+    setJointSlidersFromQ(sol.q);
+    Q0 = sol.q;
+    syncControlsFromUI();
+    enterSetupMode();
+  });
+}
+// Export Markdown Academic Report & CSV
+document.getElementById('btnExportMd').addEventListener('click', () => {
+  runAllComparison();
+  const assess = computePreReachAssessment();
+  const lines = [
+    '# İnsansı Stereo Perspektif (Looming) & Singularity Kontrollü Ulaşma Raporu',
+    '',
+    '## 1. Kamera ve Kol Geometrisi Parametreleri',
+    `- **Kamera Konumu (Eklem-1 Omuz Üstü/Arkası):** X = ${(state.camPos[0]*100).toFixed(1)} cm, Z = ${(state.camPos[2]*100).toFixed(1)} cm, Baseline B = ${(state.baseline*1000).toFixed(0)} mm`,
+    `- **Kol Uzunlukları:** Üst Kol L2 = ${(state.links[1].a*100).toFixed(1)} cm, Ön Kol L3 = ${(state.links[2].a*100).toFixed(1)} cm (Güvenli Singularity Sınırı = ${assess.maxSafeCm.toFixed(1)} cm)`,
+    `- **Aktif Kamera Paralks Tahmini:** Hedef Mesafesi = ${assess.distCm.toFixed(1)} cm, Paralks Kayması = ${assess.parallaxPx.toFixed(2)} px, Ulaşılabilir = ${assess.reachable ? 'EVET' : 'SINIR DIŞI'}`,
+    '',
+    '## 2. Kontrol Modelleri Karşılaştırma Tablosu',
+    '| Kontrol Modeli | Yerleşme Süresi (s) | Hedefi Aşma (%) | Başlangıç İvmesi (m/s²) | İlk Yaklaşım Hatası E_init (mm) | Kompanzasyon T_comp | El Perspektif Boyu (Baş->Son px) | Min Singularity w(q) | Tepe Tork (Nm) | Görsel Yük L_vis (Hz) | Darbe Verimi η_pulse (%) |',
+    '|---|---|---|---|---|---|---|---|---|---|---|'
+  ];
+  const labelsLookup = {
+    hlsl: 'HLSL (Bizim Modelimiz)',
+    governor: 'Governor (Basamak)',
+    pid: 'Klasik PID',
+    lqr: 'LQR Durum Geri Besleme',
+    fixed: 'Sabit Kazanç (P)',
+    bio: 'Biyomimetik Pulse',
+    hdap: 'İnsan-HDA'
+  };
+  Object.keys(state.compareResults).forEach(k => {
+    const m = state.compareResults[k];
+    lines.push(`| ${labelsLookup[k] || k} | ${m.mt.toFixed(2)} | ${m.overshootPct.toFixed(1)} % | ${m.onsetAcc.toFixed(2)} | ${(m.eInitMm || 0).toFixed(1)} | ${m.tComp.toFixed(2)} s (${(m.tCompPct || 0).toFixed(0)} %) | ${m.sgStart.toFixed(1)} -> ${m.sgEnd.toFixed(1)} | ${m.minW.toFixed(4)} | ${m.peakTau.toFixed(1)} | ${(m.visualLoadHz || 100).toFixed(1)} | ${(m.pulseEffPct || 0).toFixed(0)} % |`);
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'insansi_stereo_looming_raporu.md';
+  a.click();
+});
+document.getElementById('btnExportCsv').addEventListener('click', () => {
+  const tr = state.traj;
+  if (!tr) return;
+  const m = tr.metrics;
+  const rows = ['# e_init_mm,t_ballistic_s,t_comp_s,t_comp_pct,mt_s,overshoot_pct,visual_load_hz,pulse_eff_pct'];
+  rows.push([(m.eInitMm || 0).toFixed(3), (m.tBallistic || 0).toFixed(3), (m.tComp || 0).toFixed(4), (m.tCompPct || 0).toFixed(2), m.mt.toFixed(3), m.overshootPct.toFixed(3), (m.visualLoadHz || 100).toFixed(2), (m.pulseEffPct || 0).toFixed(2)].join(','));
+  rows.push('t_s,error_m,speed_mps,accel_mps2,gripper_px,target_px,scale_ratio,manipulability_w,damping_lam,tau1,tau2,tau3');
+  for (let i = 0; i < tr.t.length; i++) {
+    rows.push([
+      tr.t[i].toFixed(3), tr.err[i].toFixed(5), tr.vel[i].toFixed(4), tr.acc[i].toFixed(4),
+      tr.sgPx[i].toFixed(2), tr.stPx[i].toFixed(2), tr.scaleRatio[i].toFixed(4),
+      tr.w[i].toFixed(5), tr.lam[i].toFixed(4),
+      tr.tau[i][0].toFixed(2), tr.tau[i][1].toFixed(2), tr.tau[i][2].toFixed(2)
+    ].join(','));
+  }
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'stereo_looming_trajectory.csv';
+  a.click();
+});
+// Initialize on load: play a demo reach (HLSL vs baselines). Any change flips
+// the page into setup mode — the user tunes the reach, then presses
+// "Simülasyonu Başlat" again.
+buildJointSliders();
+buildLockGrid();
+refreshCustomList();
+setJointSlidersFromQ(POSTURES[Object.keys(POSTURES)[0]].map(d => d * DEG));
+populateSubModes();
+applySpeedTier(false);
+syncControlsFromUI();
+bindViewControls();
+bindSettingsStore();
+enterSetupMode();
+runAllComparison();
+runAndAnimate();
+</script>
+</body>
+</html>
+"""

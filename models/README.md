@@ -13,6 +13,7 @@ complete working example.
 | file | description |
 |---|---|
 | `six_axis_arm.json` | design-study 6R arm: 0.96 m reach, harmonic-drive joints, BLDC drives, 15.1 kg |
+| `human_arm.json` | human-limb-proportioned 6R humanoid arm: upper arm 0.31 m, forearm 0.26 m, hand 0.12 m; shoulder height 0.90 m; ~5.0 kg arm; `q2 = 0` is the neutral hanging pose (arm down, gravity torque ≈ 0); named postures embedded (`hanging_natural`, `hanging_vertical`, `ready_desk`, `reach_high`) |
 
 ## Validity
 

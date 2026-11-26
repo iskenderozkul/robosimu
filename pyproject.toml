@@ -4,15 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "robosimu"
-version = "0.1.0"
-description = "Dependency-light 6-axis arm simulator: kinematics, dynamics, motors, energy"
+version = "0.6.0"
+description = "Oracle-free visual reaching (Perceptual 1/e Governor) and a dependency-light arm simulator: kinematics, dynamics, motors, energy"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
+authors = [{ name = "Iskender Ozkul", email = "iskenderaksaray@gmail.com" }]
 dependencies = ["numpy>=1.24", "Pillow>=9.0"]
 
 [project.optional-dependencies]
-dev = ["pytest>=7"]
+dev = ["pytest>=7", "matplotlib>=3.6", "pandas>=1.5"]
+
+[project.urls]
+Homepage = "https://iskenderozkul.github.io/robosimu/"
+Source = "https://github.com/iskenderozkul/robosimu"
 
 [project.scripts]
 robosimu = "robosimu.cli:main"

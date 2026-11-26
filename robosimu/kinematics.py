@@ -25,6 +25,7 @@ def forward_kinematics(model: ArmModel, q) -> tuple[list[np.ndarray], list[np.nd
     """
     q = np.asarray(q, float)
     T = np.eye(4)
+    T[:3, 3] = model.base_origin
     Ts: list[np.ndarray] = []
     frames = [T.copy()]
     for i, link in enumerate(model.links):
@@ -57,6 +58,66 @@ def point_position(model: ArmModel, q, link_index: int, point=None) -> np.ndarra
 def end_effector_position(model: ArmModel, q) -> np.ndarray:
     _, frames = forward_kinematics(model, q)
     return frames[-1][:3, 3].copy()
+
+
+def end_effector_rotation(model: ArmModel, q) -> np.ndarray:
+    """Return 3x3 SO(3) rotation matrix of the end-effector frame in base coordinates."""
+    _, frames = forward_kinematics(model, q)
+    return frames[-1][:3, :3].copy()
+
+
+def end_effector_pose(model: ArmModel, q) -> tuple[np.ndarray, np.ndarray]:
+    """Return full SE(3) pose as ``(position_3, rotation_3x3)`` in base coordinates."""
+    _, frames = forward_kinematics(model, q)
+    T = frames[-1]
+    return T[:3, 3].copy(), T[:3, :3].copy()
+
+
+def build_grasp_rotation_so3(roll_deg: float, pitch_deg: float, yaw_deg: float) -> np.ndarray:
+    """Construct a 3x3 SO(3) grasp rotation matrix consistent with the 6-DOF DH wrist frame."""
+    rl, el, az = np.radians([float(roll_deg), float(pitch_deg), float(yaw_deg)])
+    zd = np.array([np.cos(el) * np.cos(az), np.cos(el) * np.sin(az), np.sin(el)], dtype=float)
+    x0 = np.array([np.sin(az), -np.cos(az), 0.0], dtype=float)
+    y0 = np.cross(zd, x0)
+    ny = float(np.linalg.norm(y0))
+    if ny > 1e-9:
+        y0 = y0 / ny
+    else:
+        y0 = np.array([0.0, 1.0, 0.0], dtype=float)
+    xd = np.cos(rl) * x0 + np.sin(rl) * y0
+    yd = -np.sin(rl) * x0 + np.cos(rl) * y0
+    return np.column_stack([xd, yd, zd])
+
+
+def extract_rpy_deg(R: np.ndarray) -> np.ndarray:
+    """Extract (roll_x, pitch_y, yaw_z) in degrees matching ``build_grasp_rotation_so3``."""
+    R = np.asarray(R, float)
+    zd = R[:, 2]
+    az = float(np.arctan2(zd[1], zd[0]))
+    el = float(np.arctan2(zd[2], np.hypot(zd[0], zd[1])))
+    x0 = np.array([np.sin(az), -np.cos(az), 0.0], dtype=float)
+    y0 = np.cross(zd, x0)
+    ny = float(np.linalg.norm(y0))
+    if ny > 1e-9:
+        y0 = y0 / ny
+    else:
+        y0 = np.array([0.0, 1.0, 0.0], dtype=float)
+    rl = float(np.arctan2(np.dot(R[:, 0], y0), np.dot(R[:, 0], x0)))
+    return np.degrees(np.array([rl, el, az], dtype=float))
+
+
+def orientation_error_so3(R_current: np.ndarray, R_desired: np.ndarray) -> tuple[np.ndarray, float]:
+    """Return 3D axis-angle vector error in base frame and geodesic angle (deg) in SO(3)."""
+    Rc = np.asarray(R_current, float)
+    Rd = np.asarray(R_desired, float)
+    e_w = 0.5 * (
+        np.cross(Rc[:, 0], Rd[:, 0])
+        + np.cross(Rc[:, 1], Rd[:, 1])
+        + np.cross(Rc[:, 2], Rd[:, 2])
+    )
+    cos_ang = float(np.clip((np.trace(Rd.T @ Rc) - 1.0) * 0.5, -1.0, 1.0))
+    deg = float(np.degrees(np.arccos(cos_ang)))
+    return e_w, deg
 
 
 def jacobian(model: ArmModel, q, link_index: int, point=None) -> np.ndarray:

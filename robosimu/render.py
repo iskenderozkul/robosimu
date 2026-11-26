@@ -171,12 +171,16 @@ def save_error_plot(results, path, size=(760, 420)):
     return path
 
 
-def save_html(model, result, path, every=2):
+def save_html(model, result, path, every=2, postures=None):
     """Write a self-contained interactive HTML viewer.
 
     The file embeds the model DH parameters and a subsampled trajectory; the
     browser recomputes forward kinematics, so the six joint sliders move the
     arm live and the trajectory can be scrubbed or played back.
+
+    If ``postures`` is given (a mapping of preset name to joint angles in
+    degrees, e.g. from the model JSON), the workbench offers them as the
+    selectable initial poses.
     """
     idx = list(range(0, len(result.q), every))
     if idx[-1] != len(result.q) - 1:
@@ -191,6 +195,13 @@ def save_html(model, result, path, every=2):
                 "d": l.d,
                 "theta_offset_deg": math.degrees(l.theta_offset),
                 "limits_deg": [math.degrees(l.limits[0]), math.degrees(l.limits[1])],
+                "mass": l.mass,
+                "stall_torque": l.motor.stall_torque,
+                "continuous_torque": l.motor.continuous_torque,
+                "brake_torque_nm": l.motor.brake_torque_nm,
+                "gear_ratio": l.motor.gear_ratio,
+                "viscous_friction": l.motor.viscous_friction,
+                "speed_limit": l.motor.speed_limit,
             }
             for l in model.links
         ],
@@ -205,7 +216,13 @@ def save_html(model, result, path, every=2):
         "controller": result.controller,
         "energy": float(result.energy),
     }
-    html = _HTML_TEMPLATE.replace("__TITLE__", f"{model.name} — {result.controller}")
+    if getattr(model, 'base_origin', None) is not None:
+        data["base_origin"] = model.base_origin.tolist()
+    if postures:
+        data["postures"] = {k: [float(v) for v in vals]
+                            for k, vals in postures.items()}
+    from .workbench_html import WORKBENCH_HTML_TEMPLATE
+    html = WORKBENCH_HTML_TEMPLATE.replace("__TITLE__", f"{model.name} — {result.controller}")
     html = html.replace("/*__DATA__*/", json.dumps(data))
     Path(path).write_text(html, encoding="utf-8")
     return path

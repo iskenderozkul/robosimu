@@ -1,0 +1,878 @@
+{
+  "c_tol_pct": 0.5,
+  "kappa_star": 0.36787944117144233,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "delays": [
+    0.03,
+    0.06,
+    0.1,
+    0.15,
+    0.2
+  ],
+  "per_delay": {
+    "0.030": {
+      "c_max": {
+        "dps": 0.3,
+        "gov": 0.6
+      },
+      "frontier": {
+        "dps": {
+          "c": 0.3,
+          "mt_median": 0.63,
+          "frontier_distance_pct": 1.6129032258064528
+        },
+        "gov": {
+          "c": 0.05,
+          "mt_median": 0.62,
+          "frontier_distance_pct": 0.0
+        }
+      },
+      "h3_ok": {
+        "dps": false,
+        "gov": false
+      },
+      "scans": {
+        "dps": [
+          {
+            "c": 0.05,
+            "overshoot_max": 0.0,
+            "mt_median": 2.21,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.1,
+            "overshoot_max": 0.0,
+            "mt_median": 1.15,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.15,
+            "overshoot_max": 0.0,
+            "mt_median": 0.8600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.2,
+            "overshoot_max": 0.0,
+            "mt_median": 0.73,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.25,
+            "overshoot_max": 0.0,
+            "mt_median": 0.6699999999999999,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.3,
+            "overshoot_max": 0.04600000000000429,
+            "mt_median": 0.63,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.35,
+            "overshoot_max": 1.037554012345685,
+            "mt_median": 0.6100000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.39999999999999997,
+            "overshoot_max": 2.196296296296302,
+            "mt_median": 0.6000000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.44999999999999996,
+            "overshoot_max": 2.9875000000000043,
+            "mt_median": 0.5900000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.49999999999999994,
+            "overshoot_max": 4.21296296296297,
+            "mt_median": 0.5900000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.5499999999999999,
+            "overshoot_max": 5.305555555555565,
+            "mt_median": 0.5900000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.6,
+            "overshoot_max": 6.166666666666675,
+            "mt_median": 0.5900000000000001,
+            "settled_rate": 1.0
+          }
+        ],
+        "gov": [
+          {
+            "c": 0.05,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.1,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.15,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.2,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.25,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.3,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.35,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.39999999999999997,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.44999999999999996,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.49999999999999994,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.5499999999999999,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.6,
+            "overshoot_max": 0.1969991896157341,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          }
+        ]
+      }
+    },
+    "0.060": {
+      "c_max": {
+        "dps": 0.3,
+        "gov": 0.6
+      },
+      "frontier": {
+        "dps": {
+          "c": 0.3,
+          "mt_median": 0.75,
+          "frontier_distance_pct": 8.695652173913052
+        },
+        "gov": {
+          "c": 0.05,
+          "mt_median": 0.69,
+          "frontier_distance_pct": 0.0
+        }
+      },
+      "h3_ok": {
+        "dps": false,
+        "gov": false
+      },
+      "scans": {
+        "dps": [
+          {
+            "c": 0.05,
+            "overshoot_max": 0.0,
+            "mt_median": 3.0,
+            "settled_rate": 0.0
+          },
+          {
+            "c": 0.1,
+            "overshoot_max": 0.0,
+            "mt_median": 2.085,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.15,
+            "overshoot_max": 0.0,
+            "mt_median": 1.36,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.2,
+            "overshoot_max": 0.0,
+            "mt_median": 1.04,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.25,
+            "overshoot_max": 0.0,
+            "mt_median": 0.8600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.3,
+            "overshoot_max": 0.0,
+            "mt_median": 0.75,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.35,
+            "overshoot_max": 0.6217547582304571,
+            "mt_median": 0.6799999999999999,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.39999999999999997,
+            "overshoot_max": 2.0358024691358034,
+            "mt_median": 0.64,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.44999999999999996,
+            "overshoot_max": 3.481249999999999,
+            "mt_median": 0.6100000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.49999999999999994,
+            "overshoot_max": 5.335648148148149,
+            "mt_median": 0.6000000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.5499999999999999,
+            "overshoot_max": 7.319444444444445,
+            "mt_median": 0.6000000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.6,
+            "overshoot_max": 8.591666666666674,
+            "mt_median": 0.5900000000000001,
+            "settled_rate": 1.0
+          }
+        ],
+        "gov": [
+          {
+            "c": 0.05,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.1,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.15,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.2,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.25,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.3,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.35,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.39999999999999997,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.44999999999999996,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.49999999999999994,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.5499999999999999,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.6,
+            "overshoot_max": 0.35053662975716643,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          }
+        ]
+      }
+    },
+    "0.100": {
+      "c_max": {
+        "dps": 0.35,
+        "gov": 0.6
+      },
+      "frontier": {
+        "dps": {
+          "c": 0.35,
+          "mt_median": 0.8,
+          "frontier_distance_pct": 0.0
+        },
+        "gov": {
+          "c": 0.05,
+          "mt_median": 0.8,
+          "frontier_distance_pct": 0.0
+        }
+      },
+      "h3_ok": {
+        "dps": true,
+        "gov": false
+      },
+      "scans": {
+        "dps": [
+          {
+            "c": 0.05,
+            "overshoot_max": 0.0,
+            "mt_median": 3.0,
+            "settled_rate": 0.0
+          },
+          {
+            "c": 0.1,
+            "overshoot_max": 0.0,
+            "mt_median": 3.0,
+            "settled_rate": 0.125
+          },
+          {
+            "c": 0.15,
+            "overshoot_max": 0.0,
+            "mt_median": 2.165,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.2,
+            "overshoot_max": 0.0,
+            "mt_median": 1.53,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.25,
+            "overshoot_max": 0.0,
+            "mt_median": 1.1800000000000002,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.3,
+            "overshoot_max": 0.0,
+            "mt_median": 0.96,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.35,
+            "overshoot_max": 0.4108613055526583,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.39999999999999997,
+            "overshoot_max": 1.8584949759999903,
+            "mt_median": 0.71,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.44999999999999996,
+            "overshoot_max": 4.134108854166666,
+            "mt_median": 0.65,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.49999999999999994,
+            "overshoot_max": 6.775,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.5499999999999999,
+            "overshoot_max": 9.60191666666666,
+            "mt_median": 0.6100000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.6,
+            "overshoot_max": 12.095999999999997,
+            "mt_median": 0.6000000000000001,
+            "settled_rate": 1.0
+          }
+        ],
+        "gov": [
+          {
+            "c": 0.05,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.1,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.15,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.2,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.25,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.3,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.35,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.39999999999999997,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.44999999999999996,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.49999999999999994,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.5499999999999999,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.6,
+            "overshoot_max": 0.26061909505695985,
+            "mt_median": 0.8,
+            "settled_rate": 1.0
+          }
+        ]
+      }
+    },
+    "0.150": {
+      "c_max": {
+        "dps": 0.35,
+        "gov": 0.6
+      },
+      "frontier": {
+        "dps": {
+          "c": 0.35,
+          "mt_median": 1.0,
+          "frontier_distance_pct": 3.092783505154642
+        },
+        "gov": {
+          "c": 0.05,
+          "mt_median": 0.97,
+          "frontier_distance_pct": 0.0
+        }
+      },
+      "h3_ok": {
+        "dps": true,
+        "gov": false
+      },
+      "scans": {
+        "dps": [
+          {
+            "c": 0.05,
+            "overshoot_max": 0.0,
+            "mt_median": 3.0,
+            "settled_rate": 0.0
+          },
+          {
+            "c": 0.1,
+            "overshoot_max": 0.0,
+            "mt_median": 3.0,
+            "settled_rate": 0.0
+          },
+          {
+            "c": 0.15,
+            "overshoot_max": 0.0,
+            "mt_median": 3.0,
+            "settled_rate": 0.25
+          },
+          {
+            "c": 0.2,
+            "overshoot_max": 0.0,
+            "mt_median": 2.2600000000000002,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.25,
+            "overshoot_max": 0.0,
+            "mt_median": 1.655,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.3,
+            "overshoot_max": 0.0,
+            "mt_median": 1.27,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.35,
+            "overshoot_max": 0.1927582281834119,
+            "mt_median": 1.0,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.39999999999999997,
+            "overshoot_max": 1.5089144225185251,
+            "mt_median": 0.81,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.44999999999999996,
+            "overshoot_max": 4.055217125000004,
+            "mt_median": 0.71,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.49999999999999994,
+            "overshoot_max": 7.39658950617282,
+            "mt_median": 0.65,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.5499999999999999,
+            "overshoot_max": 11.478639351851855,
+            "mt_median": 0.63,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.6,
+            "overshoot_max": 15.882399999999992,
+            "mt_median": 0.6100000000000001,
+            "settled_rate": 1.0
+          }
+        ],
+        "gov": [
+          {
+            "c": 0.05,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.1,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.15,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.2,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.25,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.3,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.35,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.39999999999999997,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.44999999999999996,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.49999999999999994,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.5499999999999999,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.6,
+            "overshoot_max": 0.36425487518924393,
+            "mt_median": 0.97,
+            "settled_rate": 1.0
+          }
+        ]
+      }
+    },
+    "0.200": {
+      "c_max": {
+        "dps": 0.35,
+        "gov": 0.6
+      },
+      "frontier": {
+        "dps": {
+          "c": 0.35,
+          "mt_median": 1.22,
+          "frontier_distance_pct": 5.172413793103433
+        },
+        "gov": {
+          "c": 0.05,
+          "mt_median": 1.1600000000000001,
+          "frontier_distance_pct": 0.0
+        }
+      },
+      "h3_ok": {
+        "dps": true,
+        "gov": false
+      },
+      "scans": {
+        "dps": [
+          {
+            "c": 0.05,
+            "overshoot_max": 0.0,
+            "mt_median": 3.0,
+            "settled_rate": 0.0
+          },
+          {
+            "c": 0.1,
+            "overshoot_max": 0.0,
+            "mt_median": 3.0,
+            "settled_rate": 0.0
+          },
+          {
+            "c": 0.15,
+            "overshoot_max": 0.0,
+            "mt_median": 3.0,
+            "settled_rate": 0.0
+          },
+          {
+            "c": 0.2,
+            "overshoot_max": 0.0,
+            "mt_median": 2.99,
+            "settled_rate": 0.5
+          },
+          {
+            "c": 0.25,
+            "overshoot_max": 0.0,
+            "mt_median": 2.21,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.3,
+            "overshoot_max": 0.0,
+            "mt_median": 1.6400000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.35,
+            "overshoot_max": 0.17383934315833618,
+            "mt_median": 1.22,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.39999999999999997,
+            "overshoot_max": 1.4406541360000023,
+            "mt_median": 0.9299999999999999,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.44999999999999996,
+            "overshoot_max": 3.7730692988281316,
+            "mt_median": 0.77,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.49999999999999994,
+            "overshoot_max": 7.119106445312482,
+            "mt_median": 0.69,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.5499999999999999,
+            "overshoot_max": 11.092927343749984,
+            "mt_median": 0.65,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.6,
+            "overshoot_max": 15.495462499999984,
+            "mt_median": 0.62,
+            "settled_rate": 1.0
+          }
+        ],
+        "gov": [
+          {
+            "c": 0.05,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.1,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.15,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.2,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.25,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.3,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.35,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.39999999999999997,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.44999999999999996,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.49999999999999994,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.5499999999999999,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          },
+          {
+            "c": 0.6,
+            "overshoot_max": 0.3268763041773082,
+            "mt_median": 1.1600000000000001,
+            "settled_rate": 1.0
+          }
+        ]
+      }
+    }
+  }
+}

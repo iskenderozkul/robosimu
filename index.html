@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>robosimu — Oracle'sız görsel uzanma / Oracle-free visual reaching</title>
+<style>
+  :root { --ink:#1f1b16; --muted:#6b6258; --accent:#8c3b1f; --bg:#fbf8f3; --card:#ffffff; --line:#e6ded2; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:var(--bg); line-height:1.55; }
+  main { max-width: 980px; margin: 0 auto; padding: 48px 20px 64px; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-size: 2rem; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 28px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
+  a.card { display:block; text-decoration:none; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 18px 16px; transition: border-color .15s, transform .15s; }
+  a.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .tag { font-size:.75rem; letter-spacing:.04em; text-transform:uppercase; color:var(--accent); font-weight:600; }
+  .card h2 { font-size:1.08rem; margin:6px 0 6px; }
+  .card p { margin:0; color:var(--muted); font-size:.92rem; }
+  .eq { font-family: ui-monospace, Consolas, monospace; background:#f3ece2; padding:10px 12px; border-radius:8px; margin: 18px 0 28px; display:inline-block; }
+  footer { margin-top: 36px; color: var(--muted); font-size: .88rem; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>robosimu</h1>
+  <p class="sub">Enkodersiz, metrik derinliksiz ve gecikme bilgisi olmadan görsel uzanma — yalnız piksel + zaman damgası.<br>
+  Oracle-free visual reaching from pixels and timestamps alone.</p>
+  <div class="eq">k = (1/e) / δ<sub>eff</sub>, &nbsp; δ<sub>eff</sub> = δ<sub>obs</sub> + L + (n−1)T/2 + T/2</div>
+
+  <div class="grid">
+    <a class="card" href="figures/human_arm_workbench.html">
+      <div class="tag">3B · ana simülasyon / main 3D</div>
+      <h2>İnsansı kol 3B laboratuvarı · Human-like arm 3D workbench</h2>
+      <p>İki göz / tek göz, hareketli baş, gövde dönüşü, tekillik ölçüsü, oracle'sız 1/e yasası ve rastgele hacim benchmark'ı. Tarayıcıda çalışır, kurulum yok.</p>
+    </a>
+    <a class="card" href="figures/arm_viewer.html">
+      <div class="tag">3B · 6 eksen / 6-axis</div>
+      <h2>Altı eksenli kol görüntüleyici · Six-axis arm viewer</h2>
+      <p>Eklem kaydırıcıları ve kayıtlı uzanma; makalenin ana robotu.</p>
+    </a>
+    <a class="card" href="figures/v5_oracle_free_lab.html">
+      <div class="tag">2B · öğretim / teaching</div>
+      <h2>Oracle'sız 1/e laboratuvarı · Oracle-free 1/e lab</h2>
+      <p>Gecikme terimi, öğrenilen servo gecikmesi, Broyden ve c kazancını açıp kapatarak ablasyonu canlı görün.</p>
+    </a>
+  </div>
+
+  <footer>
+    Kod ve veri / code and data: <a href="https://github.com/iskenderozkul/robosimu">github.com/iskenderozkul/robosimu</a> · MIT ·
+    Yalnız simülasyon; donanım doğrulaması iddia edilmez / simulation only, no hardware claim.
+  </footer>
+</main>
+</body>
+</html>
