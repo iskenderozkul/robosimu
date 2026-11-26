@@ -10,7 +10,10 @@
 > Kurulum gerekmez. Tüm demolar: **https://iskenderozkul.github.io/robosimu/**
 > Yedek bağlantı (GitHub Pages kapalıysa) · mirror: [raw.githack](https://raw.githack.com/iskenderozkul/robosimu/main/figures/human_arm_workbench.html)
 
-![Oracle-free reach](figures/human_reach_shelf.gif)
+[![3B laboratuvar ekran görüntüsü · 3D workbench screenshot](figures/workbench_screenshot.png)](https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench.html)
+
+*Tarayıcıdaki 3B laboratuvar: sol göz · sağ göz · 3B sahne, altta üstten ve yandan görünüş ve ayar sekmeleri. Görsele tıklayınca canlı simülasyon açılır.*
+*The browser 3D workbench: left eye · right eye · 3D scene, with top and side views and the settings tabs below. Click the image to open the live simulation.*
 
 **Dil / Language:** [Türkçe](#türkçe) · [English](#english)
 
@@ -83,6 +86,13 @@ efferent-kopya ileri modeliyle %3,1'in altında kalır.
 | [**İnsansı kol 3B laboratuvarı**](https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench.html) | Sol göz · sağ göz · 3B sahne; üstten ve yandan görünüş; gövde dönüşü, bilek yönelimi, tek/çift göz, hareketli baş ve hareket paralaksı, tekillik ölçüsü; *Rastgele Hacim* ve *Çapraz Hacim* benchmark düğmeleri |
 | [Altı eksenli kol görüntüleyici](https://iskenderozkul.github.io/robosimu/figures/arm_viewer.html) | Makalenin ana kolu, eklem kaydırıcıları |
 | [Oracle'sız 1/e laboratuvarı (2B)](https://iskenderozkul.github.io/robosimu/figures/v5_oracle_free_lab.html) | Gecikme terimi, öğrenilen gecikme, Broyden ve c kazancıyla canlı ablasyon |
+
+**Python render'ı (GIF) hakkında.** Aşağıdaki animasyon tarayıcı laboratuvarından değil, Python simülatörünün
+çevrimdışı çiziminden gelir (`python -m robosimu simulate models/human_arm.json --posture hanging_natural --target "0.45 0.0 1.10" --controller governor --delay 0.06`).
+Kullanılan kontrolcü **oracle'lı governor**'dır (metrik hata ve gerçek gecikme alır); makaledeki oracle'sız yasa **değildir**.
+Yalnızca insansı kol modelinin sarkık duruştan rafa uzanmasını ve bitki dinamiğini göstermek içindir.
+
+![Python render: oracle'lı governor, insansı kol, 60 ms](figures/human_reach_shelf.gif)
 
 Laboratuvardaki diğer kontrolcüler metrik 3B geri çatım, gerçek gecikme ve eklem
 açısı alır; tork ve enerji gibi bazı göstergeler basitleştirilmiş modellerdir.
@@ -175,11 +185,18 @@ Details: `reports/v5_summary.md`, `reports/v5_tune_fixed.jsonl`,
 | [Six-axis arm viewer](https://iskenderozkul.github.io/robosimu/figures/arm_viewer.html) | the paper's main arm with joint sliders |
 | [Oracle-free 1/e lab (2D)](https://iskenderozkul.github.io/robosimu/figures/v5_oracle_free_lab.html) | toggle the delay term, learned lag, Broyden and the gain c to see the ablation live |
 
+**About the GIF.** The animation below is an offline render of the Python simulator, not the browser
+workbench. Its controller is the **oracle governor** (metric error and true delay), **not** the oracle-free law of the paper;
+it only illustrates the human-like arm model reaching from a hanging posture to a shelf.
+
+![Python render: oracle governor, human-like arm, 60 ms](figures/human_reach_shelf.gif)
+
 The workbench UI is in Turkish. Its other controllers receive metric 3D
 reconstructions, the true delay and joint angles, and some displayed quantities
 (torque, energy) use simplified models; it is meant for exploration. Numbers in
-the paper come from the Python scripts. Rebuild it with
-`python -m robosimu workbench models/human_arm.json --out figures/human_arm_workbench.html`.
+the paper come from the Python scripts. `figures/human_arm_workbench.html` is the maintained
+version of the workbench; the generator template in `robosimu/workbench_html.py` is older and does
+not yet contain the randomised-workspace benchmarks, so do not overwrite the HTML by regenerating it.
 
 ### Reproduce
 

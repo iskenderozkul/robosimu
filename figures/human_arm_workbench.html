@@ -229,7 +229,10 @@
     border-radius: 4px;
     padding: 8px;
     margin: 6px 0 8px 0;
+    overflow-x: auto;
   }
+  .ctrl-diag-wrap .ctrl-diag-svg { min-width: 1180px; }
+  .hw-diag-svg { min-height: 300px; }
   .ctrl-diag-svg {
     width: 100%;
     height: auto;
@@ -525,7 +528,7 @@
   .sym-s { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1b2a41; min-width: 62px; }
 
 
-  .math-illu { display: block; width: 100%; height: 92px; margin: 5px 0 3px; background: #faf9f7; border: 1px solid #e7e5df; border-radius: 4px; }
+  .math-illu { display: block; width: 100%; height: auto; aspect-ratio: 150 / 92; min-height: 150px; max-height: 320px; margin: 6px 0 4px; background: #faf9f7; border: 1px solid #e7e5df; border-radius: 4px; }
   .method-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
   @media (max-width: 1500px) { .method-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .method-item { background: var(--card-alt); border: 1px solid var(--border); border-radius: 5px; padding: 6px 8px; }
@@ -1441,7 +1444,7 @@
     <p>Üç Reddiye (Enkodersiz Enerji Darbesi + Tutma Frenleri · Sabit XYZ Yerine Ordinal Perspektif Konisi · Kesintili S0–S6 Bakış + Çan-Eğrisi HDA/HLSL) Çalışma Tezgahı</p>
   </div>
   <div class="header-actions">
-    <button class="btn" id="btnViewMode" title="Metrik sayıları (cm, px, derece) gizle ve algoritmanın gerçekten gördüğü yalnızca ordinal/perspektif durumu göster">Teorem Görünümü: Sayı Yok</button>
+    <button class="btn" id="btnViewMode" title="Metrik sayıları (cm, px, derece) gizle ve algoritmanın gerçekten gördüğü yalnızca ordinal/perspektif durumu göster">Teorem Modu: KAPALI</button>
     <button class="btn" id="btnConceptGuide" title="Üç Reddiye kuramını ve her panelin neyi kanıtladığını aç/kapat">Kavram &amp; Okuma Rehberi</button>
     <button class="btn" id="btnSymbolGlossary" title="Programdaki tüm sembol ve kısaltmaların açıklaması">Sembol Rehberi</button>
     <button class="btn" id="btnReset">&#8634; Kuruluma Dön</button>
@@ -1466,7 +1469,7 @@
     <div class="concept-item refusal-2">
       <h4>II. Metrik XYZ Reddiyesi — Binoküler Looming &amp; Göreceli Derinlik Konileri</h4>
       <p>Kontrolör (x, y, z) santimetresi veya mutlak derinlik Z hesaplamaz. Omuz üstü iki kameradan el ve hedefin göreceli açısal konisini (u<sub>L</sub>, u<sub>R</sub>, &Delta;u, &Delta;v, &Delta;d) ve <b>perspektif küçülme oranı &rho;_s(t) &rarr; 1.0</b>'ı okuyarak ordinal sınıfa (UZAK &rarr; YAKIN &rarr; TEMAS) göre yaklaşır.</p>
-      <div class="how-test">Nasıl Test Edilir: Üstten <b>Teorem Görünümü: Sayı Yok</b> düğmesini açın ve algoritmanın metrik cm olmadan yalnız ordinal işaretle ulaştığını görün.</div>
+      <div class="how-test">Nasıl Test Edilir: Üstten <b>Teorem Modu</b> düğmesini açın ve algoritmanın metrik cm olmadan yalnız ordinal işaretle ulaştığını görün.</div>
     </div>
     <div class="concept-item refusal-3">
       <h4>III. Sürekli Bakış &amp; P-Kazancı Reddiyesi — S0–S6 Göz Makinesi + HDA/HLSL</h4>
@@ -7079,7 +7082,6 @@ function drawOptic3D(idx) {
 function updateKinematicDiagramLive(tr, idx) {
   try { drawKin3D(idx); } catch (e) {}
   try { drawOptic3D(idx); } catch (e) {}
-  if (!document.getElementById('svgKinematicDiagram')) return;
   const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   // Şema etiketleri Türkçe ondalık virgülle yazılır (60,7 cm gibi).
   const f1 = (v) => Number(v).toFixed(1).replace('.', ',');
@@ -8887,7 +8889,11 @@ document.getElementById('btnResetToStart').addEventListener('click', () => {
 });
 document.getElementById('btnOpenBenchmark').addEventListener('click', () => {
   if (typeof window.__activateTab === 'function') window.__activateTab('tab5');
-  setModeBanner('', 'AKADEMİK BENCHMARK — Sekme 5: ▶ "5-Senaryo Akademik Benchmark Testini Çalıştır" (makale Tablo 5 ile aynı protokol)');
+  setModeBanner('', 'AKADEMİK BENCHMARK — Sekme 5: ▶ "Standart 5-Senaryo Akademik Benchmark Test", "Çapraz Hacim" veya "Rastgele Hacim" düğmesine basın');
+  setTimeout(() => {
+    const b = document.getElementById('btnRunAcademicBenchmark');
+    if (b) { b.scrollIntoView({behavior: 'smooth', block: 'center'}); b.classList.add('qw-flash'); setTimeout(() => b.classList.remove('qw-flash'), 2400); }
+  }, 120);
 });
 document.getElementById('btnRunReach').addEventListener('click', () => {
   if (state.playing) {
@@ -11068,6 +11074,33 @@ bindSettingsStore();
 enterSetupMode();
 runAllComparison();
 runAndAnimate();
+</script>
+
+<style>
+  .ctrl-diag-svg, .math-illu, .hw-diag-svg, .dash-svg { cursor: zoom-in; }
+  #qwZoom { position: fixed; inset: 0; background: rgba(17,24,39,.82); display: none; z-index: 99999;
+            align-items: center; justify-content: center; padding: 3vh 3vw; cursor: zoom-out; }
+  #qwZoom.open { display: flex; }
+  #qwZoom .qwz-box { background: #fff; border-radius: 6px; padding: 14px; width: min(96vw, 1600px); max-height: 94vh; overflow: auto; }
+  #qwZoom .qwz-box svg { width: 100% !important; height: auto !important; max-height: none !important; min-width: 0 !important; cursor: zoom-out; }
+  #qwZoom .qwz-hint { color: #e5e7eb; position: fixed; top: 10px; right: 18px; font: 13px system-ui, sans-serif; }
+  .qw-flash { outline: 3px solid #b45309; outline-offset: 2px; transition: outline-color .3s; }
+</style>
+<div id="qwZoom" role="dialog" aria-label="Büyütülmüş şekil"><div class="qwz-hint">Kapatmak için tıklayın veya Esc</div><div class="qwz-box"></div></div>
+<script>
+(function () {
+  const ov = document.getElementById('qwZoom'), box = ov.querySelector('.qwz-box');
+  const close = () => { ov.classList.remove('open'); box.innerHTML = ''; };
+  document.addEventListener('click', (ev) => {
+    const svg = ev.target.closest && ev.target.closest('svg.ctrl-diag-svg, svg.math-illu, svg.hw-diag-svg, svg.dash-svg');
+    if (!svg || ov.contains(svg)) return;
+    const c = svg.cloneNode(true); c.removeAttribute('id');
+    c.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    box.innerHTML = ''; box.appendChild(c); ov.classList.add('open');
+  });
+  ov.addEventListener('click', close);
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') close(); });
+})();
 </script>
 </body>
 </html>
