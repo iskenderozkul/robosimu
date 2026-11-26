@@ -528,7 +528,7 @@
   .sym-s { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1b2a41; min-width: 62px; }
 
 
-  .math-illu { display: block; width: 100%; height: auto; aspect-ratio: 150 / 92; min-height: 150px; max-height: 320px; margin: 6px 0 4px; background: #faf9f7; border: 1px solid #e7e5df; border-radius: 4px; }
+  .math-illu { display: block; width: 100%; max-width: 520px; height: auto; margin: 8px auto 6px; background: #faf9f7; border: 1px solid #e7e5df; border-radius: 4px; }
   .method-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
   @media (max-width: 1500px) { .method-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .method-item { background: var(--card-alt); border: 1px solid var(--border); border-radius: 5px; padding: 6px 8px; }
@@ -1436,6 +1436,51 @@
   body.overlay-robot-only #sceneOverlay #cv3d { width: 100% !important; height: 100% !important; display: block; }
   body.overlay-robot-only #sceneOverlay { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; flex-direction: column; z-index: 9999; }
 </style>
+
+<style id="qwR2css">
+  .math-summary-row { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 12px !important; }
+  @media (max-width: 1100px) { .math-summary-row { grid-template-columns: 1fr !important; } }
+  .math-mini-card { font-size: 12px !important; line-height: 1.5 !important; }
+  .math-mini-card .mi-title { display: block; font-size: 13px; margin-bottom: 2px; }
+  .math-illu .bd circle { fill: #8c3b1f; }
+  .math-illu .bd text { fill: #ffffff; font: 700 10px Inter, system-ui, sans-serif !important; text-anchor: middle; }
+  .math-illu .ld { stroke: #8c3b1f; stroke-width: 0.9; stroke-dasharray: 2 2; }
+  .math-illu .lb { font-size: 11px; fill: #3a3f47; font-style: italic; }
+  .math-illu .tk { font-size: 9px; fill: #555b64; }
+  .math-illu .bx { font-size: 11px; fill: #1b2a41; font-weight: 600; }
+  .mi-legend { margin: 4px 0 6px 0; padding-left: 0; list-style: none; counter-reset: mi; }
+  .mi-legend li { counter-increment: mi; position: relative; padding-left: 24px; margin: 3px 0; }
+  .mi-legend li::before { content: counter(mi); position: absolute; left: 0; top: 1px; width: 17px; height: 17px; border-radius: 50%;
+     background: #8c3b1f; color: #fff; font: 700 10px/17px Inter, system-ui, sans-serif; text-align: center; }
+  .mi-lines { font-size: 11px; color: #555b64; margin: 2px 0 6px; }
+  .mi-lines .sw { display: inline-block; width: 18px; height: 0; vertical-align: middle; margin: 0 2px 0 6px; border-top: 2px solid; }
+  .mi-lines .sw.g { border-color: #3f6b5a; } .mi-lines .sw.r { border-color: #8b2635; border-top-style: dashed; } .mi-lines .sw.b { border-color: #3d5f8f; }
+  .mf { background: #ffffff; border: 1px solid var(--border); border-left: 3px solid #8c3b1f; border-radius: 3px; padding: 6px 10px; margin: 6px 0;
+        font-family: 'Cambria Math', 'Times New Roman', serif; font-size: 14px; color: #1b2a41; }
+  .mf div { margin: 2px 0; }
+  .mf var, .mi-params var, .mi-legend var, .mi-read var, .mi-title var { font-style: italic; font-family: 'Cambria Math', 'Times New Roman', serif; }
+  .mf sub, .mf sup, .math-mini-card sub, .math-mini-card sup { font-size: 70%; line-height: 0; }
+  .mi-params { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 11.5px; }
+  .mi-params th { text-align: left; background: #eef4f4; font-weight: 600; padding: 3px 6px; border-bottom: 1px solid var(--border); }
+  .mi-params td { padding: 3px 6px; border-bottom: 1px solid #eceae5; vertical-align: top; }
+  .mi-params td:first-child { white-space: nowrap; font-size: 13px; }
+  .mi-read { font-size: 11.5px; color: var(--ink-soft); }
+  #cardPaperPlayer .pp-ctl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0; }
+  #cardPaperPlayer .pp-ctl .btn { font-size: 12px; }
+  #cardPaperPlayer .pp-modes label { display: block; margin: 3px 0; font-size: 12px; }
+  #cardPaperPlayer .pp-status { font: 12px/1.5 Inter, system-ui, sans-serif; background: #f8fafc; border: 1px solid var(--border); border-radius: 4px; padding: 6px 10px; }
+  #cardPaperPlayer .pp-bar { height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; margin: 6px 0; }
+  #cardPaperPlayer .pp-bar i { display: block; height: 100%; width: 0; background: #8c3b1f; transition: width .2s; }
+  #cardPaperPlayer table.pp-tab { width: 100%; border-collapse: collapse; font-size: 11.5px; margin: 6px 0; }
+  #cardPaperPlayer table.pp-tab th, #cardPaperPlayer table.pp-tab td { border: 1px solid #e3e1dc; padding: 3px 6px; text-align: center; }
+  #cardPaperPlayer table.pp-tab th { background: #eef4f4; }
+  #cardPaperPlayer table.pp-tab td:first-child { text-align: left; }
+  #cardPaperPlayer .pp-paper { color: #6b6258; }
+  #cardPaperPlayer .pp-zones { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+  #cardPaperPlayer .pp-zones span { border: 1px solid var(--border); border-radius: 12px; padding: 2px 9px; font-size: 11.5px; background: #fff; }
+  #cardPaperPlayer .pp-zones span.on { background: #8c3b1f; color: #fff; border-color: #8c3b1f; }
+  #cardPaperPlayer .pp-log { max-height: 150px; overflow: auto; font: 11px/1.45 'JetBrains Mono', Consolas, monospace; background: #fbfaf8; border: 1px solid var(--border); padding: 4px 8px; }
+</style>
 </head>
 <body>
 <header>
@@ -1487,80 +1532,80 @@
     <div class="sym-group">
       <h5>A. Uzamsal Kinematik &amp; Geometri</h5>
       <div class="sym-row"><span class="sym-s">F₀</span><span>Sabit taban referans çerçevesi (O₀-XYZ) — enkoder yok, mutlak dünya yok</span></div>
-      <div class="sym-row"><span class="sym-s">F_ee</span><span>Tutucu (el) 3B yönelim çerçevesi — SO(3) grubu içinde RPY</span></div>
-      <div class="sym-row"><span class="sym-s">F_hedef</span><span>Hedef nesne yönelim çerçevesi — SO(3)</span></div>
+      <div class="sym-row"><span class="sym-s">F<sub>ee</sub></span><span>Tutucu (el) 3B yönelim çerçevesi — SO(3) grubu içinde RPY</span></div>
+      <div class="sym-row"><span class="sym-s">F<sub>hedef</sub></span><span>Hedef nesne yönelim çerçevesi — SO(3)</span></div>
       <div class="sym-row"><span class="sym-s">SE(3)</span><span>6-DOF uzaysal tutucu pozu: konum (ℝ³) + yönelim (SO(3)) — yarı-direkt çarpım SO(3)⋊ℝ³</span></div>
-      <div class="sym-row"><span class="sym-s">SO(3)</span><span>3B dönme grubu (roll φ_x, pitch θ_y, yaw ψ_z) — bilek ve kafa yönelimi</span></div>
+      <div class="sym-row"><span class="sym-s">SO(3)</span><span>3B dönme grubu (roll φ<sub>x</sub>, pitch θ<sub>y</sub>, yaw ψ<sub>z</sub>) — bilek ve kafa yönelimi</span></div>
       <div class="sym-row"><span class="sym-s">ẑᵢ</span><span>i-inci eklem eksen vektörü (z₁…z₆; DH konvansiyonu)</span></div>
-      <div class="sym-row"><span class="sym-s">J(q)</span><span>6×6 geometrik Jacobian — [J_v; J_ω]: öteleme + dönme blokları</span></div>
-      <div class="sym-row"><span class="sym-s">J_v / J_ω</span><span>Jacobian'ın ℝ³×⁶ öteleme ve ℝ³×⁶ dönme alt-matrisleri</span></div>
+      <div class="sym-row"><span class="sym-s">J(q)</span><span>6×6 geometrik Jacobian — [J<sub>v</sub>; J<sub>ω</sub>]: öteleme + dönme blokları</span></div>
+      <div class="sym-row"><span class="sym-s">J<sub>v</sub> / J<sub>ω</sub></span><span>Jacobian'ın ℝ³×⁶ öteleme ve ℝ³×⁶ dönme alt-matrisleri</span></div>
       <div class="sym-row"><span class="sym-s">w(q)</span><span>Yoshikawa manipülabilite ölçüsü √det(J·Jᵀ); tekillikte 0</span></div>
       <div class="sym-row"><span class="sym-s">κ(J)</span><span>Jacobian koşul sayısı — tekillik yakınında ∞'a ıraksar</span></div>
-      <div class="sym-row"><span class="sym-s">N(J_v)</span><span>Boşluk uzayı — tork doğurmadan tutucu yönelimini değiştiren eksenel dengede</span></div>
-      <div class="sym-row"><span class="sym-s">θ_bel</span><span>Merkezi sütun (bel) Z₀-ekseni dönüşü — ±60° anatomik limit</span></div>
+      <div class="sym-row"><span class="sym-s">N(J<sub>v</sub>)</span><span>Boşluk uzayı — tork doğurmadan tutucu yönelimini değiştiren eksenel dengede</span></div>
+      <div class="sym-row"><span class="sym-s">θ<sub>bel</sub></span><span>Merkezi sütun (bel) Z₀-ekseni dönüşü — ±60° anatomik limit</span></div>
       <div class="sym-row"><span class="sym-s">d₁</span><span>Omuz yüksekliği (pedestal tabanından eklem 1 eksenine)</span></div>
       <div class="sym-row"><span class="sym-s">y₀</span><span>Klavikula yanal ofseti (omuz-omuz arası ≈ 19 cm)</span></div>
       <div class="sym-row"><span class="sym-s">L₂ / L₃</span><span>Üst kol (humerus) / ön kol uzunluğu (31 / 26 cm)</span></div>
-      <div class="sym-row"><span class="sym-s">L_el</span><span>El (tutucu) uzunluğu — 12 cm</span></div>
-      <div class="sym-row"><span class="sym-s">R_max</span><span>Güvenli 3B erişim yarıçapı (0.88 × ΣL ≈ 61 cm)</span></div>
+      <div class="sym-row"><span class="sym-s">L<sub>el</sub></span><span>El (tutucu) uzunluğu — 12 cm</span></div>
+      <div class="sym-row"><span class="sym-s">R<sub>max</sub></span><span>Güvenli 3B erişim yarıçapı (0.88 × ΣL ≈ 61 cm)</span></div>
       <div class="sym-row"><span class="sym-s">ẑ₆ (Roll)</span><span>j₆ wrist roll — el/tutucu rotasyonu</span></div>
     </div>
     <div class="sym-group">
       <h5>B. Optik, Stereo &amp; Looming</h5>
       <div class="sym-row"><span class="sym-s">B</span><span>İki göz arasındaki baz mesafesi (interpupillary ≈ 65 mm)</span></div>
-      <div class="sym-row"><span class="sym-s">B_boyun</span><span>Tek gözde boyun-paralaks sentetik tabanı — boyut yanılsamasını kırmak için</span></div>
+      <div class="sym-row"><span class="sym-s">B<sub>boyun</sub></span><span>Tek gözde boyun-paralaks sentetik tabanı — boyut yanılsamasını kırmak için</span></div>
       <div class="sym-row"><span class="sym-s">f</span><span>Kamera/göz odak uzaklığı (piksel, pinhole modeli)</span></div>
-      <div class="sym-row"><span class="sym-s">E_L / E_R</span><span>Sol / sağ göz optik merkezleri</span></div>
+      <div class="sym-row"><span class="sym-s">E<sub>L</sub> / E<sub>R</sub></span><span>Sol / sağ göz optik merkezleri</span></div>
       <div class="sym-row"><span class="sym-s">(u, v)</span><span>Retina (yatay, dikey) piksel koordinatları</span></div>
-      <div class="sym-row"><span class="sym-s">s_g / s_t</span><span>El (grabber) / hedef nesne piksel boyu (apparent size)</span></div>
-      <div class="sym-row"><span class="sym-s">ρ_s</span><span>Ölçek yakınsama oranı = (s_g/W_g) / (s_t/W_t); hedefe varınca → 1.00</span></div>
+      <div class="sym-row"><span class="sym-s">s<sub>g</sub> / s<sub>t</sub></span><span>El (grabber) / hedef nesne piksel boyu (apparent size)</span></div>
+      <div class="sym-row"><span class="sym-s">ρ<sub>s</sub></span><span>Ölçek yakınsama oranı = (s<sub>g</sub>/W<sub>g</sub>) / (s<sub>t</sub>/W<sub>t</sub>); hedefe varınca → 1.00</span></div>
       <div class="sym-row"><span class="sym-s">Δu / Δv</span><span>Sol–sağ göz yatay / dikey piksel farkı ( disparite bileşeni)</span></div>
-      <div class="sym-row"><span class="sym-s">Δd</span><span>Toplam disparite (u_L − u_R); Z = f·B / Δd</span></div>
-      <div class="sym-row"><span class="sym-s">Z_mp</span><span>Boyun paralaksından elde edilen derinlik tahmini</span></div>
+      <div class="sym-row"><span class="sym-s">Δd</span><span>Toplam disparite (u<sub>L</sub> − u<sub>R</sub>); Z = f·B / Δd</span></div>
+      <div class="sym-row"><span class="sym-s">Z<sub>mp</sub></span><span>Boyun paralaksından elde edilen derinlik tahmini</span></div>
       <div class="sym-row"><span class="sym-s">Z</span><span>Kameraya göre 3B derinlik (optik eksen doğrultusu)</span></div>
-      <div class="sym-row"><span class="sym-s">W_g / W_t</span><span>El ve hedefin gerçek fiziksel genişliği (kalibrasyonda bilinir)</span></div>
-      <div class="sym-row"><span class="sym-s">Ŵ_t</span><span>Paralaksla yolda kalibre edilen hedef genişliği tahmini</span></div>
+      <div class="sym-row"><span class="sym-s">W<sub>g</sub> / W<sub>t</sub></span><span>El ve hedefin gerçek fiziksel genişliği (kalibrasyonda bilinir)</span></div>
+      <div class="sym-row"><span class="sym-s">Ŵ<sub>t</sub></span><span>Paralaksla yolda kalibre edilen hedef genişliği tahmini</span></div>
       <div class="sym-row"><span class="sym-s">PARALAKS</span><span>Bakış doğrultusunu ≥40 ms değiştirmeden stereonun yeniden yerleşmesi</span></div>
-      <div class="sym-row"><span class="sym-s">u_mp</span><span>Monoküler boyun kaymasındaki piksel yer değiştirmesi</span></div>
-      <div class="sym-row"><span class="sym-s">F_ee/F_t SAPMASI</span><span>İki çerçevenin görüntüsündeki ayrışma — konum/yönelim hatası vekili</span></div>
+      <div class="sym-row"><span class="sym-s">u<sub>mp</sub></span><span>Monoküler boyun kaymasındaki piksel yer değiştirmesi</span></div>
+      <div class="sym-row"><span class="sym-s">F<sub>ee</sub>/F<sub>t</sub> SAPMASI</span><span>İki çerçevenin görüntüsündeki ayrışma — konum/yönelim hatası vekili</span></div>
     </div>
     <div class="sym-group">
       <h5>C. Kontrol Yasası &amp; Gecikme</h5>
-      <div class="sym-row"><span class="sym-s">τ_d</span><span>Görsel-sinirsel iletişim gecikmesi (ms cinsinden)</span></div>
-      <div class="sym-row"><span class="sym-s">δ_etkin</span><span>Toplam etkin gecikme (tutma süresi dahil) — k = 1/(e·δ_etkin)</span></div>
+      <div class="sym-row"><span class="sym-s">τ<sub>d</sub></span><span>Görsel-sinirsel iletişim gecikmesi (ms cinsinden)</span></div>
+      <div class="sym-row"><span class="sym-s">δ<sub>etkin</sub></span><span>Toplam etkin gecikme (tutma süresi dahil) — k = 1/(e·δ<sub>etkin</sub>)</span></div>
       <div class="sym-row"><span class="sym-s">κ = g = k·δ</span><span>Taşmama kuralı: κ ≤ 1/e ⇒ monoton yaklaşım; aşma yok</span></div>
       <div class="sym-row"><span class="sym-s">φ(p)</span><span>İlerleme oranına bağlı çan-eğrisi hız rampası (0→1→0)</span></div>
-      <div class="sym-row"><span class="sym-s">v_el / ω_el</span><span>Tutucunun doğrusal / açısal hızı</span></div>
-      <div class="sym-row"><span class="sym-s">e_ret</span><span>Retinal konum hata vektörü (yatay, dikey)</span></div>
-      <div class="sym-row"><span class="sym-s">e_ω</span><span>SO(3) yönelim hatası: ½(x̂×x̂_d + ŷ×ŷ_d + ẑ×ẑ_d)</span></div>
+      <div class="sym-row"><span class="sym-s">v<sub>el</sub> / ω<sub>el</sub></span><span>Tutucunun doğrusal / açısal hızı</span></div>
+      <div class="sym-row"><span class="sym-s">e<sub>ret</sub></span><span>Retinal konum hata vektörü (yatay, dikey)</span></div>
+      <div class="sym-row"><span class="sym-s">e<sub>ω</sub></span><span>SO(3) yönelim hatası: ½(x̂×x̂<sub>d</sub> + ŷ×ŷ_d + ẑ×ẑ_d)</span></div>
       <div class="sym-row"><span class="sym-s">J⁺ / Jᵀ</span><span>Pseudoinvers / devrik — null-space gradyanı</span></div>
       <div class="sym-row"><span class="sym-s">λ(w)</span><span>Manipülabiliteye bağlı sönümleme: w↓ ⇒ λ↑</span></div>
-      <div class="sym-row"><span class="sym-s">P_N</span><span>Null-space projeksiyon (bilek hizalama alt-uzayında)</span></div>
-      <div class="sym-row"><span class="sym-s">τ_b</span><span>Tutma freni torku (hedefte kilit; sürekli akım gerektirmez)</span></div>
-      <div class="sym-row"><span class="sym-s">T_comp</span><span>Kompanzasyon süresi — kalan hatanın kapandığı süre</span></div>
+      <div class="sym-row"><span class="sym-s">P<sub>N</sub></span><span>Null-space projeksiyon (bilek hizalama alt-uzayında)</span></div>
+      <div class="sym-row"><span class="sym-s">τ<sub>b</sub></span><span>Tutma freni torku (hedefte kilit; sürekli akım gerektirmez)</span></div>
+      <div class="sym-row"><span class="sym-s">T<sub>comp</sub></span><span>Kompanzasyon süresi — kalan hatanın kapandığı süre</span></div>
       <div class="sym-row"><span class="sym-s">S0–S6</span><span>Kesintili bakış durum makinesi (Ara→Ele→Hedefe→Kör Uçuş→Yeniden→Komp.→Kilit)</span></div>
       <div class="sym-row"><span class="sym-s">Ĝ</span><span>Öğrenilmiş ileri model — efference copy integrali (kör uçuşta tek bilgi)</span></div>
-      <div class="sym-row"><span class="sym-s">Σ_eff</span><span>Efference copy belirsizlik çapı — bakış tetiğinin girdisi</span></div>
-      <div class="sym-row"><span class="sym-s">R_max</span><span>Erişim sınırı — bel döndürülerek telafi edilir</span></div>
+      <div class="sym-row"><span class="sym-s">Σ<sub>eff</sub></span><span>Efference copy belirsizlik çapı — bakış tetiğinin girdisi</span></div>
+      <div class="sym-row"><span class="sym-s">R<sub>max</sub></span><span>Erişim sınırı — bel döndürülerek telafi edilir</span></div>
     </div>
     <div class="sym-group">
       <h5>D. Biyomekanik &amp; Akademik Kıyas Ölçütleri</h5>
-      <div class="sym-row"><span class="sym-s">E_init</span><span>İlk Yaklaşım Hatası (Initial Approach Error) — ilk darbe sonundaki kalan mesafe</span></div>
-      <div class="sym-row"><span class="sym-s">%T_comp</span><span>Kompanzasyon süresinin toplam süreye ora(n)lı — balistik/düzeltme ayrımını verir</span></div>
-      <div class="sym-row"><span class="sym-s">L_vis</span><span>Görsel işlem yükü — saniyede tüketilen görsel örnek/kare sayısı</span></div>
-      <div class="sym-row"><span class="sym-s">η_pulse</span><span>Darbe enerji verimliliği — faydalı mekanik işin harcanan elektrik enerjisine oranı</span></div>
-      <div class="sym-row"><span class="sym-s">T_s</span><span>Yerleşme süresi — 5 mm banda oturma; yerleşmeyen süre tavanından skorlanır</span></div>
-      <div class="sym-row"><span class="sym-s">ID_e</span><span>Effective Fitts zorluk indeksi — log₂(D/W_e + 1)</span></div>
-      <div class="sym-row"><span class="sym-s">TP</span><span>Throughput (bit/s) = ID_e / T_eff — ISO 9241-9 Fitts performans ölçüsü</span></div>
-      <div class="sym-row"><span class="sym-s">W_e</span><span>Effective width = max(W_t, 4.133·σ_e)</span></div>
-      <div class="sym-row"><span class="sym-s">w_min</span><span>Erişim boyunca minimum manipülabilite — tekillik riski göstergesi</span></div>
-      <div class="sym-row"><span class="sym-s">τ_max</span><span>Tepe eklem torku (Nm) — motor koruma/rezerv ölçütü</span></div>
+      <div class="sym-row"><span class="sym-s">E<sub>init</sub></span><span>İlk Yaklaşım Hatası (Initial Approach Error) — ilk darbe sonundaki kalan mesafe</span></div>
+      <div class="sym-row"><span class="sym-s">%T<sub>comp</sub></span><span>Kompanzasyon süresinin toplam süreye ora(n)lı — balistik/düzeltme ayrımını verir</span></div>
+      <div class="sym-row"><span class="sym-s">L<sub>vis</sub></span><span>Görsel işlem yükü — saniyede tüketilen görsel örnek/kare sayısı</span></div>
+      <div class="sym-row"><span class="sym-s">η<sub>pulse</sub></span><span>Darbe enerji verimliliği — faydalı mekanik işin harcanan elektrik enerjisine oranı</span></div>
+      <div class="sym-row"><span class="sym-s">T<sub>s</sub></span><span>Yerleşme süresi — 5 mm banda oturma; yerleşmeyen süre tavanından skorlanır</span></div>
+      <div class="sym-row"><span class="sym-s">ID_e</span><span>Effective Fitts zorluk indeksi — log₂(D/W<sub>e</sub> + 1)</span></div>
+      <div class="sym-row"><span class="sym-s">TP</span><span>Throughput (bit/s) = ID_e / T<sub>eff</sub> — ISO 9241-9 Fitts performans ölçüsü</span></div>
+      <div class="sym-row"><span class="sym-s">W<sub>e</sub></span><span>Effective width = max(W<sub>t</sub>, 4.133·σ<sub>e</sub>)</span></div>
+      <div class="sym-row"><span class="sym-s">w<sub>min</sub></span><span>Erişim boyunca minimum manipülabilite — tekillik riski göstergesi</span></div>
+      <div class="sym-row"><span class="sym-s">τ<sub>max</sub></span><span>Tepe eklem torku (Nm) — motor koruma/rezerv ölçütü</span></div>
       <div class="sym-row"><span class="sym-s">GA95</span><span>%95 bootstrap güven aralığı (10 000 tekrar, seed=42)</span></div>
-      <div class="sym-row"><span class="sym-s">p_Holm</span><span>Holm step-down düzeltmeli permutasyon p-değeri (25 karşılaştırma)</span></div>
+      <div class="sym-row"><span class="sym-s">p<sub>Holm</sub></span><span>Holm step-down düzeltmeli permutasyon p-değeri (25 karşılaştırma)</span></div>
       <div class="sym-row"><span class="sym-s">HDA</span><span>İnsansı Dinamik Yaklaşım — mesafe+aciliyet uyarlamalı hız zarfı (bu makale)</span></div>
       <div class="sym-row"><span class="sym-s">HLSL</span><span>Bell-shaped gecikme-türevi yönetici ile İnsansı Stereo Looming (bu makale)</span></div>
       <div class="sym-row"><span class="sym-s">SE(3) / SO(3)</span><span>6-DOF pozu / 3B yönelim grubu — enkoder ile değil, hareket alanı ile tanımlı</span></div>
-      <div class="sym-row"><span class="sym-s">F₀ / F_ee / F_t</span><span>Taban / tutucu / hedef referans çerçeveleri</span></div>
+      <div class="sym-row"><span class="sym-s">F₀ / F<sub>ee</sub> / F<sub>t</sub></span><span>Taban / tutucu / hedef referans çerçeveleri</span></div>
     </div>
   </div>
 </div>
@@ -1572,9 +1617,9 @@
   <span class="th-badge" id="thEfference">Efference Copy: <b>FRENLE KORUNMUŞ</b></span>
 </div>
 <div class="formula-strip formula-strip-top" id="formulaStripTop">
-  <div class="f-item"><div class="f-label">1. Elin Perspektif Küçülmesi</div><div class="f-math" id="mathGripperSize">s_g(t) = f·W_g / Z_g(t) = -- px</div></div>
-  <div class="f-item"><div class="f-label">2. Hedef Perspektif Boyu &amp; Paralks</div><div class="f-math" id="mathTargetSize">s_t = f·W_t / Z_t = -- px</div></div>
-  <div class="f-item"><div class="f-label">3. Perspektif Ölçek Yakınsaması</div><div class="f-math" id="mathScaleRatio">ρ_s(t) = (s_g/W_g)/(s_t/W_t) = -- → 1.00</div></div>
+  <div class="f-item"><div class="f-label">1. Elin Perspektif Küçülmesi</div><div class="f-math" id="mathGripperSize">s<sub>g</sub>(t) = f·W<sub>g</sub> / Z<sub>g</sub>(t) = -- px</div></div>
+  <div class="f-item"><div class="f-label">2. Hedef Perspektif Boyu &amp; Paralks</div><div class="f-math" id="mathTargetSize">s<sub>t</sub> = f·W<sub>t</sub> / Z<sub>t</sub> = -- px</div></div>
+  <div class="f-item"><div class="f-label">3. Perspektif Ölçek Yakınsaması</div><div class="f-math" id="mathScaleRatio">ρ<sub>s</sub>(t) = (s<sub>g</sub>/W<sub>g</sub>)/(s<sub>t</sub>/W<sub>t</sub>) = -- → 1.00</div></div>
 </div>
 <!-- Pre-reach prediction and live optical looming math bar -->
 <div class="assessment-bar">
@@ -1582,7 +1627,7 @@
     <span class="mode-banner" id="modeBanner">KURULUM MODU — kolu ve hedefi ayarlayın, sonra Başlat</span>
     <span class="status-pill" id="reachBadge">STEREO PARALKS ANALİZİ HAZIR</span>
     <span class="math-chip" id="chipReachDist">Tahmini Mesafe: <b>-- cm</b> / Güvenli Kol Sınırı: <b>-- cm</b></span>
-    <span class="math-chip" id="chipLooming">El Perspektif Boyu s_g: <b>-- px</b> &rarr; Hedef Ölçeği ρ_s: <b>--</b></span>
+    <span class="math-chip" id="chipLooming">El Perspektif Boyu s<sub>g</sub>: <b>-- px</b> &rarr; Hedef Ölçeği ρ<sub>s</sub>: <b>--</b></span>
     <span class="math-chip" id="chipSing">Singularity İndeksi w(q): <b>--</b></span>
     <span class="math-chip" id="chipGaze">Kafa: <b>otomatik alterasyon</b> · geri besleme: yalnızca stereo görüş</span>
   </div>
@@ -1694,7 +1739,7 @@
       <div class="panel-titlebar">
         <span class="pw-tag">PANEL I</span>
         <span class="pw-title" title="SOL GÖZ — Omuz Üstü Stereo Retina">SOL GÖZ</span>
-        <span class="pw-live-stat" id="lblLeftEye">u_L, v_L | s_g = -- px</span>
+        <span class="pw-live-stat" id="lblLeftEye">u<sub>L</sub>, v<sub>L</sub> | s<sub>g</sub> = -- px</span>
         <div class="pw-controls">
           <button class="pw-btn" data-act="toggle" title="Daralt / Genişlet">&#8211;</button>
           <button class="pw-btn" data-act="close" title="Kapat">&#10005;</button>
@@ -1714,7 +1759,7 @@
       <div class="panel-titlebar">
         <span class="pw-tag">PANEL II</span>
         <span class="pw-title" title="SAĞ GÖZ — Omuz Üstü Stereo Retina">SAĞ GÖZ</span>
-        <span class="pw-live-stat" id="lblRightEye">u_R, v_R | d = -- px</span>
+        <span class="pw-live-stat" id="lblRightEye">u<sub>R</sub>, v<sub>R</sub> | d = -- px</span>
         <div class="pw-controls">
           <button class="pw-btn" data-act="toggle" title="Daralt / Genişlet">&#8211;</button>
           <button class="pw-btn" data-act="close" title="Kapat">&#10005;</button>
@@ -1834,11 +1879,11 @@
       <details>
         <summary>Detaylı Hız / Rampa Ayarları (sınıf seçince otomatik dolar)</summary>
         <div class="ctrl-group" style="margin-top:8px;">
-          <label>Maks. El Hızı v_max <span class="val" id="valVmax">0.50 m/s</span></label>
+          <label>Maks. El Hızı v<sub>max</sub> <span class="val" id="valVmax">0.50 m/s</span></label>
           <input type="range" id="rngVmax" min="0.05" max="1.50" step="0.01" value="0.50">
         </div>
         <div class="ctrl-group">
-          <label>Maks. Eklem Hızı q̇_max <span class="val" id="valMaxQd">1.40 rad/s</span></label>
+          <label>Maks. Eklem Hızı q̇<sub>max</sub> <span class="val" id="valMaxQd">1.40 rad/s</span></label>
           <input type="range" id="rngMaxQd" min="0.30" max="3.50" step="0.05" value="1.40">
         </div>
         <div class="ctrl-group">
@@ -1850,7 +1895,7 @@
           <input type="range" id="rngEps" min="1.0" max="10.0" step="0.5" value="4.0">
         </div>
         <div class="ctrl-group">
-          <label>Kalkış Rampası Taban φ_min <span class="val" id="valPhiMin">0.28</span></label>
+          <label>Kalkış Rampası Taban φ<sub>min</sub> <span class="val" id="valPhiMin">0.28</span></label>
           <input type="range" id="rngPhiMin" min="0.05" max="0.90" step="0.01" value="0.28">
         </div>
         <div class="ctrl-group">
@@ -1858,7 +1903,7 @@
           <input type="range" id="rngGamma" min="0.20" max="1.00" step="0.01" value="0.55">
         </div>
         <div class="ctrl-group">
-          <label>Frenleme Bölgesi Başlangıcı p_term <span class="val" id="valTermP">0.45</span></label>
+          <label>Frenleme Bölgesi Başlangıcı p<sub>term</sub> <span class="val" id="valTermP">0.45</span></label>
           <input type="range" id="rngTermP" min="0.20" max="0.85" step="0.01" value="0.45">
         </div>
         <div class="ctrl-group">
@@ -1897,8 +1942,8 @@
             </marker>
           </defs>
           <!-- Referans & Toplama Düğümü -->
-          <text id="diagRefTop" x="46" y="40" text-anchor="middle" font-size="9.5" font-weight="700" fill="#14171c">Hedef: ρ_s = 1</text>
-          <text id="diagRefSub" x="46" y="53" text-anchor="middle" font-size="8.0" fill="#555b64">(e_ret=0, e_ω=0)</text>
+          <text id="diagRefTop" x="46" y="40" text-anchor="middle" font-size="9.5" font-weight="700" fill="#14171c">Hedef: ρ<tspan baseline-shift="sub" font-size="72%">s</tspan> = 1</text>
+          <text id="diagRefSub" x="46" y="53" text-anchor="middle" font-size="8.0" fill="#555b64">(e<tspan baseline-shift="sub" font-size="72%">ret</tspan>=0, e<tspan baseline-shift="sub" font-size="72%">ω</tspan>=0)</text>
           <line x1="8" y1="90" x2="27" y2="90" stroke="#1b2a41" stroke-width="1.8" marker-end="url(#arrTeal)"/>
           <circle cx="46" cy="90" r="18" fill="#ffffff" stroke="#1b2a41" stroke-width="2"/>
           <text x="46" y="95" text-anchor="middle" font-size="14" font-weight="700" fill="#1b2a41">Σ</text>
@@ -1912,15 +1957,15 @@
           <rect x="90" y="36" width="192" height="8" fill="#ebe8e1"/>
           <text id="diagRetTitle" x="186" y="36" text-anchor="middle" font-size="9.0" font-weight="700" fill="#14171c">1. ÖLÇÜM (ÇİFT GÖZ STEREO)</text>
           <text id="diagRetSub" x="186" y="58" text-anchor="middle" font-size="7.8" fill="#555b64">Cetvel/XYZ yok; piksel + boy oranı</text>
-          <text id="diagRetEq1" x="186" y="76" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#14171c">Yön: Δu=u_h−u_e , Δv=v_h−v_e</text>
-          <text id="diagRetEq2" x="186" y="93" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#1b2a41" font-weight="600">Boy: ρ_s=(s_e/W_e)/(s_h/W_h)→1</text>
-          <text id="diagRetEq3" x="186" y="110" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#3f6b5a">Stereo: Z = f·B / (u_sol−u_sağ)</text>
+          <text id="diagRetEq1" x="186" y="76" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#14171c">Yön: Δu=u<tspan baseline-shift="sub" font-size="72%">h</tspan>−u<tspan baseline-shift="sub" font-size="72%">e</tspan> , Δv=v<tspan baseline-shift="sub" font-size="72%">h</tspan>−v<tspan baseline-shift="sub" font-size="72%">e</tspan></text>
+          <text id="diagRetEq2" x="186" y="93" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#1b2a41" font-weight="600">Boy: ρ<tspan baseline-shift="sub" font-size="72%">s</tspan>=(s<tspan baseline-shift="sub" font-size="72%">e</tspan>/W<tspan baseline-shift="sub" font-size="72%">e</tspan>)/(s<tspan baseline-shift="sub" font-size="72%">h</tspan>/W<tspan baseline-shift="sub" font-size="72%">h</tspan>)→1</text>
+          <text id="diagRetEq3" x="186" y="110" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#3f6b5a">Stereo: Z = f·B / (u<tspan baseline-shift="sub" font-size="72%">sol</tspan>−u<tspan baseline-shift="sub" font-size="72%">sağ</tspan>)</text>
           <rect x="97" y="121" width="178" height="26" rx="2" fill="#faf9f7" stroke="#d9d4ca"/>
-          <text id="diagRetinaVal" x="186" y="138" text-anchor="middle" font-size="9.0" font-weight="700" font-family="Consolas, monospace" fill="#1b2a41">Δu=-- px | ρ_s=--</text>
+          <text id="diagRetinaVal" x="186" y="138" text-anchor="middle" font-size="9.0" font-weight="700" font-family="Consolas, monospace" fill="#1b2a41">Δu=-- px | ρ<tspan baseline-shift="sub" font-size="72%">s</tspan>=--</text>
 
           <line x1="282" y1="90" x2="306" y2="90" stroke="#1b2a41" stroke-width="1.8" marker-end="url(#arrTeal)"/>
           <rect x="281" y="70" width="26" height="12" rx="2" fill="#ffffff"/>
-          <text x="294" y="79" text-anchor="middle" font-size="7.5" font-family="Consolas, monospace" fill="#555b64">e_ret</text>
+          <text x="294" y="79" text-anchor="middle" font-size="7.5" font-family="Consolas, monospace" fill="#555b64">e<tspan baseline-shift="sub" font-size="72%">ret</tspan></text>
 
           <!-- Blok 2: Gecikme & S0-S6 Bakış Kapısı -->
           <rect id="diagBlkGaze" class="diag-block-rect" x="308" y="20" width="178" height="134" rx="3"/>
@@ -1928,11 +1973,11 @@
           <rect x="308" y="36" width="178" height="8" fill="#ebe8e1"/>
           <text id="diagGazeTitle" x="397" y="36" text-anchor="middle" font-size="9.0" font-weight="700" fill="#14171c">2. GECİKME &amp; BAKIŞ KAPISI</text>
           <text id="diagGazeSub" x="397" y="58" text-anchor="middle" font-size="7.8" fill="#555b64">Gecikme + aralıklı bakışı yönetir</text>
-          <text id="diagGazeEq1" x="397" y="76" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#14171c">Sinir Gecikmesi: τ_d + Sakkad</text>
-          <text id="diagGazeEq2" x="397" y="93" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#1b2a41" font-weight="600">Etkin Gecikme: δ = τ_d + 0.5·τ_tut</text>
+          <text id="diagGazeEq1" x="397" y="76" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#14171c">Sinir Gecikmesi: τ<tspan baseline-shift="sub" font-size="72%">d</tspan> + Sakkad</text>
+          <text id="diagGazeEq2" x="397" y="93" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#1b2a41" font-weight="600">Etkin Gecikme: δ = τ<tspan baseline-shift="sub" font-size="72%">d</tspan> + 0.5·τ<tspan baseline-shift="sub" font-size="72%">tut</tspan></text>
           <text id="diagGazeEq3" x="397" y="110" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#555b64">Örnekleme: ~20–80 Hz (S3 Hold)</text>
           <rect x="315" y="121" width="164" height="26" rx="2" fill="#faf9f7" stroke="#d9d4ca"/>
-          <text id="diagGazeVal" x="397" y="138" text-anchor="middle" font-size="9.0" font-weight="700" font-family="Consolas, monospace" fill="#1b2a41">S0 KİLİT · L_vis=-- Hz</text>
+          <text id="diagGazeVal" x="397" y="138" text-anchor="middle" font-size="9.0" font-weight="700" font-family="Consolas, monospace" fill="#1b2a41">S0 KİLİT · L<tspan baseline-shift="sub" font-size="72%">vis</tspan>=-- Hz</text>
 
           <line x1="486" y1="90" x2="510" y2="90" stroke="#1b2a41" stroke-width="1.8" marker-end="url(#arrTeal)"/>
           <text x="498" y="79" text-anchor="middle" font-size="8.4" font-family="Consolas, monospace" fill="#555b64">ê</text>
@@ -1943,15 +1988,15 @@
           <rect x="512" y="36" width="194" height="8" fill="#ebe8e1"/>
           <text id="diagLawTitle" x="609" y="36" text-anchor="middle" font-size="9.0" font-weight="700" fill="#14171c">3. HIZ YASASI (HDA / HLSL)</text>
           <text id="diagLawSub" x="609" y="58" text-anchor="middle" font-size="7.8" fill="#555b64">Hız eğrisi &amp; taşmama güvenliği</text>
-          <text id="diagLawEq1" x="609" y="76" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#14171c">Faz 1: v_el = φ(t)·k·e (Çan Eğrisi)</text>
-          <text id="diagLawEq2" x="609" y="93" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#7d2a2f" font-weight="600">Faz 2: k ≤ 0.37 / δ_etkin (Fren)</text>
+          <text id="diagLawEq1" x="609" y="76" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#14171c">Faz 1: v<tspan baseline-shift="sub" font-size="72%">el</tspan> = φ(t)·k·e (Çan Eğrisi)</text>
+          <text id="diagLawEq2" x="609" y="93" text-anchor="middle" font-size="8.0" font-family="Consolas, monospace" fill="#7d2a2f" font-weight="600">Faz 2: k ≤ 0.37 / δ<tspan baseline-shift="sub" font-size="72%">etkin</tspan> (Fren)</text>
           <text id="diagLawEq3" x="609" y="110" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#555b64">Gecikme × 2 ⇒ hız kazancı k ÷ 2</text>
           <rect x="519" y="121" width="180" height="26" rx="2" fill="#fdf4f5" stroke="#d8b4b8"/>
           <text id="diagLawVal" x="609" y="138" text-anchor="middle" font-size="9.0" font-weight="700" font-family="Consolas, monospace" fill="#7d2a2f">BEKLEMEDE (FREN)</text>
 
           <line x1="706" y1="90" x2="730" y2="90" stroke="#1b2a41" stroke-width="1.8" marker-end="url(#arrTeal)"/>
-          <text x="717" y="73" text-anchor="middle" font-size="7.8" font-family="Consolas, monospace" fill="#555b64">v_el</text>
-          <text x="717" y="84" text-anchor="middle" font-size="7.8" font-family="Consolas, monospace" fill="#3f6b5a">ω_el</text>
+          <text x="717" y="73" text-anchor="middle" font-size="7.8" font-family="Consolas, monospace" fill="#555b64">v<tspan baseline-shift="sub" font-size="72%">el</tspan></text>
+          <text x="717" y="84" text-anchor="middle" font-size="7.8" font-family="Consolas, monospace" fill="#3f6b5a">ω<tspan baseline-shift="sub" font-size="72%">el</tspan></text>
 
           <!-- Blok 4: 6-DOF Uzaysal Eklem Dağılımı, SO(3) Bilek, Bel & Fren -->
           <rect id="diagBlkSing" class="diag-block-rect" x="732" y="20" width="180" height="134" rx="3"/>
@@ -1960,17 +2005,17 @@
           <text id="diagSingTitle" x="822" y="36" text-anchor="middle" font-size="8.6" font-weight="700" fill="#14171c">4. 6-DOF J(q), SO(3) &amp; FREN</text>
           <text id="diagSingSub" x="822" y="58" text-anchor="middle" font-size="7.7" fill="#555b64">3B öteleme + 3B yönelim (6×6)</text>
           <text id="diagSingEq1" x="822" y="76" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#14171c">[v;ω] = J(q)θ̇  (J=[Jv;Jω])</text>
-          <text id="diagSingEq2" x="822" y="93" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#3a3f47" font-weight="600">e_ω=½Σ(r×r_d), θ̇_ω=Jω^T e_ω</text>
-          <text id="diagSingEq3" x="822" y="110" text-anchor="middle" font-size="7.8" font-family="Consolas, monospace" fill="#555b64">w(q)&lt;0.02⇒λ | Hedef⇒τ_b=kilit</text>
+          <text id="diagSingEq2" x="822" y="93" text-anchor="middle" font-size="7.9" font-family="Consolas, monospace" fill="#3a3f47" font-weight="600">e<tspan baseline-shift="sub" font-size="72%">ω</tspan>=½Σ(r×r<tspan baseline-shift="sub" font-size="72%">d</tspan>), θ̇<tspan baseline-shift="sub" font-size="72%">ω</tspan>=Jω^T e<tspan baseline-shift="sub" font-size="72%">ω</tspan></text>
+          <text id="diagSingEq3" x="822" y="110" text-anchor="middle" font-size="7.8" font-family="Consolas, monospace" fill="#555b64">w(q)&lt;0.02⇒λ | Hedef⇒τ<tspan baseline-shift="sub" font-size="72%">b</tspan>=kilit</text>
           <rect x="739" y="121" width="166" height="26" rx="2" fill="#faf9f7" stroke="#d9d4ca"/>
           <text id="diagSingVal" x="822" y="138" text-anchor="middle" font-size="9.0" font-weight="700" font-family="Consolas, monospace" fill="#22262d">w(q)=-- | τ=-- Nm</text>
 
           <!-- Geri Besleme Hattı -->
           <polyline points="822,154 822,208 46,208 46,109" fill="none" stroke="#1b2a41" stroke-width="1.9" stroke-dasharray="6 3" marker-end="url(#arrTeal)"/>
           <rect id="diagFeedbackRect" x="120" y="193" width="660" height="28" rx="3" fill="#ffffff" stroke="#1b2a41" stroke-width="1.3"/>
-          <text id="diagFeedbackTxt" x="450" y="211" text-anchor="middle" font-size="9.8" font-weight="600" fill="#1b2a41">Geri Besleme (Çift Göz Stereo): u_sol, u_sağ, el boyutu s_g, hedef boyutu s_t</text>
+          <text id="diagFeedbackTxt" x="450" y="211" text-anchor="middle" font-size="9.8" font-weight="600" fill="#1b2a41">Geri Besleme (Çift Göz Stereo): u<tspan baseline-shift="sub" font-size="72%">sol</tspan>, u<tspan baseline-shift="sub" font-size="72%">sağ</tspan>, el boyutu s<tspan baseline-shift="sub" font-size="72%">g</tspan>, hedef boyutu s<tspan baseline-shift="sub" font-size="72%">t</tspan></text>
           <rect x="175" y="230" width="550" height="25" rx="3" fill="#fdf4f5" stroke="#7d2a2f" stroke-width="1.2"/>
-          <text x="450" y="246" text-anchor="middle" font-size="9.8" font-weight="700" fill="#7d2a2f">✕ Eklem Enkoderi (θ_i) YOK   ·   ✕ Mutlak (X, Y, Z) Dünya Koordinatı YOK</text>
+          <text x="450" y="246" text-anchor="middle" font-size="9.8" font-weight="700" fill="#7d2a2f">✕ Eklem Enkoderi (θ<tspan baseline-shift="sub" font-size="72%">i</tspan>) YOK   ·   ✕ Mutlak (X, Y, Z) Dünya Koordinatı YOK</text>
 
           <!-- Bakış zaman çizelgesi: S0→S6 (kesintili; örnek yalnızca fiksasyon sonunda üretilir) -->
           <text x="24" y="274" font-size="8.8" font-weight="700" fill="#3a3f47">BAKIŞ ZAMAN ÇİZELGESİ <tspan font-weight="400" fill="#7a7f87">— örnek yalnızca fiksasyon sonunda (sample-and-hold); arada efference copy + öğrenilmiş ileri model</tspan></text>
@@ -1996,7 +2041,7 @@
           <text x="632" y="311" text-anchor="middle" font-size="6.6" fill="#99f6e4">30–120 ms</text>
           <rect x="696" y="286" width="96" height="30" rx="4" fill="#555b64"/>
           <text x="744" y="299" text-anchor="middle" font-size="8.2" font-weight="700" fill="#ffffff">S6 KİLİT</text>
-          <text x="744" y="311" text-anchor="middle" font-size="6.6" fill="#e8e4dc">ρ_s ≈ 1.00</text>
+          <text x="744" y="311" text-anchor="middle" font-size="6.6" fill="#e8e4dc">ρ<tspan baseline-shift="sub" font-size="72%">s</tspan> ≈ 1.00</text>
         </svg>
         <div class="diag-caption">
           <b>Diyagramın omurgası (dört aşamalı kapalı çevrim):</b> ölç → gecikme/bakış kapısı → hız yasası → 6-DOF J(q) dağılımı. Geri beslemede yalnızca iki retinal görüntü ve boyut oranı vardır; mutlak <i>(X, Y, Z)</i> hiçbir kutuya girmez. Sıralı seçim (binoküler / monoküler / bel senkronlu), kutuların içindeki denklemleri canlı değiştirir — omurga sabittir.
@@ -2004,82 +2049,155 @@
       </div>
 
       <div class="math-summary-row">
-        <div class="math-mini-card">
-          <b>1. Kamera Cetvel Kullanmadan Derinliği Nasıl Bulur? (Benzer Üçgenler)</b>
-          <svg class="math-illu" viewBox="0 0 150 92" role="img" aria-label="Benzer üçgenlerle derinlik kestirimi">
-          <circle cx="12" cy="46" r="4.5" fill="#1b2a41"/>
-          <text x="12" y="61" font-size="6.4" text-anchor="middle" fill="#555b64">göz</text>
-          <line x1="16" y1="46" x2="138" y2="18" stroke="#3f6b5a" stroke-width="1.4"/>
-          <line x1="16" y1="46" x2="138" y2="74" stroke="#3f6b5a" stroke-width="1.4"/>
-          <line x1="44" y1="26" x2="44" y2="66" stroke="#3d5f8f" stroke-width="2.2"/>
-          <rect x="44" y="33" width="10" height="26" fill="rgba(15,118,110,0.75)"/>
-          <text x="49" y="76" font-size="6.2" text-anchor="middle" fill="#1b2a41">s_g (yakın)</text>
-          <line x1="104" y1="30" x2="104" y2="62" stroke="#a7a196" stroke-width="1.6" stroke-dasharray="3 2"/>
-          <rect x="104" y="37" width="10" height="18" fill="rgba(139,38,53,0.75)"/>
-          <text x="109" y="76" font-size="6.2" text-anchor="middle" fill="#7d2a2f">s_t (uzak)</text>
-          <line x1="66" y1="86" x2="134" y2="86" stroke="#555b64" stroke-width="1"/>
-          <line x1="66" y1="83" x2="66" y2="89" stroke="#555b64" stroke-width="1"/>
-          <line x1="134" y1="83" x2="134" y2="89" stroke="#555b64" stroke-width="1"/>
-          <text x="100" y="84" font-size="6.2" text-anchor="middle" fill="#555b64">Z (derinlik)</text>
-          </svg>
-          
-          <span class="math-eq">s = f · (W / Z) &nbsp;⇒&nbsp; ρ_s = (s_el / W_el) / (s_hedef / W_hedef) → 1.00</span>
-          İğne deliğinden giren görüntü boyutu uzaklıkla ters orantılıdır. <b>Örnek:</b> Odak <code>f=580 px</code>, hedef kupa <code>W_t=5 cm</code> ve <code>Z=52 cm</code> uzaktaysa ekranda <code>s_t ≈ 56 px</code> görünür. El kameradan uzaklaşıp hedefe vardıkça küçülür; <code>s_el/W_el</code> ile <code>s_hedef/W_hedef</code> oranı <b>1.00</b> olduğunda aynı derinliğe inmiş olur — santimetre ölçmeye gerek kalmaz.
-        </div>
-        <div class="math-mini-card">
-          <b>2. Tek Gözde Boyun Kayması (B_boyun) Gerçekten Ne İşe Yarar? (Dürüst Analiz)</b>
-          <svg class="math-illu" viewBox="0 0 150 92" role="img" aria-label="Monoküler boyut-uzaklık yanılsaması">
-          <circle cx="14" cy="46" r="4.5" fill="#1b2a41"/>
-          <line x1="18" y1="46" x2="30" y2="34" stroke="#8a6a3b" stroke-width="1.2" stroke-dasharray="3 2"/>
-          <line x1="30" y1="34" x2="56" y2="26" stroke="#8a6a3b" stroke-width="1.2"/>
-          <rect x="52" y="30" width="10" height="14" rx="1.5" fill="#8a6a3b"/>
-          <text x="57" y="56" font-size="6.0" text-anchor="middle" fill="#8a6a3b">küçük-yakın</text>
-          <line x1="18" y1="46" x2="138" y2="20" stroke="#555b64" stroke-width="1" stroke-dasharray="3 3"/>
-          <line x1="18" y1="46" x2="138" y2="72" stroke="#555b64" stroke-width="1" stroke-dasharray="3 3"/>
-          <rect x="124" y="20" width="16" height="22" rx="2" fill="#555b64"/>
-          <text x="132" y="52" font-size="6.0" text-anchor="middle" fill="#555b64">büyük-uzak</text>
-          <text x="75" y="82" font-size="6.6" text-anchor="middle" fill="#3a3f47">aynı piksel boyu ⇒ boyut belirsiz</text>
-          </svg>
-          
-          <span class="math-eq">Z_mp = (f · B_boyun) / Δu_mp &nbsp;⇒&nbsp; Ŵ_hedef(t) = (s_hedef · Z_mp) / f → W_hedef</span>
-          Tek göz sabit kalırsa <b>Boyut–Uzaklık Yanılsaması</b> doğar (<code>s_t = f·W_t/Z_t</code> tek denklemde 2 bilinmeyen bırakır; küçük yakın bardak büyük uzak bardakla aynı pikselde görünür, örn. +%28 önbilgi hatası <b>~16 cm</b> derinlik sapması yaratır). Yalnız kafa döndürmek de işe yaramaz (<code>B_boyun=0</code>). Ancak boyun yana kayınca (<code>B_boyun ≈ 59 mm</code>) hedef ekranda <code>Δu_mp</code> piksel kayar; buradan boyuttan bağımsız <code>Z_mp</code> üçgenlenir ve hedefin gerçek boyu <code>Ŵ_hedef</code> yoldayken kalibre edilir.
-        </div>
-        <div class="math-mini-card">
-          <b>3. Gecikme Varken Kol Neden Hedefi Delip Geçmez? (Basit Çarpım Kuralı)</b>
-          <svg class="math-illu" viewBox="0 0 150 92" role="img" aria-label="Gecikmeye göre aşma yanıtı">
-          <polyline points="6,52 36,52 46,50 58,30 70,58 82,40 94,52 106,44 118,52 142,52" fill="none" stroke="#7d2a2f" stroke-width="1.8"/>
-          <text x="8" y="14" font-size="6.3" fill="#7d2a2f">k·δ &gt; 1/e ⇒ aşma/salınım</text>
-          <polyline points="6,84 40,84 52,78 64,70 76,66 92,63 142,62" fill="none" stroke="#3f6b5a" stroke-width="1.8"/>
-          <text x="8" y="42" font-size="6.3" fill="#3f6b5a">k·δ ≤ 1/e ⇒ monoton</text>
-          <line x1="6" y1="52" x2="142" y2="52" stroke="#e8e4dc" stroke-width="1" stroke-dasharray="3 2"/>
-          </svg>
-          
-          <span class="math-eq">k · δ_etkin ≤ 1/e ≈ 0.37 &nbsp;⇒&nbsp; v_el = φ(t) · k · (ε + e_kalan)</span>
-          Beyne görüntü <code>τ_d</code> (örn. 120 ms) geç gelirse yüksek hız komutu hedefi aşar (salınım). Bu yasada hız kazancı <code>k</code>, toplam gecikme <code>δ_etkin = τ_d + τ_tutma/2</code> ile ters orantılı seçilir: <b>Örnek:</b> <code>δ = 0.10 s</code> iken <code>k ≤ 3.7 1/s</code>, gecikme <code>0.20 s</code>'ye çıkınca <code>k ≤ 1.85 1/s</code> olur. İlk aşamada <code>φ(t)</code> çan eğrisi enerjisi yumuşak kalkış ve yumuşak duruş verir.
-        </div>
-        <div class="math-mini-card">
-          <b>4. 6-DOF 3B Kinematik: Gövde (Bel), Omuz &amp; SO(3) Bilek Yönelimi</b>
-          <svg class="math-illu" viewBox="0 0 150 92" role="img" aria-label="Yakınsal ve distal eksen dağılımı">
-          <rect x="8" y="26" width="58" height="30" rx="3" fill="#1b2a41"/>
-          <text x="37" y="44" font-size="7.2" font-weight="700" text-anchor="middle" fill="#ffffff">j₁–j₃</text>
-          <text x="37" y="68" font-size="6.0" text-anchor="middle" fill="#3a3f47">omuz/dirsek</text>
-          <text x="37" y="79" font-size="6.0" text-anchor="middle" fill="#7a7f87">taşıma (J_v)</text>
-          <line x1="66" y1="41" x2="80" y2="41" stroke="#555b64" stroke-width="1.6" marker-end="url(#arrBig)"/>
-          <rect x="80" y="26" width="60" height="30" rx="3" fill="#3f6b5a"/>
-          <text x="110" y="44" font-size="7.2" font-weight="700" text-anchor="middle" fill="#ffffff">j₄–j₆</text>
-          <text x="110" y="68" font-size="6.0" text-anchor="middle" fill="#3a3f47">SO(3) bilek</text>
-          <text x="110" y="79" font-size="6.0" text-anchor="middle" fill="#7a7f87">yönelim (J_ω)</text>
-          <defs>
-            <marker id="arrBig" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
-              <polygon points="0 0, 7 3, 0 6" fill="#555b64"/>
-            </marker>
-          </defs>
-          </svg>
-          
-          <span class="math-eq">[v; ω] = J(q)θ̇ (J=[J_v; J_ω]∈ℝ⁶ˣ⁶) · e_ω∈SO(3) · Hedef≥R_max⇒θ_bel</span>
-          Tam 3B hareket hem <b>konum ötelemesini (J_v ∈ ℝ³ˣ⁶)</b> hem <b>3 eksen yönelimi (J_ω ∈ ℝ³ˣ⁶: Roll φ_x, Pitch θ_y, Yaw ψ_z)</b> kapsar. Büyük ötelemeyi <b>omuz/dirsek</b> (<code>j₁–j₃</code>) üstlenirken, 3-eksen küresel <b>bilek</b> (<code>j₄–j₆</code>) boşluk uzayında (<code>N(J_v)</code>) hedef tutma çerçevesine (<code>SO(3)</code>) kilitlenir. Erişim sınırı (<code>R_max</code>) dışına <b>bel (θ_bel)</b> döner, tekillikte (<code>w(q)&lt;0.02</code>) sönüm, hedefte <b>fren (τ_b)</b> devreye girer.
-        </div>
-      </div>
+<div class="math-mini-card">
+<b class="mi-title">1. Kamera cetvel kullanmadan derinliği nasıl bulur? (benzer üçgenler)</b>
+<svg class="math-illu" viewBox="0 0 320 175" role="img" aria-label="Benzer üçgenlerle derinlik: göz, görüntü düzlemi, yakın el ve uzak hedef"><line x1="24" y1="85" x2="120" y2="55" stroke="#3f6b5a" stroke-width="1.6"/><line x1="24" y1="85" x2="120" y2="115" stroke="#3f6b5a" stroke-width="1.6"/><line x1="24" y1="85" x2="250" y2="70" stroke="#8b2635" stroke-width="1.4" stroke-dasharray="5 3"/><line x1="24" y1="85" x2="250" y2="100" stroke="#8b2635" stroke-width="1.4" stroke-dasharray="5 3"/><line x1="70" y1="38" x2="70" y2="132" stroke="#3d5f8f" stroke-width="2"/><line x1="66" y1="70.6" x2="66" y2="99.4" stroke="#3f6b5a" stroke-width="4"/><line x1="75" y1="81.9" x2="75" y2="88.1" stroke="#8b2635" stroke-width="4"/><rect x="120" y="55" width="16" height="60" rx="2" fill="rgba(63,107,90,0.85)"/><rect x="250" y="70" width="16" height="30" rx="2" fill="rgba(139,38,53,0.85)"/><circle cx="24" cy="85" r="7" fill="#1b2a41"/><g stroke="#555b64" stroke-width="1"><line x1="24" y1="142" x2="70" y2="142"/><line x1="24" y1="139" x2="24" y2="145"/><line x1="70" y1="139" x2="70" y2="145"/><line x1="24" y1="153" x2="128" y2="153"/><line x1="24" y1="150" x2="24" y2="156"/><line x1="128" y1="150" x2="128" y2="156"/><line x1="24" y1="165" x2="258" y2="165"/><line x1="24" y1="162" x2="24" y2="168"/><line x1="258" y1="162" x2="258" y2="168"/></g><text class="lb" x="47" y="138" text-anchor="middle">f</text><text class="lb" x="134" y="156">Z<tspan baseline-shift="sub" font-size="72%">el</tspan></text><text class="lb" x="264" y="168">Z<tspan baseline-shift="sub" font-size="72%">hedef</tspan></text><g class="bd"><circle cx="24" cy="64" r="8"/><text x="24" y="67.6">1</text></g><g class="bd"><circle cx="70" cy="26" r="8"/><text x="70" y="29.6">2</text></g><g class="bd"><circle cx="128" cy="42" r="8"/><text x="128" y="45.6">3</text></g><g class="bd"><circle cx="258" cy="57" r="8"/><text x="258" y="60.6">4</text></g><line class="ld" x1="52" y1="124" x2="66" y2="100"/><g class="bd"><circle cx="52" cy="124" r="8"/><text x="52" y="127.6">5</text></g><line class="ld" x1="88" y1="124" x2="75" y2="89"/><g class="bd"><circle cx="88" cy="124" r="8"/><text x="88" y="127.6">6</text></g><g class="bd"><circle cx="10" cy="159" r="8"/><text x="10" y="162.6">7</text></g></svg>
+<ol class="mi-legend">
+  <li><b>Göz (kamera merkezi):</b> bütün ışınların geçtiği iğne deliği.</li>
+  <li><b>Görüntü düzlemi (sensör, ekran)</b> — mavi dikey çizgi. Gerçekte merceğin arkasındadır; okunaklılık için öne çizildi. Göze uzaklığı odak uzaklığı <var>f</var>.</li>
+  <li><b>El (kavrayıcı)</b> — yeşil dikdörtgen, yakında. Gerçek boyu <var>W</var><sub>el</sub>.</li>
+  <li><b>Hedef (kupa)</b> — kırmızı dikdörtgen, uzakta. Gerçek boyu <var>W</var><sub>hedef</sub>.</li>
+  <li><b>Elin ekrandaki boyu <var>s</var><sub>el</sub></b> (piksel): yeşil ışınların sensörü kestiği kalın yeşil aralık.</li>
+  <li><b>Hedefin ekrandaki boyu <var>s</var><sub>hedef</sub></b>: kalın kırmızı aralık. Hedef uzak olduğu için küçük görünür.</li>
+  <li><b>Derinlikler <var>Z</var><sub>el</sub>, <var>Z</var><sub>hedef</sub></b>: gözden ölçülen uzaklıklar (alttaki ölçü çizgileri).</li>
+</ol>
+<div class="mi-lines">Çizgiler: <span class="sw g"></span> düz yeşil = ele giden ışın · <span class="sw r"></span> kesikli kırmızı = hedefe giden ışın · <span class="sw b"></span> mavi = görüntü düzlemi.</div>
+<div class="mf">
+  <div><var>s</var> = <var>f</var> · <var>W</var> / <var>Z</var></div>
+  <div><var>s</var><sub>el</sub> / <var>W</var><sub>el</sub> = <var>f</var> / <var>Z</var><sub>el</sub>, &nbsp; <var>s</var><sub>hedef</sub> / <var>W</var><sub>hedef</sub> = <var>f</var> / <var>Z</var><sub>hedef</sub></div>
+  <div><var>ρ</var><sub>s</sub> = (<var>s</var><sub>el</sub> / <var>W</var><sub>el</sub>) / (<var>s</var><sub>hedef</sub> / <var>W</var><sub>hedef</sub>) = <var>Z</var><sub>hedef</sub> / <var>Z</var><sub>el</sub> &nbsp;→&nbsp; 1.00</div>
+</div>
+<table class="mi-params"><tr><th>Simge</th><th>Anlamı</th><th>Birim · örnek</th></tr>
+<tr><td><var>f</var></td><td>Odak uzaklığı: merceğin büyütme gücü</td><td>piksel · 580 px</td></tr>
+<tr><td><var>W</var></td><td>Nesnenin gerçek boyu (genişliği)</td><td>m · kupa 0.05 m</td></tr>
+<tr><td><var>Z</var></td><td>Nesnenin gözden uzaklığı (derinlik)</td><td>m · 0.52 m</td></tr>
+<tr><td><var>s</var></td><td>Nesnenin ekrandaki boyu</td><td>piksel · 580·0.05/0.52 ≈ 56 px</td></tr>
+<tr><td><var>ρ</var><sub>s</sub></td><td>Ölçek oranı: &gt; 1 ise el hâlâ hedeften öndedir; = 1 ise el hedefle aynı derinliktedir</td><td>birimsiz</td></tr>
+</table>
+<div class="mi-read"><b>Nasıl okunur:</b> Benzer üçgenlerden <var>s</var> = <var>f</var>·<var>W</var>/<var>Z</var> çıkar: aynı nesne iki kat uzaklaşınca ekranda yarı boyda görünür. El ileri uzandıkça küçülür. İki oran eşitlendiğinde (<var>ρ</var><sub>s</sub> = 1) el hedefin derinliğine varmıştır. Bunun için hiçbir santimetre değeri ölçmek gerekmez, yalnız iki piksel boyu ve boyların oranı yeter.</div>
+</div>
+<div class="math-mini-card">
+<b class="mi-title">2. Tek gözde boyun kayması <var>B</var><sub>boyun</sub> ne işe yarar?</b>
+<svg class="math-illu" viewBox="0 0 320 175" role="img" aria-label="Tek göz: küçük-yakın ve büyük-uzak kupa aynı piksel boyunda; boyun kayması paralaks verir"><line x1="24" y1="100" x2="240" y2="67.3" stroke="#555b64" stroke-width="1.2" stroke-dasharray="4 3"/><line x1="24" y1="100" x2="240" y2="132.7" stroke="#555b64" stroke-width="1.2" stroke-dasharray="4 3"/><line x1="24" y1="42" x2="117" y2="100" stroke="#b8792f" stroke-width="1.3"/><line x1="24" y1="42" x2="251" y2="100" stroke="#b8792f" stroke-width="1.3"/><rect x="110" y="87" width="14" height="26" rx="2" fill="#8a6a3b"/><rect x="240" y="67.3" width="22" height="65.4" rx="2" fill="#555b64"/><line x1="24" y1="91" x2="24" y2="52" stroke="#1b2a41" stroke-width="1.6" marker-end="url(#arrMono)"/><circle cx="24" cy="100" r="7" fill="#1b2a41"/><circle cx="24" cy="42" r="7" fill="#ffffff" stroke="#1b2a41" stroke-width="1.6" stroke-dasharray="2 2"/><defs><marker id="arrMono" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0, 7 3, 0 6" fill="#1b2a41"/></marker></defs><g class="bd"><circle cx="24" cy="122" r="8"/><text x="24" y="125.6">1</text></g><g class="bd"><circle cx="117" cy="128" r="8"/><text x="117" y="131.6">2</text></g><g class="bd"><circle cx="251" cy="152" r="8"/><text x="251" y="155.6">3</text></g><line class="ld" x1="180" y1="52" x2="180" y2="76"/><g class="bd"><circle cx="180" cy="52" r="8"/><text x="180" y="55.6">4</text></g><g class="bd"><circle cx="46" cy="72" r="8"/><text x="46" y="75.6">5</text></g><line class="ld" x1="70" y1="34" x2="70" y2="53"/><g class="bd"><circle cx="70" cy="34" r="8"/><text x="70" y="37.6">6</text></g></svg>
+<ol class="mi-legend">
+  <li><b>Göz, ilk konum</b> (dolu daire). Tek göz açık.</li>
+  <li><b>Küçük ve yakın kupa</b> (kahverengi).</li>
+  <li><b>Büyük ve uzak kupa</b> (gri).</li>
+  <li><b>Aynı ışın çifti</b> (gri kesikli): iki kupanın kenarları aynı iki ışının üzerindedir, yani ekranda <b>aynı piksel boyunda</b> görünürler. Tek bir görüntüden hangisi olduğu anlaşılamaz.</li>
+  <li><b>Boyun kayması <var>B</var><sub>boyun</sub></b> (ok): baş yana kayar, göz kesik çizgili daireye taşınır.</li>
+  <li><b>Yeni görüş ışınları</b> (turuncu): yeni konumdan bakınca yakın kupa uzak kupadan daha çok yer değiştirir. Bu kayma <var>Δu</var><sub>mp</sub> paralakstır.</li>
+</ol>
+<div class="mf">
+  <div><var>s</var> = <var>f</var> · <var>W</var> / <var>Z</var> &nbsp; (tek denklem, iki bilinmeyen: <var>W</var> ve <var>Z</var>)</div>
+  <div><var>Z</var><sub>mp</sub> = <var>f</var> · <var>B</var><sub>boyun</sub> / <var>Δu</var><sub>mp</sub> &nbsp;⇒&nbsp; <var>Ŵ</var><sub>hedef</sub> = <var>s</var><sub>hedef</sub> · <var>Z</var><sub>mp</sub> / <var>f</var></div>
+</div>
+<table class="mi-params"><tr><th>Simge</th><th>Anlamı</th><th>Birim · örnek</th></tr>
+<tr><td><var>B</var><sub>boyun</sub></td><td>Başın yana kayma miktarı (iki bakış arasındaki taban)</td><td>m · 0.059 m</td></tr>
+<tr><td><var>Δu</var><sub>mp</sub></td><td>Hedefin iki bakış arasında ekranda kayması (paralaks)</td><td>piksel</td></tr>
+<tr><td><var>Z</var><sub>mp</sub></td><td>Paralakstan bulunan derinlik</td><td>m</td></tr>
+<tr><td><var>Ŵ</var><sub>hedef</sub></td><td>Hedefin kestirilen gerçek boyu (şapka = kestirim)</td><td>m</td></tr>
+<tr><td><var>r</var><sub>0</sub></td><td>Kâhinsiz yasada el/hedef boyut oranı varsayımı (makale §8.7)</td><td>birimsiz · %5 hata ⇒ yanlış derinlik</td></tr>
+</table>
+<div class="mi-read"><b>Nasıl okunur:</b> Tek göz sabit dururken küçük-yakın ile büyük-uzak nesne ayırt edilemez. Yalnız başı döndürmek de yetmez, çünkü göz yer değiştirmez (<var>B</var><sub>boyun</sub> = 0). Baş yana kayınca yakın nesne daha çok kayar ve derinlik üçgenlenebilir. Makalede kâhinsiz yasa boyut oranı doğruysa tek gözle de hedefe ulaştı; oran %5 yanlışsa güvenle ama yanlış derinliğe gitti.</div>
+</div>
+<div class="math-mini-card">
+<b class="mi-title">3. Gecikme varken kol neden hedefi delip geçmez? (1/<var>e</var> kuralı)</b>
+<svg class="math-illu" viewBox="0 0 320 175" role="img" aria-label="Gecikmeli döngünün yanıtı: kδ küçük, 1/e ve büyük"><g stroke="#555b64" stroke-width="1"><line x1="44" y1="16" x2="44" y2="142"/><line x1="44" y1="142" x2="300" y2="142"/></g><line x1="44" y1="89" x2="296" y2="89" stroke="#b9b3a8" stroke-width="1" stroke-dasharray="4 3"/><line x1="44" y1="142" x2="44" y2="146" stroke="#555b64"/><text class="tk" x="44" y="156" text-anchor="middle">0</text><line x1="107" y1="142" x2="107" y2="146" stroke="#555b64"/><text class="tk" x="107" y="156" text-anchor="middle">2</text><line x1="170" y1="142" x2="170" y2="146" stroke="#555b64"/><text class="tk" x="170" y="156" text-anchor="middle">4</text><line x1="233" y1="142" x2="233" y2="146" stroke="#555b64"/><text class="tk" x="233" y="156" text-anchor="middle">6</text><line x1="296" y1="142" x2="296" y2="146" stroke="#555b64"/><text class="tk" x="296" y="156" text-anchor="middle">8</text><text class="tk" x="38" y="28" text-anchor="end">1</text><text class="tk" x="38" y="92" text-anchor="end">0</text><text class="tk" x="38" y="124" text-anchor="end">−0.5</text><text class="lb" x="300" y="170" text-anchor="end">t / δ</text><text class="lb" x="50" y="12">e(t) / e<tspan baseline-shift="sub" font-size="72%">0</tspan></text><polyline fill="none" stroke="#3f6b5a" stroke-width="1.8" points="44.0,25.2 45.6,25.8 47.1,26.5 48.7,27.1 50.3,27.7 51.9,28.4 53.5,29.0 55.0,29.7 56.6,30.3 58.2,30.9 59.8,31.6 61.3,32.2 62.9,32.8 64.5,33.5 66.0,34.1 67.6,34.8 69.2,35.4 70.8,36.0 72.3,36.7 73.9,37.3 75.5,37.9 77.1,38.6 78.7,39.2 80.2,39.8 81.8,40.4 83.4,41.1 85.0,41.7 86.5,42.3 88.1,42.8 89.7,43.4 91.2,44.0 92.8,44.6 94.4,45.1 96.0,45.7 97.5,46.3 99.1,46.8 100.7,47.3 102.3,47.9 103.8,48.4 105.4,48.9 107.0,49.4 108.6,49.9 110.2,50.4 111.7,50.9 113.3,51.4 114.9,51.9 116.5,52.4 118.0,52.8 119.6,53.3 121.2,53.8 122.8,54.2 124.3,54.7 125.9,55.1 127.5,55.5 129.1,56.0 130.6,56.4 132.2,56.8 133.8,57.2 135.3,57.6 136.9,58.0 138.5,58.4 140.1,58.8 141.7,59.2 143.2,59.6 144.8,60.0 146.4,60.4 147.9,60.7 149.5,61.1 151.1,61.5 152.7,61.8 154.2,62.2 155.8,62.5 157.4,62.8 159.0,63.2 160.6,63.5 162.1,63.8 163.7,64.2 165.3,64.5 166.8,64.8 168.4,65.1 170.0,65.4 171.6,65.7 173.1,66.0 174.7,66.3 176.3,66.6 177.9,66.9 179.4,67.2 181.0,67.5 182.6,67.7 184.2,68.0 185.8,68.3 187.3,68.5 188.9,68.8 190.5,69.1 192.1,69.3 193.6,69.6 195.2,69.8 196.8,70.1 198.4,70.3 199.9,70.6 201.5,70.8 203.1,71.0 204.7,71.3 206.2,71.5 207.8,71.7 209.4,71.9 210.9,72.2 212.5,72.4 214.1,72.6 215.7,72.8 217.2,73.0 218.8,73.2 220.4,73.4 222.0,73.6 223.6,73.8 225.1,74.0 226.7,74.2 228.3,74.4 229.9,74.6 231.4,74.8 233.0,74.9 234.6,75.1 236.2,75.3 237.7,75.5 239.3,75.7 240.9,75.8 242.4,76.0 244.0,76.2 245.6,76.3 247.2,76.5 248.8,76.7 250.3,76.8 251.9,77.0 253.5,77.1 255.1,77.3 256.6,77.4 258.2,77.6 259.8,77.7 261.4,77.9 262.9,78.0 264.5,78.2 266.1,78.3 267.6,78.4 269.2,78.6 270.8,78.7 272.4,78.8 273.9,79.0 275.5,79.1 277.1,79.2 278.7,79.3 280.2,79.5 281.8,79.6 283.4,79.7 285.0,79.8 286.6,79.9 288.1,80.1 289.7,80.2 291.3,80.3 292.9,80.4 294.4,80.5"/><polyline fill="none" stroke="#1b2a41" stroke-width="1.8" points="44.0,25.2 45.6,26.4 47.1,27.5 48.7,28.7 50.3,29.9 51.9,31.1 53.5,32.2 55.0,33.4 56.6,34.6 58.2,35.7 59.8,36.9 61.3,38.1 62.9,39.3 64.5,40.4 66.0,41.6 67.6,42.8 69.2,44.0 70.8,45.1 72.3,46.3 73.9,47.5 75.5,48.7 77.1,49.8 78.7,51.0 80.2,52.1 81.8,53.2 83.4,54.3 85.0,55.3 86.5,56.3 88.1,57.4 89.7,58.3 91.2,59.3 92.8,60.3 94.4,61.2 96.0,62.1 97.5,63.0 99.1,63.8 100.7,64.7 102.3,65.5 103.8,66.3 105.4,67.1 107.0,67.8 108.6,68.5 110.2,69.3 111.7,69.9 113.3,70.6 114.9,71.3 116.5,71.9 118.0,72.5 119.6,73.1 121.2,73.7 122.8,74.2 124.3,74.8 125.9,75.3 127.5,75.8 129.1,76.3 130.6,76.7 132.2,77.2 133.8,77.6 135.3,78.1 136.9,78.5 138.5,78.9 140.1,79.2 141.7,79.6 143.2,80.0 144.8,80.3 146.4,80.6 147.9,81.0 149.5,81.3 151.1,81.6 152.7,81.9 154.2,82.1 155.8,82.4 157.4,82.7 159.0,82.9 160.6,83.1 162.1,83.4 163.7,83.6 165.3,83.8 166.8,84.0 168.4,84.2 170.0,84.4 171.6,84.6 173.1,84.8 174.7,84.9 176.3,85.1 177.9,85.2 179.4,85.4 181.0,85.5 182.6,85.7 184.2,85.8 185.8,85.9 187.3,86.1 188.9,86.2 190.5,86.3 192.1,86.4 193.6,86.5 195.2,86.6 196.8,86.7 198.4,86.8 199.9,86.9 201.5,87.0 203.1,87.1 204.7,87.1 206.2,87.2 207.8,87.3 209.4,87.4 210.9,87.4 212.5,87.5 214.1,87.6 215.7,87.6 217.2,87.7 218.8,87.7 220.4,87.8 222.0,87.8 223.6,87.9 225.1,87.9 226.7,88.0 228.3,88.0 229.9,88.1 231.4,88.1 233.0,88.1 234.6,88.2 236.2,88.2 237.7,88.2 239.3,88.3 240.9,88.3 242.4,88.3 244.0,88.3 245.6,88.4 247.2,88.4 248.8,88.4 250.3,88.4 251.9,88.5 253.5,88.5 255.1,88.5 256.6,88.5 258.2,88.6 259.8,88.6 261.4,88.6 262.9,88.6 264.5,88.6 266.1,88.6 267.6,88.7 269.2,88.7 270.8,88.7 272.4,88.7 273.9,88.7 275.5,88.7 277.1,88.7 278.7,88.7 280.2,88.7 281.8,88.8 283.4,88.8 285.0,88.8 286.6,88.8 288.1,88.8 289.7,88.8 291.3,88.8 292.9,88.8 294.4,88.8"/><polyline fill="none" stroke="#7d2a2f" stroke-width="1.8" points="44.0,25.2 45.6,29.0 47.1,32.8 48.7,36.7 50.3,40.5 51.9,44.3 53.5,48.2 55.0,52.0 56.6,55.8 58.2,59.6 59.8,63.5 61.3,67.3 62.9,71.1 64.5,74.9 66.0,78.8 67.6,82.6 69.2,86.4 70.8,90.2 72.3,94.1 73.9,97.9 75.5,101.7 77.1,105.4 78.7,108.9 80.2,112.2 81.8,115.2 83.4,118.0 85.0,120.6 86.5,122.9 88.1,125.0 89.7,126.9 91.2,128.6 92.8,130.0 94.4,131.2 96.0,132.1 97.5,132.9 99.1,133.4 100.7,133.6 102.3,133.7 103.8,133.5 105.4,133.1 107.0,132.4 108.6,131.6 110.2,130.5 111.7,129.2 113.3,127.7 114.9,126.0 116.5,124.2 118.0,122.3 119.6,120.2 121.2,117.9 122.8,115.6 124.3,113.2 125.9,110.7 127.5,108.1 129.1,105.5 130.6,102.9 132.2,100.2 133.8,97.5 135.3,94.8 136.9,92.2 138.5,89.6 140.1,87.0 141.7,84.4 143.2,82.0 144.8,79.6 146.4,77.3 147.9,75.2 149.5,73.1 151.1,71.2 152.7,69.4 154.2,67.7 155.8,66.2 157.4,64.8 159.0,63.6 160.6,62.5 162.1,61.6 163.7,60.8 165.3,60.2 166.8,59.8 168.4,59.5 170.0,59.4 171.6,59.4 173.1,59.6 174.7,60.0 176.3,60.4 177.9,61.1 179.4,61.8 181.0,62.7 182.6,63.7 184.2,64.8 185.8,66.1 187.3,67.4 188.9,68.8 190.5,70.3 192.1,71.8 193.6,73.5 195.2,75.1 196.8,76.8 198.4,78.6 199.9,80.3 201.5,82.1 203.1,83.9 204.7,85.7 206.2,87.4 207.8,89.1 209.4,90.8 210.9,92.5 212.5,94.1 214.1,95.6 215.7,97.1 217.2,98.5 218.8,99.9 220.4,101.1 222.0,102.3 223.6,103.4 225.1,104.3 226.7,105.2 228.3,106.0 229.9,106.7 231.4,107.3 233.0,107.7 234.6,108.1 236.2,108.3 237.7,108.5 239.3,108.5 240.9,108.5 242.4,108.3 244.0,108.1 245.6,107.7 247.2,107.3 248.8,106.7 250.3,106.1 251.9,105.4 253.5,104.7 255.1,103.8 256.6,102.9 258.2,102.0 259.8,101.0 261.4,100.0 262.9,98.9 264.5,97.8 266.1,96.6 267.6,95.5 269.2,94.3 270.8,93.1 272.4,92.0 273.9,90.8 275.5,89.6 277.1,88.5 278.7,87.4 280.2,86.3 281.8,85.3 283.4,84.3 285.0,83.3 286.6,82.4 288.1,81.5 289.7,80.7 291.3,79.9 292.9,79.2 294.4,78.6"/><line class="ld" x1="205.5" y1="58.8" x2="201.5" y2="70.8"/><g class="bd"><circle cx="205.5" cy="58.8" r="8"/><text x="205.5" y="62.4">1</text></g><line class="ld" x1="146.5" y1="102.9" x2="138.5" y2="78.9"/><g class="bd"><circle cx="146.5" cy="102.9" r="8"/><text x="146.5" y="106.5">2</text></g><line class="ld" x1="76" y1="136" x2="101.8" y2="133.7"/><g class="bd"><circle cx="76" cy="136" r="8"/><text x="76" y="139.6">3</text></g><g class="bd"><circle cx="309" cy="89" r="8"/><text x="309" y="92.6">4</text></g></svg>
+<ol class="mi-legend">
+  <li><b>Yeşil, <var>k</var>·<var>δ</var> = 0.2:</b> kazanç küçük. Kol hedefe hiç geçmeden ama yavaş yaklaşır.</li>
+  <li><b>Lacivert, <var>k</var>·<var>δ</var> = 1/e ≈ 0.368:</b> geçmeden yaklaşmanın <b>en hızlı</b> hâli (sınır).</li>
+  <li><b>Kırmızı, <var>k</var>·<var>δ</var> = 1.2:</b> kazanç sınırı aşar. Hata sıfırın altına iner, yani el hedefi deler ve salınır.</li>
+  <li><b>Kesikli gri çizgi:</b> hedef (hata = 0).</li>
+</ol>
+<div class="mi-lines">Yatay eksen zamanı gecikme cinsinden gösterir (2 = iki gecikme süresi). Dikey eksen başlangıç hatasına bölünmüş kalan hatadır.</div>
+<div class="mf">
+  <div><var>ė</var>(<var>t</var>) = −<var>k</var> · <var>e</var>(<var>t</var> − <var>δ</var>)</div>
+  <div>hedefi geçmeden yaklaşma &nbsp;⇔&nbsp; <var>k</var> · <var>δ</var> ≤ 1/<var>e</var> ≈ 0.368 &nbsp;⇒&nbsp; <var>k</var> = (1/<var>e</var>) / <var>δ</var><sub>eff</sub></div>
+</div>
+<table class="mi-params"><tr><th>Simge</th><th>Anlamı</th><th>Birim · örnek</th></tr>
+<tr><td><var>e</var>(<var>t</var>)</td><td>El ile hedef arasındaki kalan hata</td><td>mm veya piksel</td></tr>
+<tr><td><var>ė</var>(<var>t</var>)</td><td>Hatanın değişim hızı (üstteki nokta = zamana göre türev)</td><td>mm/s</td></tr>
+<tr><td><var>δ</var></td><td>Görsel gecikme: görüntünün çekilmesi ile kullanılması arasındaki süre</td><td>s · 0.06–0.20 s</td></tr>
+<tr><td><var>k</var></td><td>Kazanç: hatanın ne kadar hızlı kapatılacağı</td><td>1/s · 2.45 s⁻¹ (60 ms)</td></tr>
+<tr><td><var>e</var> (sabit)</td><td>Euler sayısı 2.718…; 1/<var>e</var> ≈ 0.368</td><td>—</td></tr>
+<tr><td><var>δ</var><sub>eff</sub></td><td>Etkin gecikme: ölçülen gecikme + servo gecikmesi + ortalama ve örnekleme gecikmesi (5. karta bakın)</td><td>s · 0.15 s (60 ms için)</td></tr>
+</table>
+<div class="mi-read"><b>Nasıl okunur:</b> Kol, <var>δ</var> saniye önceki görüntüye göre hareket eder. Kazanç çok büyükse el, görüntü yetişmeden hedefin ötesine geçer. <var>k</var>·<var>δ</var> çarpımı 1/<var>e</var>'yi aşmadıkça bu olmaz. <b>Örnek:</b> <var>δ</var><sub>eff</sub> = 0.10 s ise <var>k</var> ≤ 3.68 s⁻¹; gecikme 0.20 s olunca <var>k</var> ≤ 1.84 s⁻¹. Gecikme iki katına çıkınca kazanç yarıya iner. HLSL/HDA kontrolcülerinde bu hız ayrıca bir çan eğrisi zarfı <var>φ</var>(<var>t</var>) ile çarpılır.</div>
+</div>
+<div class="math-mini-card">
+<b class="mi-title">4. 6 eksenli 3B kinematik: bel, omuz, dirsek ve bilek</b>
+<svg class="math-illu" viewBox="0 0 320 175" role="img" aria-label="Kol zinciri: bel, omuz-dirsek taşıma, bilek yönelim, hedef ve erişim sınırı"><polyline fill="none" stroke="#a7a196" stroke-width="1.2" stroke-dasharray="4 3" points="222.3,-53.9 226.2,-47.5 229.8,-40.9 233.2,-34.2 236.4,-27.4 239.3,-20.5 242.0,-13.5 244.5,-6.4 246.7,0.7 248.6,8.0 250.3,15.3 251.7,22.7 252.9,30.1 253.8,37.5 254.5,45.0 254.9,52.5 255.0,60.0 254.9,67.5 254.5,75.0 253.8,82.5 252.9,89.9 251.7,97.3 250.3,104.7 248.6,112.0 246.7,119.3 244.5,126.4 242.0,133.5 239.3,140.5 236.4,147.4 233.2,154.2 229.8,160.9 226.2,167.5 222.3,173.9"/><line x1="40" y1="166" x2="40" y2="60" stroke="#7a7f87" stroke-width="7" stroke-linecap="round"/><ellipse cx="40" cy="148" rx="15" ry="5" fill="none" stroke="#1b2a41" stroke-width="1.4"/><line x1="40" y1="60" x2="120" y2="95" stroke="#1b2a41" stroke-width="6" stroke-linecap="round"/><line x1="120" y1="95" x2="195" y2="72" stroke="#1b2a41" stroke-width="5" stroke-linecap="round"/><line x1="195" y1="72" x2="222" y2="64" stroke="#3f6b5a" stroke-width="4" stroke-linecap="round"/><circle cx="40" cy="60" r="6" fill="#fff" stroke="#1b2a41" stroke-width="2"/><circle cx="40" cy="60" r="1.8" fill="#1b2a41"/><circle cx="120" cy="95" r="5.5" fill="#fff" stroke="#1b2a41" stroke-width="2"/><circle cx="195" cy="72" r="7" fill="#fff" stroke="#3f6b5a" stroke-width="2"/><circle cx="234" cy="55" r="7" fill="none" stroke="#e0a04a" stroke-width="2.2"/><g class="bd"><circle cx="66" cy="152" r="8"/><text x="66" y="155.6">1</text></g><g class="bd"><circle cx="80" cy="114" r="8"/><text x="80" y="117.6">2</text></g><g class="bd"><circle cx="195" cy="98" r="8"/><text x="195" y="101.6">3</text></g><g class="bd"><circle cx="234" cy="33" r="8"/><text x="234" y="36.6">4</text></g><line class="ld" x1="268" y1="146" x2="244" y2="128"/><g class="bd"><circle cx="268" cy="146" r="8"/><text x="268" y="149.6">5</text></g><line class="ld" x1="18" y1="40" x2="34" y2="56"/><g class="bd"><circle cx="18" cy="40" r="8"/><text x="18" y="43.6">6</text></g></svg>
+<ol class="mi-legend">
+  <li><b>J1, bel:</b> gövde dikey eksen etrafında döner (elips). Hedef erişim dışındaysa devreye girer.</li>
+  <li><b>J2–J3, omuz ve dirsek</b> (lacivert kollar): elin <b>konumunu</b> taşır. Bunun matematiği <var>J</var><sub>v</sub>'dir.</li>
+  <li><b>J4–J6, bilek</b> (yeşil): elin <b>yönelimini</b> ayarlar. Bunun matematiği <var>J</var><sub>ω</sub>'dır.</li>
+  <li><b>Hedef</b> (turuncu halka).</li>
+  <li><b>Erişim sınırı <var>R</var><sub>max</sub></b> (kesikli yay): kol tam açıldığında elin gidebileceği en uzak mesafe. Sınıra yaklaşınca kol tekilliğe girer.</li>
+  <li><b>Eklem ekseni <var>ẑ</var><sub>i</sub></b>: içi noktalı daire, eksenin sayfadan dışarı baktığını gösterir.</li>
+</ol>
+<div class="mf">
+  <div>[<var>v</var>; <var>ω</var>] = <var>J</var>(<var>q</var>) · <var>q̇</var>, &nbsp; <var>J</var> = [<var>J</var><sub>v</sub>; <var>J</var><sub>ω</sub>] ∈ ℝ<sup>6×6</sup></div>
+  <div><var>J</var><sub>v,i</sub> = <var>ẑ</var><sub>i−1</sub> × (<var>p</var><sub>e</sub> − <var>p</var><sub>i−1</sub>), &nbsp; <var>J</var><sub>ω,i</sub> = <var>ẑ</var><sub>i−1</sub></div>
+  <div><var>w</var>(<var>q</var>) = √det(<var>J</var><sub>v</sub> <var>J</var><sub>v</sub><sup>T</sup>), &nbsp; <var>q̇</var> = <var>J</var><sub>v</sub><sup>T</sup>(<var>J</var><sub>v</sub><var>J</var><sub>v</sub><sup>T</sup> + <var>λ</var><sup>2</sup><var>I</var>)<sup>−1</sup> <var>v</var></div>
+</div>
+<table class="mi-params"><tr><th>Simge</th><th>Anlamı</th><th>Birim · örnek</th></tr>
+<tr><td><var>q</var>, <var>q̇</var></td><td>Eklem açıları ve eklem hızları (6 eklem)</td><td>rad, rad/s</td></tr>
+<tr><td><var>v</var>, <var>ω</var></td><td>Elin doğrusal hızı ve dönme hızı</td><td>m/s, rad/s</td></tr>
+<tr><td><var>J</var>(<var>q</var>)</td><td>Jacobian: eklem hızlarını el hızına çeviren 6×6 tablo</td><td>—</td></tr>
+<tr><td><var>p</var><sub>e</sub>, <var>p</var><sub>i−1</sub></td><td>Elin ve <var>i</var>. eklemin konumu</td><td>m</td></tr>
+<tr><td><var>ẑ</var><sub>i−1</sub></td><td><var>i</var>. eklemin dönme ekseni (birim vektör)</td><td>—</td></tr>
+<tr><td><var>w</var>(<var>q</var>)</td><td>Manipülabilite: kolun her yöne ne kadar kolay hareket edebildiği. 0 = tekillik (kol tam açık)</td><td>· 0.02'nin altı riskli</td></tr>
+<tr><td><var>λ</var></td><td>Sönüm: tekilliğe yaklaşırken komutların patlamasını önler</td><td>0.02</td></tr>
+</table>
+</div>
+<div class="math-mini-card">
+<b class="mi-title">5. Kâhinsiz 1/<var>e</var> yasası: yalnız piksel ve zaman damgasıyla (makalenin ana kontrolcüsü)</b>
+<svg class="math-illu" viewBox="0 0 320 175" role="img" aria-label="Kâhinsiz 1/e yasasının döngüsü"><defs><marker id="arrPg" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0, 7 3, 0 6" fill="#555b64"/></marker></defs><rect x="6" y="20" width="96" height="34" rx="5" fill="#e9eef5"/><g class="bd"><circle cx="19" cy="37.0" r="8"/><text x="19" y="40.6">1</text></g><text class="bx" x="32" y="41.0">Kameralar</text><rect x="112" y="20" width="96" height="34" rx="5" fill="#e9eef5"/><g class="bd"><circle cx="125" cy="37.0" r="8"/><text x="125" y="40.6">2</text></g><text class="bx" x="138" y="41.0">Ortalama</text><rect x="218" y="20" width="96" height="34" rx="5" fill="#f6e9e4"/><g class="bd"><circle cx="231" cy="37.0" r="8"/><text x="231" y="40.6">3</text></g><text class="bx" x="244" y="41.0">Kazanç k</text><rect x="218" y="112" width="96" height="34" rx="5" fill="#f6e9e4"/><g class="bd"><circle cx="231" cy="129.0" r="8"/><text x="231" y="132.6">4</text></g><text class="bx" x="244" y="133.0">Komut</text><rect x="6" y="112" width="96" height="34" rx="5" fill="#e7efe9"/><g class="bd"><circle cx="19" cy="129.0" r="8"/><text x="19" y="132.6">5</text></g><text class="bx" x="32" y="133.0">Kol</text><rect x="112" y="70" width="96" height="30" rx="5" fill="#f3f1ec"/><g class="bd"><circle cx="125" cy="85.0" r="8"/><text x="125" y="88.6">6</text></g><text class="bx" x="138" y="89.0">Agulama</text><g stroke="#555b64" stroke-width="1.5" fill="none"><line x1="102" y1="37" x2="110" y2="37" marker-end="url(#arrPg)"/><line x1="208" y1="37" x2="216" y2="37" marker-end="url(#arrPg)"/><line x1="266" y1="54" x2="266" y2="110" marker-end="url(#arrPg)"/><polyline points="266,146 266,160 54,160 54,148" marker-end="url(#arrPg)"/><line x1="54" y1="112" x2="54" y2="56" marker-end="url(#arrPg)"/><line x1="208" y1="78" x2="226" y2="56" stroke-dasharray="3 2" marker-end="url(#arrPg)"/><line x1="208" y1="94" x2="226" y2="112" stroke-dasharray="3 2" marker-end="url(#arrPg)"/></g></svg>
+<ol class="mi-legend">
+  <li><b>Kameralar:</b> iki gözde elin ve hedefin piksel konumu, görüntünün çekilme anı <var>t</var><sub>cap</sub> ve kullanılma anı <var>t</var><sub>now</sub>. Kontrolcünün aldığı her şey yalnız bu kadardır.</li>
+  <li><b>Ortalama:</b> son <var>n</var> karenin retinal hatası ortalanır: <var>ē</var>. Gürültü azalır ama <var>(n−1)T/2</var> kadar gecikme eklenir.</li>
+  <li><b>Kazanç:</b> gecikme zaman damgalarından ölçülür, etkin gecikme <var>δ</var><sub>eff</sub> toplanır, <var>k</var> = (1/<var>e</var>)/<var>δ</var><sub>eff</sub> seçilir.</li>
+  <li><b>Komut:</b> öğrenilmiş Jacobian ile eklem hızları hesaplanır.</li>
+  <li><b>Kol:</b> eklem servosu komutu uygular; kamera yeni görüntüyü alır ve döngü kapanır (alt ve sol oklar).</li>
+  <li><b>Agulama (bir kez):</b> her eklem sırayla biraz oynatılır. Görüntünün nasıl değiştiğinden <var>Ĵ</var>, gecikmesinden <var>L</var> öğrenilir (kesikli oklar).</li>
+</ol>
+<div class="mf">
+  <div><var>δ</var><sub>obs</sub> = max(<var>t</var><sub>now</sub> − <var>t</var><sub>cap</sub>)</div>
+  <div><var>δ</var><sub>eff</sub> = <var>δ</var><sub>obs</sub> + <var>L</var> + (<var>n</var> − 1)<var>T</var>/2 + <var>T</var>/2, &nbsp; <var>k</var> = (1/<var>e</var>) / <var>δ</var><sub>eff</sub></div>
+  <div><var>q̇</var> = −<var>k</var> · <var>Ĵ</var><sup>T</sup>(<var>Ĵ</var><var>Ĵ</var><sup>T</sup> + <var>λ</var><sup>2</sup><var>I</var>)<sup>−1</sup> · <var>ē</var></div>
+</div>
+<table class="mi-params"><tr><th>Simge</th><th>Anlamı</th><th>Birim · örnek</th></tr>
+<tr><td><var>δ</var><sub>obs</sub></td><td>Zaman damgalarından ölçülen görsel gecikme (gerçek gecikme kontrolcüye verilmez)</td><td>s · 0.06 s</td></tr>
+<tr><td><var>L</var></td><td>Agulamada öğrenilen servo gecikmesi</td><td>s · 0.05 s</td></tr>
+<tr><td><var>n</var>, <var>T</var></td><td>Ortalanan kare sayısı ve kare süresi</td><td>8 kare, 0.01 s</td></tr>
+<tr><td><var>Ĵ</var></td><td>Öğrenilen görüntü Jacobian'ı: eklem hareketinin pikselleri nasıl değiştirdiği</td><td>px/rad</td></tr>
+<tr><td><var>ē</var></td><td>Ortalama retinal hata: el–hedef farkı (iki göz ortalaması + disparite farkı)</td><td>piksel</td></tr>
+<tr><td><var>λ</var></td><td>Sönüm</td><td>0.3 px</td></tr>
+</table>
+<div class="mi-read"><b>Örnek (60 ms):</b> <var>δ</var><sub>eff</sub> = 0.060 + 0.050 + 0.035 + 0.005 = 0.150 s ⇒ <var>k</var> = 0.368/0.150 = 2.45 s⁻¹. Makalede bu kazancın örneklenmiş döngünün kesin aşmasız sınırına %1.2 içinde denk geldiği gösterildi (Tablo 3).</div>
+</div>
+<div class="math-mini-card">
+<b class="mi-title">6. Öğrenilen şema yanılırsa ne olur? (özdeğer koşulu)</b>
+<svg class="math-illu" viewBox="0 0 320 175" role="img" aria-label="Öğrenilen şemanın özdeğeri ile tahmin edilen aşma"><rect x="44" y="16" width="72" height="126" fill="#eef3f8"/><rect x="116" y="16" width="180" height="126" fill="#f8eeee"/><g stroke="#555b64" stroke-width="1"><line x1="44" y1="16" x2="44" y2="142"/><line x1="44" y1="142" x2="300" y2="142"/></g><line x1="116" y1="16" x2="116" y2="142" stroke="#1b2a41" stroke-width="1.2" stroke-dasharray="4 3"/><line x1="71.0" y1="142" x2="71.0" y2="146" stroke="#555b64"/><text class="tk" x="71.0" y="156" text-anchor="middle">0.5</text><line x1="116.0" y1="142" x2="116.0" y2="146" stroke="#555b64"/><text class="tk" x="116.0" y="156" text-anchor="middle">1</text><line x1="161.0" y1="142" x2="161.0" y2="146" stroke="#555b64"/><text class="tk" x="161.0" y="156" text-anchor="middle">1.5</text><line x1="206.0" y1="142" x2="206.0" y2="146" stroke="#555b64"/><text class="tk" x="206.0" y="156" text-anchor="middle">2</text><line x1="251.0" y1="142" x2="251.0" y2="146" stroke="#555b64"/><text class="tk" x="251.0" y="156" text-anchor="middle">2.5</text><line x1="296.0" y1="142" x2="296.0" y2="146" stroke="#555b64"/><text class="tk" x="296.0" y="156" text-anchor="middle">3</text><text class="tk" x="38" y="135.0" text-anchor="end">0</text><text class="tk" x="38" y="98.3" text-anchor="end">20</text><text class="tk" x="38" y="61.7" text-anchor="end">40</text><text class="tk" x="38" y="25.0" text-anchor="end">60</text><text class="lb" x="300" y="170" text-anchor="end">λ</text><text class="lb" x="130" y="12">tahmini aşma (%)</text><polyline fill="none" stroke="#7d2a2f" stroke-width="2" points="44.0,132.0 53.0,132.0 62.0,132.0 71.0,132.0 80.0,132.0 89.0,132.0 98.0,132.0 107.0,132.0 116.0,132.0 125.0,131.7 134.0,129.9 143.0,126.7 152.0,122.5 161.0,117.6 170.0,112.3 179.0,106.6 188.0,100.7 197.0,94.7 206.0,88.4 215.0,82.2 224.0,75.8 233.0,69.4 242.0,62.9 251.0,56.4 260.0,49.9 269.0,43.4 278.0,36.8 287.0,30.3 296.0,23.8"/><g class="bd"><circle cx="116" cy="8" r="8"/><text x="116" y="11.6">1</text></g><g class="bd"><circle cx="200" cy="118" r="8"/><text x="200" y="121.6">2</text></g><g class="bd"><circle cx="80" cy="100" r="8"/><text x="80" y="103.6">3</text></g></svg>
+<ol class="mi-legend">
+  <li><b>λ = 1</b> (kesikli dikey çizgi): öğrenilen şema kolun tepkisini doğru biliyor.</li>
+  <li><b>λ &gt; 1</b> (kırmızı bölge): şema kolun tepkisini olduğundan zayıf sanıyor. Kazanç fazla gelir ve el hedefi aşar (kırmızı eğri).</li>
+  <li><b>λ &lt; 1</b> (mavi bölge): şema tepkiyi abartıyor. Aşma olmaz ama o yön yavaşlar; derinlik ekseni bu yüzden yavaş.</li>
+</ol>
+<div class="mf">
+  <div><var>e</var>[<var>j</var>+1] = <var>e</var>[<var>j</var>] − <var>g</var> · <var>e</var>[<var>j</var> − <var>d</var>], &nbsp; <var>g</var> = <var>k</var><var>T</var>, &nbsp; <var>g</var>* = <var>d</var><sup>d</sup> / (<var>d</var>+1)<sup>d+1</sup></div>
+  <div><var>M</var> = <var>J</var> <var>Ĵ</var><sup>+</sup>, özdeğerler <var>λ</var><sub>i</sub>: &nbsp; aşmasız ⇔ <var>λ</var><sub>max</sub> ≤ <var>k</var>*/<var>k</var> ≈ 1</div>
+</div>
+<table class="mi-params"><tr><th>Simge</th><th>Anlamı</th><th>Birim · örnek</th></tr>
+<tr><td><var>d</var></td><td>Gecikmenin kare cinsinden değeri (<var>δ</var>/<var>T</var>)</td><td>60 ms + 50 ms ⇒ 11 kare</td></tr>
+<tr><td><var>g</var>*</td><td>Örneklenmiş döngüde hedefi geçmemenin kesin üst sınırı</td><td>birimsiz</td></tr>
+<tr><td><var>J</var>, <var>Ĵ</var><sup>+</sup></td><td>Gerçek Jacobian ve öğrenilenin sönümlü tersi</td><td>—</td></tr>
+<tr><td><var>λ</var><sub>i</sub></td><td><var>M</var>'nin özdeğerleri: her yöndeki "kazanç yanılgısı"</td><td>1 = kusursuz</td></tr>
+<tr><td><var>k</var>*/<var>k</var></td><td>Kesin sınır ile yasanın kazancının oranı (makale Tablo 3)</td><td>0.99–1.00</td></tr>
+</table>
+<div class="mi-read"><b>Nasıl okunur:</b> Gecikme terimi kaldırıldığında kazanç 60 ms'de 1.65, 150 ms'de 2.64 katına çıkar. Bu grafik %12 ve %47 aşma öngörür; simülatörde %11.6 ve %41.9 ölçüldü (makale §8.3).</div>
+</div>
+</div>
 
                                                 <div class="kin-diag-wrap">
         <div class="kin-diag-title">
@@ -2089,7 +2207,7 @@
         <div class="kin3d-wrap">
           <canvas id="cvKin3D" class="kin3d-canvas" width="1100" height="560" aria-label="3B kinematik şema: eklem eksenleri, DH çerçeveleri, SO(3) bilek ve kamera frustumu"></canvas>
           <div class="kin3d-legend">
-            <span><i style="background:#c0392b"></i>x̂ᵢ</span><span><i style="background:#2e7d5b"></i>ŷᵢ</span><span><i style="background:#2f5fa7"></i>ẑᵢ eklem ekseni</span>
+            <span><i style="background:#f3efe7;border:1px solid #333"></i>göz (kamera)</span><span><i style="background:#7ccf9e"></i>gözden ele görüş</span><span><i style="background:#e0a04a"></i>gözden hedefe görüş / hedef</span><span><i style="background:#c0392b"></i>x̂ᵢ</span><span><i style="background:#2e7d5b"></i>ŷᵢ</span><span><i style="background:#2f5fa7"></i>ẑᵢ eklem ekseni</span>
             <span><i style="background:#9c7a45"></i>SO(3) el çerçevesi</span><span><i style="background:#6b7280"></i>kamera frustumu</span>
             <span class="kin3d-hint">Sürükle: döndür · Tekerlek: yakınlaş · Çift tık: sıfırla</span>
           </div>
@@ -2139,7 +2257,7 @@
           <rect x="244" y="50" width="32" height="18" rx="3" fill="#8a6a3b" stroke="#7c2d12" stroke-width="1.1"/>
           <text x="260" y="44" text-anchor="middle" font-size="6.4" font-weight="700" fill="#8a6a3b">fren pabucu</text>
           <path d="M 302 92 A 44 44 0 0 1 298 136" fill="none" stroke="#8a6a3b" stroke-width="1.5" marker-end="url(#hwTorque)"/>
-          <text x="312" y="150" font-size="7.0" font-weight="700" fill="#8a6a3b">τ_b</text>
+          <text x="312" y="150" font-size="7.0" font-weight="700" fill="#8a6a3b">τ<tspan baseline-shift="sub" font-size="72%">b</tspan></text>
 
           <!-- motor ölçüsü -->
           <line x1="24" y1="152" x2="176" y2="152" stroke="#1b2a41" stroke-width="1" marker-start="url(#hwA2)" marker-end="url(#hwB2)"/>
@@ -2149,7 +2267,7 @@
 
           <!-- τ_b tablosu -->
           <rect x="16" y="176" width="408" height="104" rx="3" fill="#fffbeb" stroke="#a9844d" stroke-width="0.9"/>
-          <text x="24" y="190" font-size="6.6" font-weight="700" fill="#8a6a3b">τ_b = 1,5 · maks |τ_g(q)| — 15 000 rastgele duruş + tüm adlandırılmış duruşlar</text>
+          <text x="24" y="190" font-size="6.6" font-weight="700" fill="#8a6a3b">τ<tspan baseline-shift="sub" font-size="72%">b</tspan> = 1,5 · maks |τ<tspan baseline-shift="sub" font-size="72%">g</tspan>(q)| — 15 000 rastgele duruş + tüm adlandırılmış duruşlar</text>
 
           <rect x="22" y="197" width="60" height="26" rx="2" fill="#faf9f7" stroke="#d9d4ca" stroke-width="0.7"/>
           <text x="52" y="207" text-anchor="middle" font-size="6.0" fill="#555b64">j₁</text>
@@ -2182,10 +2300,10 @@
           <h5>1. 3B Kinematik &amp; SO(3) Eklem Parametreleri</h5>
           <table class="param-table">
             <tr><td class="param-sym">d₁</td><td>Omuz yüksekliği (yerden kol eksenine)</td><td class="param-val" id="pd_d1">90 cm</td></tr>
-            <tr><td class="param-sym">θ_bel</td><td>Merkezi sütun (bel) Z₀-ekseni dönüşü</td><td class="param-val" id="pd_waist">0.0°</td></tr>
+            <tr><td class="param-sym">θ<sub>bel</sub></td><td>Merkezi sütun (bel) Z₀-ekseni dönüşü</td><td class="param-val" id="pd_waist">0.0°</td></tr>
             <tr><td class="param-sym">L₂ / L₃</td><td>Üst kol (humerus) / Ön kol uzunluğu</td><td class="param-val" id="pd_L23">31 / 26 cm</td></tr>
-            <tr><td class="param-sym">R_max</td><td>Güvenli 3B erişim küresi sınırı (0.88·ΣL)</td><td class="param-val" id="pd_rmax">60.7 cm</td></tr>
-            <tr><td class="param-sym">SE(3)</td><td>6-DOF uzaysal tutucu pozu (Konum + RPY / |e_ω|)</td><td class="param-val" id="pd_qsum">6-DOF SO(3)</td></tr>
+            <tr><td class="param-sym">R<sub>max</sub></td><td>Güvenli 3B erişim küresi sınırı (0.88·ΣL)</td><td class="param-val" id="pd_rmax">60.7 cm</td></tr>
+            <tr><td class="param-sym">SE(3)</td><td>6-DOF uzaysal tutucu pozu (Konum + RPY / |e<sub>ω</sub>|)</td><td class="param-val" id="pd_qsum">6-DOF SO(3)</td></tr>
             <tr><td class="param-sym">w(q)</td><td>Konum &amp; dönme manipüle edilebilirliği (6×6 J)</td><td class="param-val" id="pd_w">0.065</td></tr>
           </table>
         </div>
@@ -2193,22 +2311,22 @@
           <h5>2. Optik, Göz &amp; Boyun Parametreleri</h5>
           <table class="param-table">
             <tr><td class="param-sym">B</td><td>İki göz arası baz mesafesi (binoküler)</td><td class="param-val" id="pd_B">65 mm</td></tr>
-            <tr><td class="param-sym">B_boyun</td><td>Tek gözde boyun kayması sentetik tabanı</td><td class="param-val" id="pd_Bneck">0.0 mm</td></tr>
+            <tr><td class="param-sym">B<sub>boyun</sub></td><td>Tek gözde boyun kayması sentetik tabanı</td><td class="param-val" id="pd_Bneck">0.0 mm</td></tr>
             <tr><td class="param-sym">f</td><td>Kamera/göz odak uzaklığı (piksel)</td><td class="param-val" id="pd_f">580 px</td></tr>
-            <tr><td class="param-sym">s_g, s_t</td><td>El ve hedefin retinadaki piksel boyutu</td><td class="param-val" id="pd_sgst">-- / --</td></tr>
-            <tr><td class="param-sym">ρ_s</td><td>Ölçek oranı: (s_g/W_g)/(s_t/W_t) → 1.00</td><td class="param-val" id="pd_rho">--</td></tr>
-            <tr><td class="param-sym">Δu / Δu_mp</td><td>Yön farkı (px) / boyun paralaks kayması</td><td class="param-val" id="pd_du">--</td></tr>
+            <tr><td class="param-sym">s<sub>g</sub>, s<sub>t</sub></td><td>El ve hedefin retinadaki piksel boyutu</td><td class="param-val" id="pd_sgst">-- / --</td></tr>
+            <tr><td class="param-sym">ρ<sub>s</sub></td><td>Ölçek oranı: (s<sub>g</sub>/W<sub>g</sub>)/(s<sub>t</sub>/W<sub>t</sub>) → 1.00</td><td class="param-val" id="pd_rho">--</td></tr>
+            <tr><td class="param-sym">Δu / Δu<sub>mp</sub></td><td>Yön farkı (px) / boyun paralaks kayması</td><td class="param-val" id="pd_du">--</td></tr>
           </table>
         </div>
         <div class="param-dict-card">
           <h5>3. Kontrol, Gecikme &amp; Fren Parametreleri</h5>
           <table class="param-table">
-            <tr><td class="param-sym">τ_d</td><td>Görsel-sinirsel iletişim gecikmesi</td><td class="param-val" id="pd_td">60 ms</td></tr>
-            <tr><td class="param-sym">δ_etkin</td><td>Tutma süresi dahil toplam etkin gecikme</td><td class="param-val" id="pd_delta">85 ms</td></tr>
+            <tr><td class="param-sym">τ<sub>d</sub></td><td>Görsel-sinirsel iletişim gecikmesi</td><td class="param-val" id="pd_td">60 ms</td></tr>
+            <tr><td class="param-sym">δ<sub>etkin</sub></td><td>Tutma süresi dahil toplam etkin gecikme</td><td class="param-val" id="pd_delta">85 ms</td></tr>
             <tr><td class="param-sym">g = k·δ</td><td>Taşmama kuralı (≤ 1/e ≈ 0.368)</td><td class="param-val" id="pd_g">--</td></tr>
-            <tr><td class="param-sym">E_init</td><td>İlk balistik itki sonu kalan hata (mm)</td><td class="param-val" id="pd_einit">--</td></tr>
-            <tr><td class="param-sym">%T_comp</td><td>Kapalı-çevrim ince düzeltme süresi oranı</td><td class="param-val" id="pd_tcomp">--</td></tr>
-            <tr><td class="param-sym">τ_b</td><td>Hedef temasta motor akımını kesen fren</td><td class="param-val" id="pd_brake">KİLİTLİ</td></tr>
+            <tr><td class="param-sym">E<sub>init</sub></td><td>İlk balistik itki sonu kalan hata (mm)</td><td class="param-val" id="pd_einit">--</td></tr>
+            <tr><td class="param-sym">%T<sub>comp</sub></td><td>Kapalı-çevrim ince düzeltme süresi oranı</td><td class="param-val" id="pd_tcomp">--</td></tr>
+            <tr><td class="param-sym">τ<sub>b</sub></td><td>Hedef temasta motor akımını kesen fren</td><td class="param-val" id="pd_brake">KİLİTLİ</td></tr>
           </table>
         </div>
       </div>
@@ -2230,7 +2348,7 @@
           <div class="vc-c">Klasik Takip: 100.0 Hz sürekli kilit</div>
         </div>
         <div class="vc-pill">
-          <div class="vc-k">Balistik İlk Yaklaşım (E_init)</div>
+          <div class="vc-k">Balistik İlk Yaklaşım (E<sub>init</sub>)</div>
           <div class="vc-v" id="vcEInit">HDA/HLSL: -- mm</div>
           <div class="vc-c" id="vcEInitPid">PID: -- mm</div>
         </div>
@@ -2238,9 +2356,9 @@
 
       <div class="tier-desc" style="border-left-color:var(--teal);margin-top:4px;">
         <b>4-Eksen Akademik Okuma Anahtarı:</b>
-        <b>1. İlk Yaklaşım Hatası (E_init, mm):</b> İlk açık-çevrim balistik darbe penceresi sonunda kalan mesafe.
-        &nbsp;|&nbsp; <b>2. Kompanzasyon Payı (%T_comp):</b> Sürenin yüzde kaçının kapalı-çevrim düzeltmede geçtiği.
-        &nbsp;|&nbsp; <b>3. Etkin Görsel Yük (L_vis, Hz):</b> S0–S6 bakış makinesinin saniyede tükettiği görsel örnek sayısı.
+        <b>1. İlk Yaklaşım Hatası (E<sub>init</sub>, mm):</b> İlk açık-çevrim balistik darbe penceresi sonunda kalan mesafe.
+        &nbsp;|&nbsp; <b>2. Kompanzasyon Payı (%T<sub>comp</sub>):</b> Sürenin yüzde kaçının kapalı-çevrim düzeltmede geçtiği.
+        &nbsp;|&nbsp; <b>3. Etkin Görsel Yük (L<sub>vis</sub>, Hz):</b> S0–S6 bakış makinesinin saniyede tükettiği görsel örnek sayısı.
         &nbsp;|&nbsp; <b>4. Darbe Verimi (&eta;_pulse, %):</b> Harcanan mekanik işin faydalı yaklaşmaya oranı.
       </div>
       <div class="ik-hint" style="line-height:1.45;margin-top:4px;">
@@ -2297,11 +2415,11 @@
         <input type="range" id="rngL3" min="0.18" max="0.34" step="0.01" value="0.26">
       </div>
       <div class="ctrl-group">
-        <label>Gözler: Omuz Gerisi (X_cam) <span class="val" id="valCamX">-10 cm</span></label>
+        <label>Gözler: Omuz Gerisi (X<sub>cam</sub>) <span class="val" id="valCamX">-10 cm</span></label>
         <input type="range" id="rngCamX" min="-0.30" max="0.05" step="0.01" value="-0.10">
       </div>
       <div class="ctrl-group">
-        <label>Gözler: Omuz Üstü Yükseklik (ΔZ_cam) <span class="val" id="valCamZ">22 cm</span></label>
+        <label>Gözler: Omuz Üstü Yükseklik (ΔZ<sub>cam</sub>) <span class="val" id="valCamZ">22 cm</span></label>
         <input type="range" id="rngCamZ" min="0.10" max="0.40" step="0.01" value="0.22">
       </div>
       <div class="ctrl-group">
@@ -2337,7 +2455,7 @@
         <div class="ik-hint" id="selInfo">3B sahnede ekleme tıklayarak seçin (snap) — boşluğa tıklayınca seçim temizlenir.</div>
       </div>
       <div class="ctrl-group">
-        <label>Eklem Referans Ekseni (F_i) Hareket Modu</label>
+        <label>Eklem Referans Ekseni (F<sub>i</sub>) Hareket Modu</label>
         <div class="drag-plane" id="gizmoModeGroup">
           <button class="seg active" id="gizmoTranslate">&#8596; Eksende Ötele</button>
           <button class="seg" id="gizmoRotate">&#10227; Eksen Etrafında Döndür</button>
@@ -2387,27 +2505,27 @@
       <div class="card-title">3. Hedef Konumu &amp; Algı Gecikmesi <span class="sub">Gözlem Uzayı</span></div>
       <div class="card-explain">3B sahneden de sürükleyebileceğiniz hedef konumunu, görsel algı gecikmesini (&delta;), kamera gürültüsünü ve el yükünü belirleyin; isterseniz özel kontrol yasası yazın.</div>
       <div class="ctrl-group">
-        <label>Hedef İleri Uzaklığı (X_hedef) <span class="val" id="valTx">45 cm</span></label>
+        <label>Hedef İleri Uzaklığı (X<sub>hedef</sub>) <span class="val" id="valTx">45 cm</span></label>
         <input type="range" id="rngTx" min="0.10" max="0.85" step="0.01" value="0.45">
       </div>
       <div class="ctrl-group">
-        <label>Hedef Yanal Konumu (Y_hedef) <span class="val" id="valTy">10 cm</span></label>
+        <label>Hedef Yanal Konumu (Y<sub>hedef</sub>) <span class="val" id="valTy">10 cm</span></label>
         <input type="range" id="rngTy" min="-0.50" max="0.50" step="0.01" value="0.10">
       </div>
       <div class="ctrl-group">
-        <label>Hedef Yüksekliği (Z_hedef) <span class="val" id="valTz">85 cm</span></label>
+        <label>Hedef Yüksekliği (Z<sub>hedef</sub>) <span class="val" id="valTz">85 cm</span></label>
         <input type="range" id="rngTz" min="0.30" max="1.40" step="0.01" value="0.85">
       </div>
       <div class="ctrl-group">
-        <label>3B Yönelim Roll (φ_x) <span class="val" id="valTargetRoll">0°</span></label>
+        <label>3B Yönelim Roll (φ<sub>x</sub>) <span class="val" id="valTargetRoll">0°</span></label>
         <input type="range" id="rngTargetRoll" min="-90" max="90" step="1" value="0">
       </div>
       <div class="ctrl-group">
-        <label>3B Yönelim Pitch (θ_y) <span class="val" id="valTargetPitch">0°</span></label>
+        <label>3B Yönelim Pitch (θ<sub>y</sub>) <span class="val" id="valTargetPitch">0°</span></label>
         <input type="range" id="rngTargetPitch" min="-45" max="45" step="1" value="0">
       </div>
       <div class="ctrl-group">
-        <label>3B Yönelim Yaw (ψ_z) <span class="val" id="valTargetYaw">0°</span></label>
+        <label>3B Yönelim Yaw (ψ<sub>z</sub>) <span class="val" id="valTargetYaw">0°</span></label>
         <input type="range" id="rngTargetYaw" min="-60" max="60" step="1" value="0">
       </div>
       <div class="ctrl-group">
@@ -2415,7 +2533,7 @@
         <input type="range" id="rngDelay" min="20" max="180" step="10" value="60">
       </div>
       <div class="ctrl-group">
-        <label>Kamera Kare Hızı (f_v) & Gürültü <span class="val" id="valFps">100 Hz / 0.35 px</span></label>
+        <label>Kamera Kare Hızı (f<sub>v</sub>) & Gürültü <span class="val" id="valFps">100 Hz / 0.35 px</span></label>
         <input type="range" id="rngNoise" min="0.0" max="1.2" step="0.05" value="0.35">
       </div>
       <div class="ctrl-group">
@@ -2448,9 +2566,9 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
             <th>İlk İvme</th>
             <th>Min w(q)</th>
             <th>Tork (Nm)</th>
-            <th>E_init (mm)</th>
-            <th>T_comp (%)</th>
-            <th>L_vis (Hz)</th>
+            <th>E<sub>init</sub> (mm)</th>
+            <th>T<sub>comp</sub> (%)</th>
+            <th>L<sub>vis</sub> (Hz)</th>
             <th>&eta;_pulse (%)</th>
           </tr>
         </thead>
@@ -2458,6 +2576,32 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
           <tr><td colspan="10" style="text-align:center;color:var(--ink-muted);">Karşılaştırma için “Modelleri Karşılaştır”a basın veya simülasyonu çalıştırın</td></tr>
         </tbody>
       </table>
+    </div>
+    <div class="card fs-academic tab-hidden" data-tab="tab5" id="cardPaperPlayer">
+      <div class="card-title">Makale deneylerini izle: rastgele çalışma hacmi protokolü <span class="sub">Makale §8.11 · Tablo 12 · aynı hedefler, aynı başlangıç duruşları, aynı gürültü tohumları</span></div>
+      <div class="card-explain">
+        Kolun ulaşabildiği hacim, 20 000 rastgele eklem açısından çıkarılan bir haritayla omuz çevresinde <b>dört kabuğa</b> bölünür. Her uzanmada kol <b>12 rastgele başlangıç duruşundan</b> birinden başlar (el iki kamerada görünür, kol tekillikten uzaktır). Hedef, seçilen kabuğun içinde rastgele bir noktadır. Her hedef <b>dört kontrolcüyle</b> art arda ve aynı gürültüyle denenir (eşleştirilmiş tasarım), yalnız konum görevi. <b>Başarı:</b> 5 s içinde hedefe 6 mm içinde yerleşmek. <b>Erişilemez kabuk Z4:</b> hiçbir kontrolcü varamaz. Ölçülen, kolun tam açılıp tekilliğe girmeden durup durmadığıdır (<var>w</var><sub>min</sub> ≥ 0.001).
+        Hareket sayfanın üstündeki <b>3B sahnede, göz pencerelerinde ve yandan/üstten görünüşlerde</b> izlenir. Sonuçlar aşağıda makaledeki değerlerle yan yana birikir.
+      </div>
+      <div class="pp-zones" id="ppZones"><span data-z="Z1">Z1 yakın · 0.25–0.45 m</span><span data-z="Z2">Z2 orta · 0.45–0.58 m</span><span data-z="Z3">Z3 sınır · 0.58–0.69 m</span><span data-z="Z4">Z4 erişilemez · 0.75–0.95 m</span></div>
+      <div class="pp-modes">
+        <label><input type="radio" name="ppMode" value="w60" checked> <b>İzlenebilir set A</b>: iki göz, 60 ms. 4 bölge × 3 hedef × 4 kontrolcü = <b>48 uzanma</b>, animasyonlu (x1 hızda yaklaşık 7 dakika).</label>
+        <label><input type="radio" name="ppMode" value="w150m"> <b>İzlenebilir set B</b>: tek göz, 150 ms. 48 uzanma, animasyonlu. Metrik yasaların tek gözde hedefi deldiği koşul.</label>
+        <label><input type="radio" name="ppMode" value="full"> <b>Tam protokol (makale Tablo 12)</b>: 3 tohum × 2 görme × 2 gecikme × 4 bölge × 12 hedef × 4 kontrolcü = <b>2304 uzanma</b>, animasyonsuz hızlı hesap (birkaç dakika).</label>
+      </div>
+      <div class="pp-ctl">
+        <button class="btn btn-accent" id="ppStart">&#9654; Başlat</button>
+        <button class="btn" id="ppPause" disabled>&#10074;&#10074; Duraklat</button>
+        <button class="btn" id="ppStop" disabled>&#9632; Durdur</button>
+        <button class="btn" id="ppSkip" disabled>&#9197; Bu uzanmayı atla</button>
+        <span style="font-size:12px">Hız:</span>
+        <select id="ppSpeed"><option value="0.5">x0.5</option><option value="1" selected>x1</option><option value="2">x2</option><option value="4">x4</option></select>
+        <button class="btn" id="ppCsv" disabled>Sonuçları CSV indir</button>
+      </div>
+      <div class="pp-bar"><i id="ppBar"></i></div>
+      <div class="pp-status" id="ppStatus">Hazır. Bir set seçip &#9654; Başlat'a basın.</div>
+      <div id="ppTable"></div>
+      <div class="pp-log" id="ppLog"></div>
     </div>
     <div class="card fs-academic tab-hidden" data-tab="tab5">
       <div class="card-title">Akademik Performans Özeti <span class="sub" id="lblActiveCtrl">İnsan-HDA</span></div>
@@ -2487,15 +2631,15 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
           <div class="k-val" id="kpiTorque">-- Nm</div>
         </div>
         <div class="kpi">
-          <div class="k-lbl">İlk Yaklaşım Hatası E_init</div>
+          <div class="k-lbl">İlk Yaklaşım Hatası E<sub>init</sub></div>
           <div class="k-val" id="kpiEInit">-- mm</div>
         </div>
         <div class="kpi">
-          <div class="k-lbl">Kompanzasyon T_comp / %T_comp</div>
+          <div class="k-lbl">Kompanzasyon T<sub>comp</sub> / %T<sub>comp</sub></div>
           <div class="k-val" id="kpiTComp">-- / -- %</div>
         </div>
         <div class="kpi">
-          <div class="k-lbl">Görsel Yük L_vis</div>
+          <div class="k-lbl">Görsel Yük L<sub>vis</sub></div>
           <div class="k-val" id="kpiLVis">-- Hz</div>
         </div>
         <div class="kpi">
@@ -2514,7 +2658,7 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
         </div>
         <div>
           <div style="font-size:11px;font-weight:600;margin:0 0 3px 0;color:var(--ink);">
-            B. Kamerada Elin Perspektif Küçülmesi s_g(t) ve &rho;_s(t) &rarr; 1.0
+            B. Kamerada Elin Perspektif Küçülmesi s<sub>g</sub>(t) ve &rho;_s(t) &rarr; 1.0
           </div>
           <div class="canvas-wrap">
             <canvas id="cvPlotLoom" width="390" height="145"></canvas>
@@ -2543,15 +2687,15 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
       </div>
       <div class="method-grid">
         <div class="method-item">
-          <b>$e_f$ — Kalıcı konum hatası (mm)</b>
+          <b>$e<sub>f</sub>$ — Kalıcı konum hatası (mm)</b>
           <p>İnsan-makine etkileşiminde hedef başarısızlığı nihai isabetle ölçülür; Fitts ve Peterson'ın hız-doğruluk yasası ve ISO 9241-9 hedefleme performansı bu iki değişkeni kullanır [<a href="#ref-fitts54">Fitts 1954</a>, <a href="#ref-iso9241">ISO 9241-9</a>, <a href="#ref-mackenzie92">MacKenzie 1992</a>].</p>
         </div>
         <div class="method-item">
-          <b>TP — Fitts bilgi işleme hızı (bit/s), $ID_e = \log_2(D/W_e+1)$</b>
-          <p>ISO 9241-9 / MacKenzie tanımı: $W_e = \max(W_t, 4.133\,\sigma_e)$, $W_t=40$ mm. TP tüm gecikme/gezegen koşullarında adil tek sayısal karşılaştırma sağlar [<a href="#ref-mac92">MacKenzie 1992</a>, <a href="#ref-iso9241">ISO 9241-9</a>, <a href="#ref-crossman83">Crossman &amp; Goodeve 1983</a>].</p>
+          <b>TP — Fitts bilgi işleme hızı (bit/s), $ID_e = \log_2(D/W<sub>e</sub>+1)$</b>
+          <p>ISO 9241-9 / MacKenzie tanımı: $W<sub>e</sub> = \max(W<sub>t</sub>, 4.133\,\sigma_e)$, $W<sub>t</sub>=40$ mm. TP tüm gecikme/gezegen koşullarında adil tek sayısal karşılaştırma sağlar [<a href="#ref-mac92">MacKenzie 1992</a>, <a href="#ref-iso9241">ISO 9241-9</a>, <a href="#ref-crossman83">Crossman &amp; Goodeve 1983</a>].</p>
         </div>
         <div class="method-item">
-          <b>$T_s$ — 5 mm banda yerleşme süresi</b>
+          <b>$T<sub>s</sub>$ — 5 mm banda yerleşme süresi</b>
           <p>Salınımlı sistemlerde 2% kriterini 5 mm (hedef genişliğiyle uyumlu) olarak uygularız; yerleşmeyenler süre tavanında skorlanır. Buna gereksinim duyan jerk-minimized kontrolcülerde tercih edilmez — uyumsuzdur [<a href="#ref-flash85">Flash &amp; Hogan 1985</a>].</p>
         </div>
         <div class="method-item">
@@ -2559,11 +2703,11 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
           <p>Gecikmeli geri beslemede $k\delta \le 1/e$ kararlılık sınırı Corless–Lambert W kök bölgesidir; aşmasız monoton yaklaşımın zorunlu koşulu budur (bu makalede Önerme 1) [<a href="#ref-corless96">Corless et al. 1996</a>].</p>
         </div>
         <div class="method-item">
-          <b>$E_{init}$ ve %$T_{comp}$ — balistik/kompanzasyon ayrımı</b>
+          <b>$E<sub>init</sub>$ ve %$T<sub>comp</sub>$ — balistik/kompanzasyon ayrımı</b>
           <p>İnsan ulaşmasının iki fazlı yapısı (ilk balistik darbe + düzeltici alt-hareketler) Woodworth'tan bu yana tartışmasızdır; olayı ayıran metrik takip eder [<a href="#ref-woodworth99">Woodworth 1899</a>, <a href="#ref-crossman83">Crossman &amp; Goodeve 1983</a>].</p>
         </div>
         <div class="method-item">
-          <b>$w_{min}$ ve τ_max — tekillik &amp; tork marjı</b>
+          <b>$w<sub>min</sub>$ ve τ<sub>max</sub> — tekillik &amp; tork marjı</b>
           <p>Tam uzanma sınırında Jacobian rank kaybını ve motor koruyucu yükü gösterir; Yoshikawa manipülabilitesi ve DLS sönümlemesi bu ölçüte dayanır [<a href="#ref-yoshikawa85">Yoshikawa 1985</a>, <a href="#ref-nakamura86">Nakamura &amp; Hanafusa 1986</a>, <a href="#ref-wampler86">Wampler 1986</a>, <a href="#ref-khatib86">Khatib 1986</a>].</p>
         </div>
         <div class="method-item">
@@ -2613,19 +2757,19 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
           <div class="chart-explain-note"><b>Ne İşe Yarar?</b> İlk balistik enerji darbesinin (bordo bölge) eli hedefe ne kadar hızla yaklaştırdığını ve ince görsel kompanzasyonla (lacivert bölge) PID gibi sıçrama/aşma yapmadan nasıl kilitlendiğini gösterir.</div>
         </div>
         <div class="dash-cell">
-          <div class="dash-label">B. Balistik İlk Yaklaşım Hatası E_init — Model Karşılaştırması (ort ± 1σ, mm)</div>
+          <div class="dash-label">B. Balistik İlk Yaklaşım Hatası E<sub>init</sub> — Model Karşılaştırması (ort ± 1σ, mm)</div>
           <svg id="svgDashEInit" class="dash-svg" viewBox="0 0 580 275" xmlns="http://www.w3.org/2000/svg"></svg>
-          <div class="chart-explain-note"><b>Ne İşe Yarar?</b> Kapalı-çevrim ince ayar devralmadan önceki balistik isabet kalitesini kıyaslar; düşük <b>E_init</b>, görsel gecikme altında bile az düzeltme gereksinimi ve yüksek enerji verimi demektir.</div>
+          <div class="chart-explain-note"><b>Ne İşe Yarar?</b> Kapalı-çevrim ince ayar devralmadan önceki balistik isabet kalitesini kıyaslar; düşük <b>E<sub>init</sub></b>, görsel gecikme altında bile az düzeltme gereksinimi ve yüksek enerji verimi demektir.</div>
         </div>
         <div class="dash-cell">
-          <div class="dash-label">C. Erişim Mesafesine Göre Balistik İtki vs Görsel Kompanzasyon Süre Payı (%T_ballistic / %T_comp)</div>
+          <div class="dash-label">C. Erişim Mesafesine Göre Balistik İtki vs Görsel Kompanzasyon Süre Payı (%T<sub>ballistic</sub> / %T<sub>comp</sub>)</div>
           <svg id="svgDashComp" class="dash-svg" viewBox="0 0 580 275" xmlns="http://www.w3.org/2000/svg"></svg>
           <div class="chart-explain-note"><b>Ne İşe Yarar?</b> Yakından erişim sınırına kadar farklı mesafelerde hareketin yüzde kaçının enkodersiz balistik itkiyle, yüzde kaçının görsel düzeltmeyle tamamlandığını ölçer.</div>
         </div>
         <div class="dash-cell">
-          <div class="dash-label">D. Görsel Gecikme Dayanımı (τ_d = 20–120 ms) — Hedefi Aşma (% Overshoot)</div>
+          <div class="dash-label">D. Görsel Gecikme Dayanımı (τ<sub>d</sub> = 20–120 ms) — Hedefi Aşma (% Overshoot)</div>
           <svg id="svgDashPulse" class="dash-svg" viewBox="0 0 580 275" xmlns="http://www.w3.org/2000/svg"></svg>
-          <div class="chart-explain-note"><b>Ne İşe Yarar?</b> Kamera/işleme gecikmesi arttıkça klasik PID ve sabit kazanç (P) nasıl kararsızlığa/aşmaya sürüklenirken HDA ve HLSL modellerinin <b>g ≤ 1/(e·δ_eff)</b> sınırı sayesinde aşmasız kaldığını kanıtlar.</div>
+          <div class="chart-explain-note"><b>Ne İşe Yarar?</b> Kamera/işleme gecikmesi arttıkça klasik PID ve sabit kazanç (P) nasıl kararsızlığa/aşmaya sürüklenirken HDA ve HLSL modellerinin <b>g ≤ 1/(e·δ<sub>eff</sub>)</b> sınırı sayesinde aşmasız kaldığını kanıtlar.</div>
         </div>
       </div>
     </div>
@@ -2659,7 +2803,7 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
         <div class="bench-kpi-box">
           <div class="bk-lbl">ISO 9241-9 Fitts Verimi (TP)</div>
           <div class="bk-val" id="bkS1Tp">--</div>
-          <div class="bk-sub" id="bkS1TpSub">TP = ID_e / T_s (bit/s, nominal W_t=40 mm)</div>
+          <div class="bk-sub" id="bkS1TpSub">TP = ID_e / T<sub>s</sub> (bit/s, nominal W<sub>t</sub>=40 mm)</div>
         </div>
         <div class="bench-kpi-box">
           <div class="bk-lbl">S4 Tek-Göz Boyun Paralaksı</div>
@@ -2679,15 +2823,15 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
               <th>Senaryo</th>
               <th>Kontrol Modeli</th>
               <th>Kâhin bilgisi</th>
-              <th>Son Hata e_f (mm)</th>
+              <th>Son Hata e<sub>f</sub> (mm)</th>
               <th>Aşma (%)</th>
-              <th>Yerleşme T_s (s)</th>
+              <th>Yerleşme T<sub>s</sub> (s)</th>
               <th>Fitts TP (bit/s)</th>
-              <th>E_init (mm)</th>
-              <th>%T_comp</th>
+              <th>E<sub>init</sub> (mm)</th>
+              <th>%T<sub>comp</sub></th>
               <th>Min w(q)</th>
               <th>Tepe Tork (Nm)</th>
-              <th>Bel &theta;_bel / B_boy</th>
+              <th>Bel &theta;_bel / B<sub>boy</sub></th>
             </tr>
           </thead>
           <tbody id="tbodyAcademicBenchmark">
@@ -6927,6 +7071,122 @@ function kin3dProject(p, W, H, c, fit) {
 // Joint roles and the mathematics that runs at each joint (DH convention, live values)
 const KIN3D_ROLE = ['Bel (gövde dönmesi, yaw)', 'Omuz (fleksiyon)', 'Dirsek (fleksiyon)', 'Bilek (fleksiyon)', 'Bilek (radyal/ulnar)', 'Önkol/el dönmesi'];
 const KIN3D_DEMO_Q = [28, 62, 70, -35, -20, 22];   // non-planar demonstration pose (deg): uses all three axes
+// ===== R2: animated 3D example (fixed, not user-adjustable): oracle-free 1/e reach, recomputed each frame =====
+const KIN3D_DEMO_GOAL = [8, 40, 95, -20, -10, 10];
+const KIN3D_ANIM = { frames: null, meta: null, f: 0 };
+function kin3dSolve3(A, b) {
+  const m = A.map((r, i) => r.concat([b[i]]));
+  for (let i = 0; i < 3; i++) {
+    let p = i; for (let r = i + 1; r < 3; r++) if (Math.abs(m[r][i]) > Math.abs(m[p][i])) p = r;
+    const tmp = m[i]; m[i] = m[p]; m[p] = tmp;
+    for (let r = 0; r < 3; r++) { if (r === i) continue; const f = m[r][i] / m[i][i]; for (let c = i; c < 4; c++) m[r][c] -= f * m[i][c]; }
+  }
+  return [m[0][3] / m[0][0], m[1][3] / m[1][1], m[2][3] / m[2][2]];
+}
+function kin3dBuildDemo() {
+  const L = state.links, T = 0.01, delay = 0.10, Lag = 0.05, nwin = 8, lam = 0.02;
+  const clampQ = a => a.map((d, i) => Math.max(L[i].limits_deg[0], Math.min(L[i].limits_deg[1], d)) * DEG);
+  const q0 = clampQ(KIN3D_DEMO_Q), qg = clampQ(KIN3D_DEMO_GOAL);
+  const tgt = forwardKinematics(qg, L, 0).ee.slice();
+  const deff = delay + Lag + (nwin - 1) * T / 2 + T / 2, k = (1 / Math.E) / deff, d = Math.round(delay / T);
+  const pix = (pS) => {
+    const a = projectStereoAndLooming(pS, state.gripperRealM, 0, 0, 0, 0.0), b = projectStereoAndLooming(tgt, state.targetRealM, 0, 0, 0, 0.0);
+    return { du: 0.5 * ((b.uL + b.uR) - (a.uL + a.uR)), dv: 0.5 * ((b.vL + b.vR) - (a.vL + a.vR)), dd: (b.uL - b.uR) - (a.uL - a.uR) };
+  };
+  const fr = []; let q = q0.slice(); const hist = [];
+  const e0v = forwardKinematics(q0, L, 0).ee, e0 = Math.hypot(tgt[0] - e0v[0], tgt[1] - e0v[1], tgt[2] - e0v[2]);
+  const look = Object.assign({ q: q0.slice(), t: 0, phase: 0, eNow: e0, eSeen: e0, qd: [0, 0, 0, 0, 0, 0], w: computeJacobianAndManip(q0, L, 0).w }, pix(e0v));
+  for (let s = 0; s < 40; s++) fr.push(look);
+  for (let s = 0; s <= 420; s++) {
+    hist.push(q.slice());
+    const qs = hist[Math.max(0, hist.length - 1 - d)];
+    const ps = forwardKinematics(qs, L, 0).ee;
+    const e = [tgt[0] - ps[0], tgt[1] - ps[1], tgt[2] - ps[2]];
+    const J = [[], [], []], h = 1e-4;
+    for (let j = 0; j < 6; j++) { const qq = qs.slice(); qq[j] += h; const p2 = forwardKinematics(qq, L, 0).ee; for (let r = 0; r < 3; r++) J[r][j] = (p2[r] - ps[r]) / h; }
+    const A = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) { let sm = (r === c ? lam * lam : 0); for (let j = 0; j < 6; j++) sm += J[r][j] * J[c][j]; A[r][c] = sm; }
+    const y = kin3dSolve3(A, e);
+    let qd = [0, 1, 2, 3, 4, 5].map(j => k * (J[0][j] * y[0] + J[1][j] * y[1] + J[2][j] * y[2]));
+    const mx = Math.max(...qd.map(Math.abs)); if (mx > 0.6) qd = qd.map(v => v * 0.6 / mx);
+    const pn = forwardKinematics(q, L, 0).ee;
+    fr.push(Object.assign({ q: q.slice(), t: s * T, phase: 1, eSeen: Math.hypot(e[0], e[1], e[2]),
+      eNow: Math.hypot(tgt[0] - pn[0], tgt[1] - pn[1], tgt[2] - pn[2]), qd: qd.slice(), w: computeJacobianAndManip(q, L, 0).w }, pix(ps)));
+    q = q.map((v, j) => Math.max(L[j].limits_deg[0] * DEG, Math.min(L[j].limits_deg[1] * DEG, v + qd[j] * T)));
+  }
+  const last = fr[fr.length - 1];
+  for (let s = 0; s < 60; s++) fr.push(Object.assign({}, last, { phase: 2 }));
+  KIN3D_ANIM.frames = fr; KIN3D_ANIM.meta = { tgt, deff, k, delay, Lag, nwin, T, e0 };
+}
+function kin3dDemoFrame() {
+  if (!KIN3D_ANIM.frames) kin3dBuildDemo();
+  const fr = KIN3D_ANIM.frames, i = KIN3D_ANIM.f % fr.length;
+  return Object.assign({ tgt: KIN3D_ANIM.meta.tgt, meta: KIN3D_ANIM.meta, idx: i, all: fr }, fr[i]);
+}
+// canvas text with real subscripts/superscripts: "δ_{eff}", "s^{−1}"
+function cvMath(ctx, s, x, y, fs, color, weight, fam) {
+  fam = fam || '"Cambria Math", "Times New Roman", serif'; weight = weight || '400';
+  ctx.fillStyle = color; let cx = x, last = 0, m;
+  const re = /([_^])(\{[^}]*\}|[A-Za-z0-9α-ωΑ-Ω]+)/g;
+  const put = (t, sz, dy) => { ctx.font = weight + ' ' + sz + 'px ' + fam; ctx.fillText(t, cx, y + dy); cx += ctx.measureText(t).width; };
+  while ((m = re.exec(s))) { if (m.index > last) put(s.slice(last, m.index), fs, 0); put(m[2].replace(/^\{|\}$/g, ''), fs * 0.7, m[1] === '_' ? fs * 0.32 : -fs * 0.42); last = re.lastIndex; }
+  if (last < s.length) put(s.slice(last), fs, 0);
+  return cx;
+}
+function kin3dDemoPanel(ctx, W, H, DM, q) {
+  const X = W * 0.62; const x0 = X + 12; let y = 22;
+  ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(X, 0, W - X, H);
+  const M = DM.meta, f = DM;
+  ctx.fillStyle = '#f3efe7'; ctx.font = '600 13px Inter, system-ui'; ctx.fillText('Yasa her karede yeniden hesaplanıyor', x0, y); y += 16;
+  const ph = ['1 · BAK: el ve hedef iki gözde görülüyor', '2 · UZAN: k sabit, hata hedefi geçmeden küçülüyor', '3 · VARDI: hata < 1 mm, örnek baştan başlıyor'][f.phase];
+  ctx.fillStyle = ['#8fb7e8', '#e0a04a', '#7ccf9e'][f.phase]; ctx.font = '700 11.5px Inter, system-ui'; ctx.fillText(ph + '   t = ' + f.t.toFixed(2) + ' s', x0, y); y += 20;
+  const C = '#e9e4da', D = '#a7a196', A = '#e0a04a';
+  const row = (lab, val, col) => { cvMath(ctx, lab, x0, y, 12.5, D); if (val) cvMath(ctx, val, x0 + 150, y, 12.5, col || C, '600'); y += 18; };
+  row('gecikme δ', '= 0.100 s  (sabit örnek)');
+  row('δ_{eff} = δ + L + (n−1)T/2 + T/2', '');
+  row('', '= 0.100 + 0.050 + 0.035 + 0.005 = ' + M.deff.toFixed(3) + ' s', A);
+  row('k = (1/e) / δ_{eff}', '= 0.368 / ' + M.deff.toFixed(3) + ' = ' + M.k.toFixed(2) + ' s^{−1}', A);
+  row('k · δ_{eff}', '= 0.368 = 1/e  (aşmasız sınır)');
+  row('retinal hata ē', 'Δu = ' + f.du.toFixed(1) + '  Δv = ' + f.dv.toFixed(1) + '  Δd = ' + f.dd.toFixed(1) + ' px', A);
+  row('q̇ = −k Ĵ^{T}(ĴĴ^{T} + λ^{2}I)^{−1} ē', '');
+  row('', 'max |q̇_{i}| = ' + Math.max(...f.qd.map(Math.abs)).toFixed(3) + ' rad/s', A);
+  row('|e| (şimdi)', '= ' + (f.eNow * 1000).toFixed(1) + ' mm', A);
+  row('w(q) = √det(J_{v}J_{v}^{T})', '= ' + f.w.toFixed(4) + (f.w < 0.02 ? '  (tekilliğe yakın)' : ''));
+  y += 4;
+  ctx.fillStyle = '#c9a46a'; ctx.font = '700 11px Inter, system-ui'; ctx.fillText('Eklemler (açı θ ve hız q̇)', x0, y); y += 15;
+  state.links.forEach((L, i) => {
+    const lo = L.limits_deg[0], hi = L.limits_deg[1], th = q[i] / DEG, bw = 90, bx = x0 + 250;
+    cvMath(ctx, 'J_{' + (i + 1) + '} ' + KIN3D_ROLE[i].split(' (')[0], x0, y, 11.5, C);
+    cvMath(ctx, 'θ = ' + th.toFixed(1) + '°   q̇ = ' + (f.qd[i] >= 0 ? '+' : '') + f.qd[i].toFixed(2), x0 + 112, y, 11.5, D);
+    ctx.fillStyle = 'rgba(255,255,255,0.12)'; ctx.fillRect(bx + 40, y - 8, bw, 6);
+    ctx.fillStyle = '#c9a46a'; ctx.fillRect(bx + 40 + bw * (th - lo) / (hi - lo) - 1.5, y - 10, 3, 10);
+    y += 15;
+  });
+  // mini plot: |e|(t) over the whole reach with the current time marker
+  const gx = x0, gy = H - 118, gw = W - X - 30, gh = 78;
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx, gy + gh); ctx.lineTo(gx + gw, gy + gh); ctx.stroke();
+  const reach = DM.all.filter(r => r.phase === 1), tmax = reach[reach.length - 1].t, e0 = M.e0;
+  ctx.strokeStyle = '#e0a04a'; ctx.lineWidth = 1.8; ctx.beginPath();
+  reach.forEach((r, i) => { const px = gx + gw * r.t / tmax, py = gy + gh - gh * r.eNow / e0; if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); }); ctx.stroke();
+  const tn = f.phase === 0 ? 0 : (f.phase === 2 ? tmax : f.t);
+  const mx = gx + gw * tn / tmax, my = gy + gh - gh * f.eNow / e0;
+  ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(mx, my, 3.5, 0, 7); ctx.fill();
+  cvMath(ctx, '|e|(t) / |e|_{0}', gx + 4, gy - 6, 11.5, D);
+  cvMath(ctx, 't (s)', gx + gw - 28, gy + gh + 15, 11, D);
+  cvMath(ctx, 'hedef geçilmez: eğri sıfırın altına inmez', gx + 60, gy + gh + 15, 10.5, '#7d7a73');
+  ctx.fillStyle = '#7d7a73'; ctx.font = '500 10px Inter, system-ui';
+  ctx.fillText('Gösterim analitik kinematikle; makaledeki kâhinsiz sürümde Ĵ agulamadan öğrenilir.', x0, H - 8);
+}
+(function kin3dAnimate() {
+  const cv = document.getElementById('cvKin3D'); if (!cv) return;
+  let visible = true;
+  if ('IntersectionObserver' in window) new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(cv);
+  setInterval(() => {
+    if (!visible || document.hidden || KIN3D.demo === false || KIN3D.drag) return;
+    KIN3D_ANIM.f += 2;
+    try { drawKin3D(state.frameIdx); } catch (e) { }
+  }, 40);
+})();
 function drawKin3D(idx) {
   const cv = document.getElementById('cvKin3D'); if (!cv || !cv.getContext) return;
   const ctx = cv.getContext('2d'); const W = cv.width, H = cv.height;
@@ -6935,8 +7195,9 @@ function drawKin3D(idx) {
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
   const tr = state.traj; const k = tr && tr.q ? Math.max(0, Math.min(idx || 0, tr.q.length - 1)) : 0;
   const demo = KIN3D.demo !== false;
-  const q = demo ? KIN3D_DEMO_Q.map((d, i) => Math.max(state.links[i].limits_deg[0], Math.min(state.links[i].limits_deg[1], d)) * DEG)
-                 : (tr && tr.q ? tr.q[k] : Q0);
+  const DM = demo ? kin3dDemoFrame() : null;
+  const q = demo ? DM.q : (tr && tr.q ? tr.q[k] : Q0);
+  const TGT = demo ? DM.tgt : state.target;
   const wy = demo ? 0 : (tr && tr.waistYaw ? tr.waistYaw[k] : 0);
   const fk = forwardKinematics(q, state.links, wy);
   const sh = fk.origins[1];
@@ -6946,7 +7207,10 @@ function drawKin3D(idx) {
   const DW = W * 0.62, pad = 34;
   const pts = [];
   for (const x of [box[0], box[1]]) for (const y of [box[2], box[3]]) for (const z of [box[4], box[5]]) pts.push([x, y, z]);
-  fk.origins.slice(1).forEach(o => pts.push(o)); pts.push(state.target);
+  fk.origins.slice(1).forEach(o => pts.push(o)); pts.push(TGT);
+  const CB = getCameraBasis(0, 0, wy), EB = state.baseline || 0.065;
+  const EYES = [add3(CB.origin, scale3(CB.right, -0.5 * EB)), add3(CB.origin, scale3(CB.right, 0.5 * EB))];
+  EYES.forEach(e_ => pts.push(e_));
   const raw = pts.map(p_ => { const r = kin3dRot(p_, c); const kk = 1.6 / (2.4 + r[2]); return [r[0] * kk, r[1] * kk]; });
   const bx = [Math.min(...raw.map(r => r[0])), Math.max(...raw.map(r => r[0])), Math.min(...raw.map(r => r[1])), Math.max(...raw.map(r => r[1]))];
   const sFit = Math.min((DW - 2 * pad) / (bx[1] - bx[0]), (H - 2 * pad - 30) / (bx[3] - bx[2]));
@@ -6975,7 +7239,7 @@ function drawKin3D(idx) {
     const o = [xm, ym, zF]; line(o, add(o, v, 0.14), col, 2); const T = P(add(o, v, 0.16)); ctx.fillStyle = col; ctx.font = '600 10px Inter, system-ui'; ctx.fillText(lb, T[0] + 2, T[1]); });
   // drop lines from hand and target to the floor (depth cue)
   line(fk.ee, [fk.ee[0], fk.ee[1], zF], 'rgba(201,164,106,0.35)', 1, [3, 3]);
-  line(state.target, [state.target[0], state.target[1], zF], 'rgba(224,160,74,0.35)', 1, [3, 3]);
+  line(TGT, [TGT[0], TGT[1], zF], 'rgba(224,160,74,0.35)', 1, [3, 3]);
   // links, depth sorted
   const segs = []; for (let i = 0; i < org.length - 1; i++) segs.push([org[i], org[i + 1]]);
   segs.map(sg => [sg, P([(sg[0][0] + sg[1][0]) / 2, (sg[0][1] + sg[1][1]) / 2, (sg[0][2] + sg[1][2]) / 2])[2]])
@@ -7000,7 +7264,17 @@ function drawKin3D(idx) {
   [[fk.xAxes[n], '#e0a04a', 'x̂ₑ'], [fk.yAxes[n], '#c9b27a', 'ŷₑ'], [fk.zAxes[n], '#9c7a45', 'ẑₑ']].forEach(([v, col, lb]) => {
     line(ee, add(ee, v, ah), col, 3); const T = P(add(ee, v, ah * 1.15)); ctx.fillStyle = col; ctx.font = '600 11px Inter, system-ui'; ctx.fillText(lb, T[0] + 3, T[1]); });
   const E = P(ee); ctx.fillStyle = '#9c7a45'; ctx.beginPath(); ctx.arc(E[0], E[1], 6, 0, 7); ctx.fill();
-  const Tg = P(state.target); ctx.strokeStyle = '#e0a04a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(Tg[0], Tg[1], 9, 0, 7); ctx.stroke();
+  const Tg = P(TGT); ctx.strokeStyle = '#e0a04a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(Tg[0], Tg[1], 9, 0, 7); ctx.stroke();
+  // --- eyes (the two cameras) with sight lines to the hand (green) and the target (orange)
+  EYES.forEach(pe => { line(pe, ee, 'rgba(124,207,158,0.55)', 1, [4, 3]); line(pe, TGT, 'rgba(224,160,74,0.55)', 1, [4, 3]); });
+  EYES.forEach((pe, ii) => { const Pe = P(pe), Ph = P(ee); const dx = Ph[0] - Pe[0], dy = Ph[1] - Pe[1], dn = Math.hypot(dx, dy) || 1;
+    ctx.fillStyle = '#f3efe7'; ctx.strokeStyle = '#14171c'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(Pe[0], Pe[1], 7.5, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#2f5fa7'; ctx.beginPath(); ctx.arc(Pe[0] + 3.2 * dx / dn, Pe[1] + 3.2 * dy / dn, 3.4, 0, 7); ctx.fill();
+    ctx.fillStyle = '#0b0d10'; ctx.beginPath(); ctx.arc(Pe[0] + 3.6 * dx / dn, Pe[1] + 3.6 * dy / dn, 1.6, 0, 7); ctx.fill();
+    const lab = ii ? 'Sağ göz' : 'Sol göz'; ctx.font = '600 10px Inter, system-ui'; const tw = ctx.measureText(lab).width;
+    const lx = ii ? Pe[0] + 12 : Pe[0] - 12 - tw - 8, ly = Pe[1] - 22;
+    ctx.fillStyle = 'rgba(20,23,28,0.85)'; ctx.fillRect(lx, ly, tw + 8, 15); ctx.fillStyle = '#f3efe7'; ctx.fillText(lab, lx + 4, ly + 11); });
+  if (demo) { kin3dDemoPanel(ctx, W, H, DM, q); } else {
   // --- right panel: the mathematics running at each joint (live DH values)
   const x0 = W * 0.62 + 6; let y = 22;
   ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(W * 0.62, 0, W * 0.38, H);
@@ -7025,10 +7299,11 @@ function drawKin3D(idx) {
    'q̇ = J_vᵀ(J_vJ_vᵀ+λ²I)⁻¹ v   (DLS, tekillik)',
    'Kâhinsiz: q̇ = −k Ĵᵀ(ĴĴᵀ+λ²I)⁻¹ e_px',
    '         k = (1/e)/δ_eff,  Ĵ: babbling'].forEach(t => { ctx.fillText(t, x0, y); y += 13; });
+  }
   ctx.fillStyle = '#f3efe7'; ctx.font = '600 12px Inter, system-ui';
-  ctx.fillText(demo ? '3B örnek duruş (tüm eksenler)' : 'Canlı duruş (simülasyon)', 12, 20);
+  ctx.fillText(demo ? '3B örnek: kâhinsiz 1/e uzanması (otomatik, sabit örnek)' : 'Canlı duruş (simülasyon)', 12, 20);
   ctx.fillStyle = '#7d7a73'; ctx.font = '500 10px Inter, system-ui';
-  ctx.fillText('İzdüşümler: zemin (bronz), arka duvar (mavi), yan duvar (yeşil) · tıkla: örnek/canlı duruş', 12, 34);
+  ctx.fillText('Gözler: iki kamera · kesikli yeşil: gözden ele, kesikli turuncu: gözden hedefe · gölgeler: zemin (bronz), arka (mavi), yan (yeşil) · tıkla: örnek/canlı', 12, 34);
 }
 (function bindKin3D() {
   const cv = document.getElementById('cvKin3D'); if (!cv || !cv.addEventListener) return;
@@ -8889,9 +9164,9 @@ document.getElementById('btnResetToStart').addEventListener('click', () => {
 });
 document.getElementById('btnOpenBenchmark').addEventListener('click', () => {
   if (typeof window.__activateTab === 'function') window.__activateTab('tab5');
-  setModeBanner('', 'AKADEMİK BENCHMARK — Sekme 5: ▶ "Standart 5-Senaryo Akademik Benchmark Test", "Çapraz Hacim" veya "Rastgele Hacim" düğmesine basın');
+  setModeBanner('', 'AKADEMİK BENCHMARK — Sekme 5: "Makale deneylerini izle" kartında bir set seçip ▶ Başlat\'a basın (toplu simülasyon, makale Tablo 12)');
   setTimeout(() => {
-    const b = document.getElementById('btnRunAcademicBenchmark');
+    const b = document.getElementById('cardPaperPlayer') || document.getElementById('btnRunAcademicBenchmark');
     if (b) { b.scrollIntoView({behavior: 'smooth', block: 'center'}); b.classList.add('qw-flash'); setTimeout(() => b.classList.remove('qw-flash'), 2400); }
   }, 120);
 });
@@ -11100,6 +11375,204 @@ runAndAnimate();
   });
   ov.addEventListener('click', close);
   document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') close(); });
+})();
+</script>
+
+<script>
+// ===== R2: paper-experiment player (randomised workspace protocol, paper §8.11 / Table 12) =====
+(function paperPlayer() {
+  const $ = id => document.getElementById(id);
+  if (!$('cardPaperPlayer') || typeof ZONE_BENCH_PAPER === 'undefined') return;
+  const ZN = { Z1: 'yakın', Z2: 'orta', Z3: 'sınır', Z4: 'erişilemez' };
+  const CTRL = ['pg', 'governor', 'fixed', 'pid'];
+  const CL = { pg: 'Kâhinsiz 1/e (bu çalışma)', governor: 'Kâhinli governor', fixed: 'Sabit kazanç', pid: 'PID' };
+  const PAPER = {
+    'binocular|0.06': { pg: [88, 5.3, 2.50], governor: [100, 1.6, 0.84], fixed: [100, 11.5, 0.87], pid: [44, 10.8, 0.60] },
+    'binocular|0.15': { pg: [97, 3.2, 2.02], governor: [100, 1.5, 1.08], fixed: [6, 66.3, null], pid: [3, 65.8, null] },
+    'mono_left|0.06': { pg: [91, 8.4, 2.37], governor: [99, 97.0, 0.92], fixed: [99, 83.9, 0.85], pid: [31, 81.6, 0.76] },
+    'mono_left|0.15': { pg: [99, 3.7, 2.02], governor: [100, 114.3, 1.21], fixed: [0, 125.9, null], pid: [0, 124.9, null] } };
+  const PAPER_UNR = { 'binocular|0.06': 100, 'binocular|0.15': 94, 'mono_left|0.06': 100, 'mono_left|0.15': 100 };   // oracle-free; metric laws 0 %
+  const P = { jobs: [], i: 0, res: [], running: false, paused: false, timer: null, mode: null, snap: null, cur: null, frameF: 0, anim: false, t0: 0 };
+  window.__qwPaperPlayer = P;
+  function buildJobs(mode) {
+    const out = [], zs = ['Z1', 'Z2', 'Z3', 'Z4'];
+    const add = (seed, vm, dl, nT) => zs.forEach((z, zi) => { for (let i = 0; i < nT; i++) CTRL.forEach(c => out.push({ seed, vm, dl, z, zi, i, c })); });
+    if (mode === 'w60') add(0, 'binocular', 0.06, 3);
+    else if (mode === 'w150m') add(0, 'mono_left', 0.15, 3);
+    else [0, 1, 2].forEach(sd => ['binocular', 'mono_left'].forEach(vm => [0.06, 0.15].forEach(dl => add(sd, vm, dl, 12))));
+    return out;
+  }
+  function setEnv(j) {
+    const tg = ZONE_BENCH_PAPER.targets[j.z][j.i];
+    Q0 = ZONE_BENCH_PAPER.postures_deg[j.i].map(d => d * DEG);
+    state.target = tg.slice(); state.delay = j.dl; state.visionMode = j.vm; state.speed.dur = 5.0;
+    return tg;
+  }
+  function simJob(j) {
+    if (P.head && typeof restoreHeadWaistState === 'function') restoreHeadWaistState(P.head);   // every reach starts from the same head state, as in the benchmark
+    const tg = setEnv(j);
+    const reachSeed = 100003 * j.seed + 7919 * (j.vm === 'binocular' ? 0 : 1) + 997 * Math.round(j.dl * 1000) + 101 * j.zi + j.i;
+    const o = projectStereoAndLooming(tg, state.targetRealM, 0, 0, 0, 0.0);
+    const inView = o.uL >= 0 && o.uL <= state.imgW && o.vL >= 0 && o.vL <= state.imgH && o.zCam > 0.15;
+    const origOri = computeOrientationErrorSO3;
+    computeOrientationErrorSO3 = (a, b) => Object.assign({}, origOri(a, b), { errDeg: 0, eVec: [0, 0, 0] });
+    let tr;
+    try { __rand = __seededRandom(reachSeed); tr = runSimulationForController(j.c, 'human_wdls', { isGhost: true, disableWaistSync: true }); }
+    finally { computeOrientationErrorSO3 = origOri; __rand = Math.random; }
+    const m = tr.metrics;
+    return { tr, row: Object.assign({}, j, { finalErrMm: m.finalErrMm, overshootPct: m.overshootPct, mt: m.mt, settled: !!m.settledWithin,
+      minW: m.minW, inView, ok: !!(m.settledWithin && m.finalErrMm <= 6) }) };
+  }
+  const med = a => { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y), n = s.length; return n % 2 ? s[(n - 1) / 2] : 0.5 * (s[n / 2 - 1] + s[n / 2]); };
+  const f1 = v => (v === null || v === undefined) ? '—' : v.toFixed(1), f2 = v => (v === null || v === undefined) ? '—' : v.toFixed(2);
+  function render() {
+    const n = P.jobs.length || 1;
+    $('ppBar').style.width = (100 * P.i / n).toFixed(1) + '%';
+    const conds = {};
+    P.res.forEach(r => { const k = r.vm + '|' + r.dl; (conds[k] = conds[k] || []).push(r); });
+    let html = '';
+    Object.keys(conds).forEach(k => {
+      const rs = conds[k], [vm, dl] = k.split('|');
+      html += '<table class="pp-tab"><tr><th rowspan="2">' + (vm === 'binocular' ? 'İki göz' : 'Tek göz') + ', ' + Math.round(+dl * 1000) + ' ms</th>'
+        + '<th colspan="4">Ulaşılabilir hedefler (Z1–Z3, görüşte)</th><th colspan="2">Erişilemez Z4</th></tr>'
+        + '<tr><th>n</th><th>başarı · <span class="pp-paper">makale</span></th><th>en büyük aşma · <span class="pp-paper">makale</span></th><th>medyan süre · <span class="pp-paper">makale</span></th>'
+        + '<th>n</th><th>tekilliğe girmeden durdu · <span class="pp-paper">makale</span></th></tr>';
+      CTRL.forEach(c => {
+        const R = rs.filter(r => r.c === c && r.z !== 'Z4' && r.inView), U = rs.filter(r => r.c === c && r.z === 'Z4');
+        if (!R.length && !U.length) return;
+        const pp = (PAPER[k] || {})[c] || [null, null, null];
+        const succ = R.length ? 100 * R.filter(r => r.ok).length / R.length : null;
+        const mos = R.length ? Math.max(...R.map(r => r.overshootPct)) : null;
+        const mt = med(R.filter(r => r.ok).map(r => r.mt));
+        const stop = U.length ? 100 * U.filter(r => r.minW >= 1e-3).length / U.length : null;
+        const pu = c === 'pg' ? PAPER_UNR[k] : 0;
+        html += '<tr><td>' + CL[c] + '</td><td>' + R.length + '</td>'
+          + '<td>' + (succ === null ? '—' : succ.toFixed(0) + ' %') + ' · <span class="pp-paper">' + (pp[0] === null ? '—' : pp[0] + ' %') + '</span></td>'
+          + '<td>' + (mos === null ? '—' : f1(mos) + ' %') + ' · <span class="pp-paper">' + (pp[1] === null ? '—' : pp[1] + ' %') + '</span></td>'
+          + '<td>' + (mt === null ? '—' : f2(mt) + ' s') + ' · <span class="pp-paper">' + (pp[2] === null ? '—' : pp[2].toFixed(2) + ' s') + '</span></td>'
+          + '<td>' + U.length + '</td><td>' + (stop === null ? '—' : stop.toFixed(0) + ' %') + ' · <span class="pp-paper">' + pu + ' %</span></td></tr>';
+      });
+      html += '</table>';
+    });
+    if (html && P.mode !== 'full') html += '<div style="font-size:11px;color:#6b6258">Makale değerleri tam protokolden (her hücrede n = 78 ulaşılabilir uzanma, 3 tohum) gelir. İzlenebilir set bunun bir alt kümesidir; sayılar yakın ama aynı olmayabilir. Birebir karşılaştırma için "Tam protokol"ü çalıştırın.</div>';
+    $('ppTable').innerHTML = html;
+  }
+  function log(r) {
+    const el = $('ppLog');
+    const s = '#' + (P.i + 1) + '  ' + r.z + ' ' + ZN[r.z] + ' · hedef ' + (r.i + 1) + ' · ' + CL[r.c] + ': '
+      + (r.z === 'Z4' ? ('erişilemez, w_min = ' + r.minW.toFixed(3) + (r.minW >= 1e-3 ? ' (tekilliğe girmeden durdu)' : ' (kol tam açıldı)'))
+                      : ((r.ok ? '✓ ' : '✗ ') + r.finalErrMm.toFixed(1) + ' mm, aşma ' + r.overshootPct.toFixed(1) + ' %' + (r.ok ? ', ' + r.mt.toFixed(2) + ' s' : '') + (r.inView ? '' : ' (hedef görüş dışı)')));
+    const d = document.createElement('div'); d.textContent = s; el.prepend(d);
+  }
+  function zoneOn(z) { document.querySelectorAll('#ppZones span').forEach(s => s.classList.toggle('on', s.getAttribute('data-z') === z)); }
+  function status(t) { $('ppStatus').innerHTML = t; }
+  function buttons() {
+    $('ppStart').disabled = P.running; $('ppPause').disabled = !P.running; $('ppStop').disabled = !P.running;
+    $('ppSkip').disabled = !(P.running && P.mode !== 'full'); $('ppCsv').disabled = !P.res.length;
+    $('ppPause').innerHTML = P.paused ? '&#9654; Devam' : '&#10074;&#10074; Duraklat';
+    document.querySelectorAll('input[name=ppMode]').forEach(x => x.disabled = P.running);
+  }
+  function step() {
+    P.timer = null;
+    if (!P.running || P.paused) return;
+    if (P.i >= P.jobs.length) { finish(true); return; }
+    if (P.mode === 'full') {
+      const t0 = performance.now();
+      while (P.i < P.jobs.length && performance.now() - t0 < 80) { P.res.push(simJob(P.jobs[P.i]).row); P.i++; }
+      const el = (performance.now() - P.t0) / 1000, eta = el / P.i * (P.jobs.length - P.i);
+      status('Tam protokol hesaplanıyor: <b>' + P.i + ' / ' + P.jobs.length + '</b> uzanma · geçen ' + el.toFixed(0) + ' s · kalan ≈ ' + eta.toFixed(0) + ' s');
+      render(); P.timer = setTimeout(step, 0); return;
+    }
+    const j = P.jobs[P.i];
+    const out = simJob(j);
+    P.cur = { tr: out.tr, row: out.row, j }; P.frameF = 0; P.anim = true;
+    state.controller = j.c; state.traj = out.tr; state.frameIdx = 0;
+    zoneOn(j.z);
+    const lab = (j.vm === 'binocular' ? 'iki göz' : 'tek göz') + ', ' + Math.round(j.dl * 1000) + ' ms';
+    status('Uzanma <b>' + (P.i + 1) + ' / ' + P.jobs.length + '</b> · bölge <b>' + j.z + ' (' + ZN[j.z] + ')</b> · hedef ' + (j.i + 1) + ' · başlangıç duruşu #' + (j.i + 1)
+      + ' · kontrolcü <b>' + CL[j.c] + '</b> · ' + lab + (out.row.inView ? '' : ' · <i>hedef kamera görüşü dışında</i>'));
+    if (typeof setModeBanner === 'function') setModeBanner('running', 'MAKALE DENEYİ ' + (P.i + 1) + '/' + P.jobs.length + ' — ' + j.z + ' ' + ZN[j.z] + ' · hedef ' + (j.i + 1) + ' · ' + CL[j.c] + ' · ' + lab);
+    P.timer = setInterval(tick, 30);
+  }
+  function tick() {
+    if (P.paused || !P.cur) return;
+    const tr = P.cur.tr; P.frameF += 2 * parseFloat($('ppSpeed').value);
+    const idx = Math.min(tr.t.length - 1, Math.floor(P.frameF));
+    try { updateUIFrame(idx); } catch (e) { }
+    if (idx >= tr.t.length - 1) {
+      clearInterval(P.timer); P.timer = null; P.anim = false;
+      P.res.push(P.cur.row); log(P.cur.row); P.i++; render(); buttons();
+      P.timer = setTimeout(step, 600 / parseFloat($('ppSpeed').value));
+    }
+  }
+  function restore() {
+    const s = P.snap; if (!s) return;
+    Q0 = s.Q0; state.target = s.target; state.delay = s.delay; state.visionMode = s.vision; state.controller = s.ctrl;
+    state.speed.dur = s.dur; state.showGhost = s.ghost; state.traj = s.traj;
+    if (P.head && typeof restoreHeadWaistState === 'function') restoreHeadWaistState(P.head);
+    try { if (state.traj) updateUIFrame(s.frame); else if (typeof renderSetupPreview === 'function') renderSetupPreview(); } catch (e) { }
+    P.snap = null;
+  }
+  function finish(done) {
+    if (P.timer) { clearInterval(P.timer); clearTimeout(P.timer); P.timer = null; }
+    P.running = false; P.paused = false; P.anim = false; zoneOn(null);
+    status((done ? '<b>Tamamlandı.</b> ' : '<b>Durduruldu.</b> ') + P.res.length + ' uzanma sonuçlandı. Ayarlarınız eski hâline getirildi.');
+    if (typeof setModeBanner === 'function') setModeBanner('setup', 'KURULUM MODU — makale deneyi oynatıcısı ' + (done ? 'tamamlandı' : 'durduruldu'));
+    restore(); render(); buttons();
+  }
+  $('ppStart').addEventListener('click', () => {
+    if (P.running) return;
+    if (typeof stopPlay === 'function') stopPlay();
+    P.mode = (document.querySelector('input[name=ppMode]:checked') || {}).value || 'w60';
+    P.jobs = buildJobs(P.mode); P.i = 0; P.res = []; $('ppLog').innerHTML = ''; P.t0 = performance.now();
+    P.snap = { Q0: Q0.slice(), target: state.target.slice(), delay: state.delay, vision: state.visionMode, ctrl: state.controller,
+               dur: state.speed.dur, ghost: state.showGhost, traj: state.traj, frame: state.frameIdx };
+    state.showGhost = false;
+    P.head = (typeof snapshotHeadWaistState === 'function') ? snapshotHeadWaistState() : null;
+    P.running = true; P.paused = false; buttons(); render();
+    status('Başlıyor…'); P.timer = setTimeout(step, 30);
+  });
+  $('ppPause').addEventListener('click', () => {
+    if (!P.running) return;
+    P.paused = !P.paused; buttons();
+    if (!P.paused && !P.anim && !P.timer) P.timer = setTimeout(step, 0);
+    if (P.paused && P.mode === 'full' && P.timer) { clearTimeout(P.timer); P.timer = null; }
+    if (P.paused) status($('ppStatus').innerHTML.replace(/^(<b>Duraklatıldı\.<\/b> )?/, '<b>Duraklatıldı.</b> '));
+  });
+  $('ppStop').addEventListener('click', () => { if (P.running) finish(false); });
+  $('ppSkip').addEventListener('click', () => { if (P.anim) P.frameF = 1e9; });
+  $('ppCsv').addEventListener('click', () => {
+    const hdr = 'seed,vision,delay,zone,target,controller,final_mm,overshoot_pct,mt_s,settled,min_w,target_in_view,ok';
+    const lines = [hdr].concat(P.res.map(r => [r.seed, r.vm, r.dl, r.z, r.i, r.c, r.finalErrMm.toFixed(2), r.overshootPct.toFixed(2), r.mt.toFixed(3),
+      r.settled ? 1 : 0, r.minW.toFixed(4), r.inView ? 1 : 0, r.ok ? 1 : 0].join(',')));
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
+    a.download = 'makale_deneyleri_' + P.mode + '.csv'; a.click();
+  });
+  buttons();
+})();
+
+// ===== R2: real subscripts inside the live control-diagram SVG (texts are rewritten by the simulator) =====
+(function svgSubs() {
+  const svg = document.getElementById('svgControlDiagram'); if (!svg || !window.MutationObserver) return;
+  const NS = 'http://www.w3.org/2000/svg';
+  const RX = /(^|[^A-Za-z0-9_ğüşıöçĞÜŞİÖÇ])([A-Za-zΑ-Ωα-ωĴŴ][\u0302\u0307]?)_(\{[^}]{1,12}\}|[A-Za-z0-9ğüşıöçĞÜŞİÖÇα-ωΑ-Ω]{1,10})/g;
+  let obs = null;
+  const fix = () => {
+    if (obs) obs.disconnect();
+    svg.querySelectorAll('text').forEach(t => {
+      if (t.querySelector('tspan')) return;
+      const s = t.textContent; if (s.indexOf('_') < 0) return;
+      const parts = []; let last = 0, m; RX.lastIndex = 0;
+      while ((m = RX.exec(s))) { const st = m.index + m[1].length; parts.push([s.slice(last, st) + m[2], false]); parts.push([m[3].replace(/[{}]/g, ''), true]); last = RX.lastIndex; }
+      if (!parts.length) return;
+      parts.push([s.slice(last), false]);
+      while (t.firstChild) t.removeChild(t.firstChild);
+      parts.forEach(([x, sub]) => { if (!x) return; const ts = document.createElementNS(NS, 'tspan'); ts.textContent = x;
+        if (sub) { ts.setAttribute('baseline-shift', 'sub'); ts.setAttribute('font-size', '72%'); } t.appendChild(ts); });
+    });
+    if (obs) obs.observe(svg, { subtree: true, childList: true, characterData: true });
+  };
+  obs = new MutationObserver(fix); fix();
 })();
 </script>
 </body>

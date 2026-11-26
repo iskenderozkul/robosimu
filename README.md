@@ -83,9 +83,15 @@ efferent-kopya ileri modeliyle %3,1'in altında kalır.
 
 | demo | ne gösterir |
 |---|---|
-| [**İnsansı kol 3B laboratuvarı**](https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench.html) | Sol göz · sağ göz · 3B sahne; üstten ve yandan görünüş; gövde dönüşü, bilek yönelimi, tek/çift göz, hareketli baş ve hareket paralaksı, tekillik ölçüsü; *Rastgele Hacim* ve *Çapraz Hacim* benchmark düğmeleri |
+| [**İnsansı kol 3B laboratuvarı**](https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench.html) | Sol göz · sağ göz · 3B sahne; üstten ve yandan görünüş; gövde dönüşü, bilek yönelimi, tek/çift göz, hareketli baş ve hareket paralaksı, tekillik ölçüsü; makale deneylerini toplu oynatan benchmark, animasyonlu 3B örnek ve açıklamalı matematik kartları |
 | [Altı eksenli kol görüntüleyici](https://iskenderozkul.github.io/robosimu/figures/arm_viewer.html) | Makalenin ana kolu, eklem kaydırıcıları |
 | [Oracle'sız 1/e laboratuvarı (2B)](https://iskenderozkul.github.io/robosimu/figures/v5_oracle_free_lab.html) | Gecikme terimi, öğrenilen gecikme, Broyden ve c kazancıyla canlı ablasyon |
+
+**Makale deneylerini izleyin.** Laboratuvarın 5. sekmesindeki *Makale deneylerini izle* kartı (üstteki *📊 Akademik Benchmark* düğmesi de oraya götürür) makalenin rastgele çalışma hacmi protokolünü (§8.11, Tablo 12) aynı hedefler, başlangıç duruşları ve gürültü tohumlarıyla toplu olarak oynatır. Çalışma hacmi dört bölgeye ayrılır: Z1 yakın, Z2 orta, Z3 sınır ve Z4 erişilemez. Kol rastgele bir duruştan bölgedeki rastgele bir hedefe uzanır ve her hedef dört kontrolcüyle art arda denenir. Üç set seçilebilir: iki göz ve 60 ms ile 48 animasyonlu uzanma, tek göz ve 150 ms ile 48 animasyonlu uzanma, ya da Tablo 12'nin tam protokolü olan 2304 uzanmanın animasyonsuz hızlı hesabı. Başlat, Duraklat, Durdur ve Atla düğmeleri ile hız seçeneği vardır. Sonuçlar makaledeki değerlerin yanında birikir ve CSV olarak indirilebilir.
+
+Aynı sayfadaki *3B örnek* paneli, sabit bir kâhinsiz 1/e uzanmasını otomatik canlandırır. İki göz ve görüş çizgileri sahnede görünür; sağdaki denklemler (δ<sub>eff</sub>, k, retinal hata, q̇, w(q)) her karede yeniden hesaplanır.
+
+![3B örnek: kâhinsiz 1/e uzanması ve canlı hesap](figures/kin3d_example.png)
 
 **Python render'ı (GIF) hakkında.** Aşağıdaki animasyon tarayıcı laboratuvarından değil, Python simülatörünün
 çevrimdışı çiziminden gelir (`python -m robosimu simulate models/human_arm.json --posture hanging_natural --target "0.45 0.0 1.10" --controller governor --delay 0.06`).
@@ -181,9 +187,13 @@ Details: `reports/v5_summary.md`, `reports/v5_tune_fixed.jsonl`,
 
 | demo | what it shows |
 |---|---|
-| [**Human-like arm 3D workbench**](https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench.html) | left eye · right eye · 3D scene; top and side views; trunk yaw, wrist orientation, one or two eyes, moving head with motion parallax, singularity measure; randomised-workspace benchmarks |
+| [**Human-like arm 3D workbench**](https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench.html) | left eye · right eye · 3D scene; top and side views; trunk yaw, wrist orientation, one or two eyes, moving head with motion parallax, singularity measure; batch replay of the paper's experiments, animated 3D example, annotated maths cards |
 | [Six-axis arm viewer](https://iskenderozkul.github.io/robosimu/figures/arm_viewer.html) | the paper's main arm with joint sliders |
 | [Oracle-free 1/e lab (2D)](https://iskenderozkul.github.io/robosimu/figures/v5_oracle_free_lab.html) | toggle the delay term, learned lag, Broyden and the gain c to see the ablation live |
+
+**Watch the paper's experiments.** The *Makale deneylerini izle* card in tab 5 of the workbench (also reached with the *📊 Akademik Benchmark* button) replays the randomised-workspace protocol of the paper (§8.11, Table 12) with the same targets, start postures and noise seeds. The workspace is split into four shells: Z1 near, Z2 middle, Z3 boundary and Z4 unreachable. The arm reaches from a random posture to a random target in a shell, and each target is tried by four controllers in a row. Three sets are available: 48 animated reaches with two eyes at 60 ms, 48 animated reaches with one eye at 150 ms, or a fast, non-animated run of the full 2304-reach Table 12 protocol. Start, pause, stop, skip and speed controls are provided; results accumulate next to the paper's values and can be exported as CSV.
+
+The *3D example* panel animates a fixed oracle-free 1/e reach with both eyes and their sight lines; the equations beside it (δ<sub>eff</sub>, k, retinal error, q̇, w(q)) are recomputed every frame.
 
 **About the GIF.** The animation below is an offline render of the Python simulator, not the browser
 workbench. Its controller is the **oracle governor** (metric error and true delay), **not** the oracle-free law of the paper;
