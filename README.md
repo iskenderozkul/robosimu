@@ -1,11 +1,12 @@
-# robosimu — Oracle'sız görsel uzanma · Oracle-free visual reaching
+# robosimu — Ayrıcalıklı bilgi kullanmadan görsel uzanma · Oracle-free visual reaching
 
 [![tests](https://github.com/iskenderozkul/robosimu/actions/workflows/tests.yml/badge.svg)](https://github.com/iskenderozkul/robosimu/actions/workflows/tests.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![3D demo](https://img.shields.io/badge/3B%20sim%C3%BClasyon-taray%C4%B1c%C4%B1da%20a%C3%A7-8c3b1f)](https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench.html)
 
 > ### ▶ 3B robot simülasyonunu tarayıcıda açın · Open the 3D robot simulation in your browser
-> **https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench.html**
+> **Türkçe:** https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench.html
+> **English:** https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench_en.html
 >
 > Kurulum gerekmez. Tüm demolar: **https://iskenderozkul.github.io/robosimu/**
 > Yedek bağlantı (GitHub Pages kapalıysa) · mirror: [raw.githack](https://raw.githack.com/iskenderozkul/robosimu/main/figures/human_arm_workbench.html)
@@ -33,7 +34,7 @@ Yöneticisi) yalnızca iki kameradaki el ve hedefin **piksel koordinatlarını**
 ve **zaman damgalarını** alır. Eklem açısını, analitik Jacobian'ı, metrik
 mesafeyi ve gerçek gecikmeyi **hiç görmez**. Bu bir testle tip düzeyinde
 denetlenir. Kendi görüntü Jacobian'ını ve servo gecikmesini 2,6 saniyelik bir
-"agulama" (babbling) hareketiyle öğrenir ve şu kazancı uygular:
+öz-tanılama hareketiyle (İng. *motor babbling*) öğrenir ve şu kazancı uygular:
 
 ```
 k = (1/e) / δ_eff ,    δ_eff = δ_obs + L + (n−1)T/2 + T/2
@@ -63,7 +64,7 @@ sınırıdır. v6'da bunu örneklenmiş döngü için **kesin olarak** hesaplad�
 
 ### Ana sonuç (6 eksenli kol, 12 bağımsız hedef × 2 gürültü tohumu)
 
-| gecikme | oracle'sız (bu çalışma) | oracle'lı governor | 30 ms'de ayarlı PID |
+| gecikme | ayrıcalıklı bilgi kullanmayan (bu çalışma) | ayrıcalıklı bilgili yönetici (İskender Governor) | 30 ms'de ayarlı PID |
 |---|---|---|---|
 | 30 ms  | %100 yerleşme, en büyük aşma %3,5 | %92, %18,6 | %83, %29,7 |
 | 60 ms  | %100, %2,8 | %100, %9,9 | %58, %53 |
@@ -71,13 +72,22 @@ sınırıdır. v6'da bunu örneklenmiş döngü için **kesin olarak** hesaplad�
 | 150 ms | %100, %0,9 | %100, %3,7 | %0, %211 |
 | 200 ms | %92 (iki tohumda aynı hedef, 6,1–6,3 mm), %0,6 | %100, %3,0 | %0, %251 |
 
-**Bedeli:** oracle'sız yasa 60–200 ms'de oracle'lı governor'dan 2,0–3,1 kat
+**Bedeli:** ayrıcalıklı bilgi kullanmayan yasa 60–200 ms'de ayrıcalıklı bilgili yönetici (İskender Governor)'dan 2,0–3,1 kat
 yavaştır. **Dürüst karşılaştırma:** bu kol için ayrı hedeflerde yeniden ayarlanan
-sabit kazanç (k = 1,5 s⁻¹, oracle girdili) de aynı güvenilirlikte ve daha
+sabit kazanç (k = 1,5 s⁻¹, ayrıcalıklı bilgi girdili) de aynı güvenilirlikte ve daha
 hızlıdır. Zayıflığı bitkidir: servo 5 rad/s'ye yavaşlatılınca başarısı %75–88'e
-düşer, oracle'sız yasa ise gecikmesini yeniden öğrenip %100'de kalır. Kesintili
-(sakkadik) bakışta oracle'lı governor %69'a kadar aşar, oracle'sız yasa
+düşer, ayrıcalıklı bilgi kullanmayan yasa ise gecikmesini yeniden öğrenip %100'de kalır. Kesintili
+(sakkadik) bakışta ayrıcalıklı bilgili yönetici (İskender Governor) %69'a kadar aşar, ayrıcalıklı bilgi kullanmayan yasa
 efferent-kopya ileri modeliyle %3,1'in altında kalır.
+
+### Neyi neyle karşılaştırıyoruz?
+
+| Model | Grup | Kısa açıklama |
+|---|---|---|
+| **Algısal 1/e Hız Yöneticisi** (`pg`) | **Bu çalışma** | İskender Governor'ın ayrıcalıklı bilgi kullanmayan biçimi: yalnız piksel ve zaman damgası alır |
+| İskender Governor (`governor`) | Önceki sürümümüz | Aynı 1/e yasası; metrik hata, analitik Jacobian ve gerçek gecikmeyle çalışır. Karşılaştırmada üst referanstır |
+| HLSL, İnsan-HDA, Biyo-Pulse | Önceki varyantlarımız | HLSL: İnsansı Stereo Yaklaşma Algısı. HDA: İnsansı Dinamik Yaklaşım. Aynı yasaya çan eğrisi hız zarfı ya da darbe ekler. Yalnız benzetimde gösterilir, makalede değerlendirilmez |
+| PID, LQR, Sabit kazanç P | Literatür (rakip) | PID: Oransal–İntegral–Türevsel kontrolcü. LQR: Doğrusal Karesel Düzenleyici. P: görsel servonun klasik oransal yasası |
 
 ### 3B simülasyon (tarayıcıda)
 
@@ -85,20 +95,20 @@ efferent-kopya ileri modeliyle %3,1'in altında kalır.
 |---|---|
 | [**İnsansı kol 3B laboratuvarı**](https://iskenderozkul.github.io/robosimu/figures/human_arm_workbench.html) | Sol göz · sağ göz · 3B sahne; üstten ve yandan görünüş; gövde dönüşü, bilek yönelimi, tek/çift göz, hareketli baş ve hareket paralaksı, tekillik ölçüsü; makale deneylerini toplu oynatan benchmark, animasyonlu 3B örnek ve açıklamalı matematik kartları |
 | [Altı eksenli kol görüntüleyici](https://iskenderozkul.github.io/robosimu/figures/arm_viewer.html) | Makalenin ana kolu, eklem kaydırıcıları |
-| [Oracle'sız 1/e laboratuvarı (2B)](https://iskenderozkul.github.io/robosimu/figures/v5_oracle_free_lab.html) | Gecikme terimi, öğrenilen gecikme, Broyden ve c kazancıyla canlı ablasyon |
+| [Ayrıcalıklı bilgi kullanmayan 1/e laboratuvarı (2B)](https://iskenderozkul.github.io/robosimu/figures/v5_oracle_free_lab.html) | Gecikme terimi, öğrenilen gecikme, Broyden ve c kazancıyla canlı ablasyon |
 
 **Makale deneylerini izleyin.** Laboratuvarın 5. sekmesindeki *Makale deneylerini izle* kartı (üstteki *📊 Akademik Benchmark* düğmesi de oraya götürür) makalenin rastgele çalışma hacmi protokolünü (§8.11, Tablo 12) aynı hedefler, başlangıç duruşları ve gürültü tohumlarıyla toplu olarak oynatır. Çalışma hacmi dört bölgeye ayrılır: Z1 yakın, Z2 orta, Z3 sınır ve Z4 erişilemez. Kol rastgele bir duruştan bölgedeki rastgele bir hedefe uzanır ve her hedef dört kontrolcüyle art arda denenir. Üç set seçilebilir: iki göz ve 60 ms ile 48 animasyonlu uzanma, tek göz ve 150 ms ile 48 animasyonlu uzanma, ya da Tablo 12'nin tam protokolü olan 2304 uzanmanın animasyonsuz hızlı hesabı. Başlat, Duraklat, Durdur ve Atla düğmeleri ile hız seçeneği vardır. Sonuçlar makaledeki değerlerin yanında birikir ve CSV olarak indirilebilir.
 
-Aynı sayfadaki *3B örnek* paneli, sabit bir kâhinsiz 1/e uzanmasını otomatik canlandırır. İki göz ve görüş çizgileri sahnede görünür; sağdaki denklemler (δ<sub>eff</sub>, k, retinal hata, q̇, w(q)) her karede yeniden hesaplanır.
+Aynı sayfadaki *3B örnek* paneli, sabit bir algısal 1/e uzanmasını otomatik canlandırır. İki göz ve görüş çizgileri sahnede görünür; sağdaki denklemler (δ<sub>eff</sub>, k, retinal hata, q̇, w(q)) her karede yeniden hesaplanır.
 
-![3B örnek: kâhinsiz 1/e uzanması ve canlı hesap](figures/kin3d_example.png)
+![3B örnek: algısal 1/e uzanması ve canlı hesap](figures/kin3d_example.png)
 
 **Python render'ı (GIF) hakkında.** Aşağıdaki animasyon tarayıcı laboratuvarından değil, Python simülatörünün
 çevrimdışı çiziminden gelir (`python -m robosimu simulate models/human_arm.json --posture hanging_natural --target "0.45 0.0 1.10" --controller governor --delay 0.06`).
-Kullanılan kontrolcü **oracle'lı governor**'dır (metrik hata ve gerçek gecikme alır); makaledeki oracle'sız yasa **değildir**.
+Kullanılan kontrolcü **ayrıcalıklı bilgili yönetici (İskender Governor)**'dır (metrik hata ve gerçek gecikme alır); makaledeki ayrıcalıklı bilgi kullanmayan yasa **değildir**.
 Yalnızca insansı kol modelinin sarkık duruştan rafa uzanmasını ve bitki dinamiğini göstermek içindir.
 
-![Python render: oracle'lı governor, insansı kol, 60 ms](figures/human_reach_shelf.gif)
+![Python render: ayrıcalıklı bilgili yönetici (İskender Governor), insansı kol, 60 ms](figures/human_reach_shelf.gif)
 
 Laboratuvardaki diğer kontrolcüler metrik 3B geri çatım, gerçek gecikme ve eklem
 açısı alır; tork ve enerji gibi bazı göstergeler basitleştirilmiş modellerdir.
@@ -182,6 +192,15 @@ saccade-like vision the oracle governor overshoots up to 69 %; the oracle-free
 law with its efference-copy forward model stays at or below 3.1 %.
 Details: `reports/v5_summary.md`, `reports/v5_tune_fixed.jsonl`,
 `reports/v5_plant_shift.jsonl`, `reports/v5_intermittent_gaze.jsonl`.
+
+### What is compared with what?
+
+| Model | Group | In short |
+|---|---|---|
+| **Perceptual 1/e Governor** (`pg`) | **This work** | The İskender Governor without privileged information: pixels and timestamps only |
+| İskender Governor (`governor`) | Our earlier version | Same 1/e law, given metric error, analytic Jacobian and true delay; upper reference |
+| HLSL, Human-HDA, Bio-Pulse | Our earlier variants | HLSL: human-like stereo looming; HDA: human-like dynamic approach; add a bell-shaped speed envelope or a pulse train to the same law; simulator only, not evaluated in the paper |
+| PID, LQR, Fixed gain P | Literature (baselines) | PID: proportional–integral–derivative; LQR: linear quadratic regulator; P: classical proportional visual-servo law |
 
 ### Interactive 3D simulation
 
