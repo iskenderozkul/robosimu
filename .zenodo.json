@@ -1,5 +1,5 @@
 {
-  "title": "robosimu: oracle-free visual reaching with the Perceptual 1/e Governor",
+  "title": "robosimu: oracle-free visual reaching with the İskender Governor (perceptual 1/e speed governor)",
   "description": "Rigid-body simulator for six-axis and human-like arms with per-joint motor and drive models, an oracle-free visual reaching controller (pixels and timestamps only), its benchmark and ablations, the exact-boundary theory of the 1/e speed law, and an interactive browser-based 3D workbench.",
   "upload_type": "software",
   "license": "MIT",
@@ -9,7 +9,7 @@
     }
   ],
   "keywords": ["robotics", "visual servoing", "time delay", "reaching", "uncalibrated control", "efference copy", "simulation"],
-  "version": "0.6.0",
+  "version": "0.8.0",
   "language": "eng",
   "notes": "Simulation software; no hardware validation is claimed."
 }

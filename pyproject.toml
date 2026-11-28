@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "robosimu"
-version = "0.6.0"
+version = "0.8.0"
 description = "Oracle-free visual reaching (Perceptual 1/e Governor) and a dependency-light arm simulator: kinematics, dynamics, motors, energy"
 readme = "README.md"
 requires-python = ">=3.10"

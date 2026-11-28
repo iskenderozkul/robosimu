@@ -29,8 +29,8 @@ mesafeyi santimetreyle hesaplamaz, kendi görme gecikmesini bir sayı olarak
 bilmez. Görür, hareket eder, tekrar bakar, düzeltir.
 
 Bu depo, aynı koşullarda çalışan bir robot kontrolcüsünü ve onu adil biçimde
-sınayan bir simülatörü içerir. **Perceptual 1/e Governor** (Algısal 1/e
-Yöneticisi) yalnızca iki kameradaki el ve hedefin **piksel koordinatlarını**
+sınayan bir simülatörü içerir. **İskender Governor** (bizim model; Algısal 1/e
+Hız Yöneticisi, kodda `PerceptualGovernor`, `pg`) yalnızca iki kameradaki el ve hedefin **piksel koordinatlarını**
 ve **zaman damgalarını** alır. Eklem açısını, analitik Jacobian'ı, metrik
 mesafeyi ve gerçek gecikmeyi **hiç görmez**. Bu bir testle tip düzeyinde
 denetlenir. Kendi görüntü Jacobian'ını ve servo gecikmesini 2,6 saniyelik bir
@@ -64,7 +64,7 @@ sınırıdır. v6'da bunu örneklenmiş döngü için **kesin olarak** hesaplad�
 
 ### Ana sonuç (6 eksenli kol, 12 bağımsız hedef × 2 gürültü tohumu)
 
-| gecikme | ayrıcalıklı bilgi kullanmayan (bu çalışma) | ayrıcalıklı bilgili yönetici (İskender Governor) | 30 ms'de ayarlı PID |
+| gecikme | ① İskender Governor (bizim model) | ② ayrıcalıklı bilgili 1/e yöneticisi (referans) | ③ 30 ms'de ayarlı PID |
 |---|---|---|---|
 | 30 ms  | %100 yerleşme, en büyük aşma %3,5 | %92, %18,6 | %83, %29,7 |
 | 60 ms  | %100, %2,8 | %100, %9,9 | %58, %53 |
@@ -72,21 +72,35 @@ sınırıdır. v6'da bunu örneklenmiş döngü için **kesin olarak** hesaplad�
 | 150 ms | %100, %0,9 | %100, %3,7 | %0, %211 |
 | 200 ms | %92 (iki tohumda aynı hedef, 6,1–6,3 mm), %0,6 | %100, %3,0 | %0, %251 |
 
-**Bedeli:** ayrıcalıklı bilgi kullanmayan yasa 60–200 ms'de ayrıcalıklı bilgili yönetici (İskender Governor)'dan 2,0–3,1 kat
+**Bedeli:** İskender Governor 60–200 ms'de ayrıcalıklı bilgili 1/e yöneticisinden 1,9–3,1 kat
 yavaştır. **Dürüst karşılaştırma:** bu kol için ayrı hedeflerde yeniden ayarlanan
 sabit kazanç (k = 1,5 s⁻¹, ayrıcalıklı bilgi girdili) de aynı güvenilirlikte ve daha
 hızlıdır. Zayıflığı bitkidir: servo 5 rad/s'ye yavaşlatılınca başarısı %75–88'e
-düşer, ayrıcalıklı bilgi kullanmayan yasa ise gecikmesini yeniden öğrenip %100'de kalır. Kesintili
-(sakkadik) bakışta ayrıcalıklı bilgili yönetici (İskender Governor) %69'a kadar aşar, ayrıcalıklı bilgi kullanmayan yasa
+düşer, İskender Governor ise gecikmesini yeniden öğrenip %100'de kalır. Kesintili
+(sakkadik) bakışta ayrıcalıklı bilgili 1/e yöneticisi %69'a kadar aşar, İskender Governor
 efferent-kopya ileri modeliyle %3,1'in altında kalır.
+
+### Kamera hızı (fps) artarsa ulaşma kalitesi artar mı? (v8)
+
+Evet, ama bir noktaya kadar ([`reports/v8_framerate.md`](reports/v8_framerate.md), 480 uzanma, `python scripts/run_v8_framerate.py`).
+
+| fps | öğrenilen servo gecikmesi L | başarı (60 / 150 ms) | en büyük aşma (60 / 150 ms) |
+|---|---|---|---|
+| 15 | 0 ms | %79 / %50 | %31,9 / %34,0 |
+| 30 | 10 ms | %100 / %100 | %6,6 / %6,1 |
+| 60 | 25 ms | %100 / %100 | %7,0 / %6,6 |
+| 100 | 50 ms | %100 / %96 | %2,6 / %0,8 |
+| 200 | 50 ms | %100 / %100 | %3,6 / %2,6 |
+
+15 fps'de bir kare (67 ms) servo gecikmesinden (50 ms) uzundur; gecikme öğrenilemez ve kazanç fazla seçilir. 30 fps'den itibaren tüm uzanmalar başarılıdır; en az aşma servo gecikmesinin doğru öğrenildiği 100–200 fps'dedir. 100 → 200 fps az şey değiştirir: etkin gecikmenin %85–95'i görüntü gecikmesi ve servo gecikmesidir.
 
 ### Neyi neyle karşılaştırıyoruz?
 
 | Model | Grup | Kısa açıklama |
 |---|---|---|
-| **Algısal 1/e Hız Yöneticisi** (`pg`) | **Bu çalışma** | İskender Governor'ın ayrıcalıklı bilgi kullanmayan biçimi: yalnız piksel ve zaman damgası alır |
-| İskender Governor (`governor`) | Önceki sürümümüz | Aynı 1/e yasası; metrik hata, analitik Jacobian ve gerçek gecikmeyle çalışır. Karşılaştırmada üst referanstır |
-| HLSL, İnsan-HDA, Biyo-Pulse | Önceki varyantlarımız | HLSL: İnsansı Stereo Yaklaşma Algısı. HDA: İnsansı Dinamik Yaklaşım. Aynı yasaya çan eğrisi hız zarfı ya da darbe ekler. Yalnız benzetimde gösterilir, makalede değerlendirilmez |
+| ① **İskender Governor** (`pg`, Algısal 1/e Hız Yöneticisi) | **Bu çalışma (bizim model)** | Yalnız piksel ve zaman damgası alır; gecikmeyi ve kendi kolunu kendisi öğrenir |
+| ② Ayrıcalıklı bilgili 1/e yöneticisi (`governor`) | Referans | Literatürde bilinen 1/e gecikme sınırı k = 1/(e·δ); metrik hata, analitik Jacobian ve gerçek gecikmeyle çalışır |
+| HLSL, İnsan-HDA, Biyo-Pulse | Ek keşif modellerimiz | HLSL: İnsansı Stereo Yaklaşma Algısı. HDA: İnsansı Dinamik Yaklaşım. 1/e fikrine çan eğrisi hız zarfı ya da darbe ekler. Yalnız simülasyonda, makalede değerlendirilmez |
 | PID, LQR, Sabit kazanç P | Literatür (rakip) | PID: Oransal–İntegral–Türevsel kontrolcü. LQR: Doğrusal Karesel Düzenleyici. P: görsel servonun klasik oransal yasası |
 
 ### 3B simülasyon (tarayıcıda)
@@ -97,18 +111,18 @@ efferent-kopya ileri modeliyle %3,1'in altında kalır.
 | [Altı eksenli kol görüntüleyici](https://iskenderozkul.github.io/robosimu/figures/arm_viewer.html) | Makalenin ana kolu, eklem kaydırıcıları |
 | [Ayrıcalıklı bilgi kullanmayan 1/e laboratuvarı (2B)](https://iskenderozkul.github.io/robosimu/figures/v5_oracle_free_lab.html) | Gecikme terimi, öğrenilen gecikme, Broyden ve c kazancıyla canlı ablasyon |
 
-**Makale deneylerini izleyin.** Laboratuvarın 5. sekmesindeki *Makale deneylerini izle* kartı (üstteki *📊 Akademik Benchmark* düğmesi de oraya götürür) makalenin rastgele çalışma hacmi protokolünü (§8.11, Tablo 12) aynı hedefler, başlangıç duruşları ve gürültü tohumlarıyla toplu olarak oynatır. Çalışma hacmi dört bölgeye ayrılır: Z1 yakın, Z2 orta, Z3 sınır ve Z4 erişilemez. Kol rastgele bir duruştan bölgedeki rastgele bir hedefe uzanır ve her hedef dört kontrolcüyle art arda denenir. Üç set seçilebilir: iki göz ve 60 ms ile 48 animasyonlu uzanma, tek göz ve 150 ms ile 48 animasyonlu uzanma, ya da Tablo 12'nin tam protokolü olan 2304 uzanmanın animasyonsuz hızlı hesabı. Başlat, Duraklat, Durdur ve Atla düğmeleri ile hız seçeneği vardır. Sonuçlar makaledeki değerlerin yanında birikir ve CSV olarak indirilebilir.
+**Makale deneylerini izleyin.** Laboratuvarın 5. sekmesindeki *Makale deneylerini izle* kartı (üstteki *📊 Akademik Benchmark* düğmesi de oraya götürür) makalenin rastgele çalışma hacmi protokolünü (§8.11, Tablo 13) aynı hedefler, başlangıç duruşları ve gürültü tohumlarıyla toplu olarak oynatır. Çalışma hacmi dört bölgeye ayrılır: Z1 yakın, Z2 orta, Z3 sınır ve Z4 erişilemez. Kol rastgele bir duruştan bölgedeki rastgele bir hedefe uzanır ve her hedef dört kontrolcüyle art arda denenir. Üç set seçilebilir: iki göz ve 60 ms ile 48 animasyonlu uzanma, tek göz ve 150 ms ile 48 animasyonlu uzanma, ya da Tablo 13'ün tam protokolü olan 2304 uzanmanın animasyonsuz hızlı hesabı. Başlat, Duraklat, Durdur ve Atla düğmeleri ile hız seçeneği vardır. Sonuçlar makaledeki değerlerin yanında birikir ve CSV olarak indirilebilir.
 
-Aynı sayfadaki *3B örnek* paneli, sabit bir algısal 1/e uzanmasını otomatik canlandırır. İki göz ve görüş çizgileri sahnede görünür; sağdaki denklemler (δ<sub>eff</sub>, k, retinal hata, q̇, w(q)) her karede yeniden hesaplanır.
+Aynı sayfadaki *3B örnek* paneli, İskender Governor'ın (bizim model) sabit bir uzanmasını otomatik canlandırır. İki göz ve görüş çizgileri sahnede görünür; sağdaki denklemler (δ<sub>eff</sub>, k, retinal hata, q̇, w(q)) her karede yeniden hesaplanır.
 
-![3B örnek: algısal 1/e uzanması ve canlı hesap](figures/kin3d_example.png)
+![3B örnek: İskender Governor (bizim model) uzanması ve canlı hesap](figures/kin3d_example.png)
 
 **Python render'ı (GIF) hakkında.** Aşağıdaki animasyon tarayıcı laboratuvarından değil, Python simülatörünün
 çevrimdışı çiziminden gelir (`python -m robosimu simulate models/human_arm.json --posture hanging_natural --target "0.45 0.0 1.10" --controller governor --delay 0.06`).
-Kullanılan kontrolcü **ayrıcalıklı bilgili yönetici (İskender Governor)**'dır (metrik hata ve gerçek gecikme alır); makaledeki ayrıcalıklı bilgi kullanmayan yasa **değildir**.
+Kullanılan kontrolcü **ayrıcalıklı bilgili 1/e yöneticisi (referans)**'dır (metrik hata ve gerçek gecikme alır); bizim model İskender Governor **değildir**.
 Yalnızca insansı kol modelinin sarkık duruştan rafa uzanmasını ve bitki dinamiğini göstermek içindir.
 
-![Python render: ayrıcalıklı bilgili yönetici (İskender Governor), insansı kol, 60 ms](figures/human_reach_shelf.gif)
+![Python render: ayrıcalıklı bilgili 1/e yöneticisi (referans), insansı kol, 60 ms](figures/human_reach_shelf.gif)
 
 Laboratuvardaki diğer kontrolcüler metrik 3B geri çatım, gerçek gecikme ve eklem
 açısı alır; tork ve enerji gibi bazı göstergeler basitleştirilmiş modellerdir.
@@ -146,7 +160,7 @@ distance in centimetres and does not know their own visual latency as a number.
 This repository contains a controller that works under the same restrictions,
 and a simulator that tests it fairly.
 
-The **Perceptual 1/e Governor** (`robosimu/perceptual_governor.py`) receives
+**İskender Governor** (our model; the perceptual 1/e speed governor, `robosimu/perceptual_governor.py`, `pg`) receives
 **only** the pixel coordinates of hand and target in two cameras plus
 capture/arrival timestamps (`TimestampedObservation`). It never reads joint
 angles, the analytic Jacobian, metric distances or the true delay; a test checks
@@ -174,7 +188,7 @@ a delayed integrator. v6 computes the **exact** boundary of the sampled loop
 
 ### Main result (six-axis arm, 12 independent targets × 2 noise seeds, 0.25 px noise)
 
-| delay | oracle-free (this work) | governor with oracle | PID tuned @30 ms |
+| delay | ① İskender Governor (our model) | ② oracle 1/e governor (reference) | ③ PID tuned @30 ms |
 |---|---|---|---|
 | 30 ms  | 100 % settle, max OS 3.5 % | 92 %, 18.6 % | 83 %, 29.7 % |
 | 60 ms  | 100 %, 2.8 % | 100 %, 9.9 % | 58 %, 53 % |
@@ -182,24 +196,38 @@ a delayed integrator. v6 computes the **exact** boundary of the sampled loop
 | 150 ms | 100 %, 0.9 % | 100 %, 3.7 % | 0 %, 211 % |
 | 200 ms | 92 % (same target fails on both seeds, 6.1–6.3 mm), 0.6 % | 100 %, 3.0 % | 0 %, 251 % |
 
-**Price:** 2.0–3.1× slower than the oracle governor at 60–200 ms.
+**Price:** 1.9–3.1× slower than the oracle 1/e governor at 60–200 ms.
 **Honest comparison:** a fixed gain retuned for this arm on separate tuning
 targets (k = 1.5 s⁻¹, oracle inputs) is just as reliable (100 %, max overshoot
 4.6–6.0 %) and faster. Its weakness is the plant: with the joint servo slowed to
 5 rad/s and no retuning it drops to 75–88 % success and 11–14 % overshoot, while
-the oracle-free law re-learns its lag (75 ms) and keeps 100 %. With intermittent,
-saccade-like vision the oracle governor overshoots up to 69 %; the oracle-free
-law with its efference-copy forward model stays at or below 3.1 %.
+İskender Governor re-learns its lag (75 ms) and keeps 100 %. With intermittent,
+saccade-like vision the oracle 1/e governor overshoots up to 69 %; İskender
+Governor with its efference-copy forward model stays at or below 3.1 %.
 Details: `reports/v5_summary.md`, `reports/v5_tune_fixed.jsonl`,
 `reports/v5_plant_shift.jsonl`, `reports/v5_intermittent_gaze.jsonl`.
+
+### Does a faster camera (higher fps) improve reaching? (v8)
+
+Yes, but only up to a point ([`reports/v8_framerate.md`](reports/v8_framerate.md), 480 reaches, `python scripts/run_v8_framerate.py`).
+
+| fps | identified servo lag L | success (60 / 150 ms) | max overshoot (60 / 150 ms) |
+|---|---|---|---|
+| 15 | 0 ms | 79 % / 50 % | 31.9 % / 34.0 % |
+| 30 | 10 ms | 100 % / 100 % | 6.6 % / 6.1 % |
+| 60 | 25 ms | 100 % / 100 % | 7.0 % / 6.6 % |
+| 100 | 50 ms | 100 % / 96 % | 2.6 % / 0.8 % |
+| 200 | 50 ms | 100 % / 100 % | 3.6 % / 2.6 % |
+
+At 15 fps one frame (67 ms) is longer than the servo lag (50 ms), so the lag cannot be identified and the gain is set too high. From 30 fps on every reach succeeds; the lowest overshoot comes at 100–200 fps, where the lag is identified correctly. 100 → 200 fps changes little: 85–95 % of the effective delay is image delay and servo lag.
 
 ### What is compared with what?
 
 | Model | Group | In short |
 |---|---|---|
-| **Perceptual 1/e Governor** (`pg`) | **This work** | The İskender Governor without privileged information: pixels and timestamps only |
-| İskender Governor (`governor`) | Our earlier version | Same 1/e law, given metric error, analytic Jacobian and true delay; upper reference |
-| HLSL, Human-HDA, Bio-Pulse | Our earlier variants | HLSL: human-like stereo looming; HDA: human-like dynamic approach; add a bell-shaped speed envelope or a pulse train to the same law; simulator only, not evaluated in the paper |
+| ① **İskender Governor** (`pg`, perceptual 1/e speed governor) | **This work (our model)** | Pixels and timestamps only; learns its delay and its arm itself |
+| ② Oracle 1/e governor (`governor`) | Reference | The 1/e delay bound known from the literature, k = 1/(e·δ), given metric error, analytic Jacobian and true delay |
+| HLSL, Human-HDA, Bio-Pulse | Exploratory models of ours | HLSL: human-like stereo looming; HDA: human-like dynamic approach; add a bell-shaped speed envelope or a pulse train to the 1/e idea; simulator only, not evaluated in the paper |
 | PID, LQR, Fixed gain P | Literature (baselines) | PID: proportional–integral–derivative; LQR: linear quadratic regulator; P: classical proportional visual-servo law |
 
 ### Interactive 3D simulation
@@ -210,17 +238,17 @@ Details: `reports/v5_summary.md`, `reports/v5_tune_fixed.jsonl`,
 | [Six-axis arm viewer](https://iskenderozkul.github.io/robosimu/figures/arm_viewer.html) | the paper's main arm with joint sliders |
 | [Oracle-free 1/e lab (2D)](https://iskenderozkul.github.io/robosimu/figures/v5_oracle_free_lab.html) | toggle the delay term, learned lag, Broyden and the gain c to see the ablation live |
 
-**Watch the paper's experiments.** The *Makale deneylerini izle* card in tab 5 of the workbench (also reached with the *📊 Akademik Benchmark* button) replays the randomised-workspace protocol of the paper (§8.11, Table 12) with the same targets, start postures and noise seeds. The workspace is split into four shells: Z1 near, Z2 middle, Z3 boundary and Z4 unreachable. The arm reaches from a random posture to a random target in a shell, and each target is tried by four controllers in a row. Three sets are available: 48 animated reaches with two eyes at 60 ms, 48 animated reaches with one eye at 150 ms, or a fast, non-animated run of the full 2304-reach Table 12 protocol. Start, pause, stop, skip and speed controls are provided; results accumulate next to the paper's values and can be exported as CSV.
+**Watch the paper's experiments.** The *Makale deneylerini izle* card in tab 5 of the workbench (also reached with the *📊 Akademik Benchmark* button) replays the randomised-workspace protocol of the paper (§8.11, Table 13) with the same targets, start postures and noise seeds. The workspace is split into four shells: Z1 near, Z2 middle, Z3 boundary and Z4 unreachable. The arm reaches from a random posture to a random target in a shell, and each target is tried by four controllers in a row. Three sets are available: 48 animated reaches with two eyes at 60 ms, 48 animated reaches with one eye at 150 ms, or a fast, non-animated run of the full 2304-reach Table 13 protocol. Start, pause, stop, skip and speed controls are provided; results accumulate next to the paper's values and can be exported as CSV.
 
-The *3D example* panel animates a fixed oracle-free 1/e reach with both eyes and their sight lines; the equations beside it (δ<sub>eff</sub>, k, retinal error, q̇, w(q)) are recomputed every frame.
+The *3D example* panel animates a fixed reach of İskender Governor (our model) with both eyes and their sight lines; the equations beside it (δ<sub>eff</sub>, k, retinal error, q̇, w(q)) are recomputed every frame.
 
 **About the GIF.** The animation below is an offline render of the Python simulator, not the browser
-workbench. Its controller is the **oracle governor** (metric error and true delay), **not** the oracle-free law of the paper;
+workbench. Its controller is the **oracle 1/e governor** (reference; metric error and true delay), **not** our model İskender Governor;
 it only illustrates the human-like arm model reaching from a hanging posture to a shelf.
 
-![Python render: oracle governor, human-like arm, 60 ms](figures/human_reach_shelf.gif)
+![Python render: oracle 1/e governor (reference), human-like arm, 60 ms](figures/human_reach_shelf.gif)
 
-The workbench UI is in Turkish. Its other controllers receive metric 3D
+The workbench is available in Turkish and English. Its other controllers receive metric 3D
 reconstructions, the true delay and joint angles, and some displayed quantities
 (torque, energy) use simplified models; it is meant for exploration. Numbers in
 the paper come from the Python scripts. `figures/human_arm_workbench.html` is the maintained

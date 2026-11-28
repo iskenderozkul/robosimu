@@ -1511,12 +1511,126 @@
   .qw-float-hint { display: none; font-size: 11px; color: #6b6258; margin: 0 0 6px; }
   .qw-float .qw-float-hint { display: block; }
 </style>
+
+<style id="qwR5css">
+  /* header: owner + pulsing purpose */
+  .qw-hdr-row { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-top: 6px; }
+  .qw-owner { font-size: 12.5px; color: #374151; }
+  .qw-purpose { font: 700 15px/1.2 Inter, system-ui, sans-serif; color: #fff; border: 0; border-radius: 999px; padding: 9px 18px; cursor: pointer;
+                background: linear-gradient(135deg, #c2410c, #ea580c); box-shadow: 0 0 0 0 rgba(234,88,12,.55); animation: qwGlow 2.6s ease-in-out infinite; }
+  .qw-purpose:hover { filter: brightness(1.08); }
+  @keyframes qwGlow { 0% { box-shadow: 0 0 0 0 rgba(234,88,12,.55); transform: scale(1); }
+                      50% { box-shadow: 0 0 0 12px rgba(234,88,12,0); transform: scale(1.045); }
+                      100% { box-shadow: 0 0 0 0 rgba(234,88,12,0); transform: scale(1); } }
+  @media (prefers-reduced-motion: reduce) { .qw-purpose { animation: none; } }
+  .qw-float-head { background: #fff4ec !important; border: 1.5px solid #c2410c !important; color: #9a3412 !important; font-weight: 700 !important; }
+  #btnSceneDiagram { width: auto !important; padding: 0 7px !important; font-size: 11px !important; color: #9a3412 !important; font-weight: 700; }
+  /* wide control card */
+  #cardCtrlModel { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); column-gap: 16px; align-items: start; }
+  #cardCtrlModel > .card-title, #cardCtrlModel > .card-explain, #cardCtrlModel > .preset-bar { grid-column: 1 / -1; }
+  /* groups */
+  .cat-ref { color: #1e3a8a; border-color: #b9c8ee; background: #f1f5ff; }
+  .cat-old { color: #5b5470; border-color: #d3cfe0; background: #f7f6fa; border-style: dashed; }
+  tr.cat-ref td:first-child { border-left: 4px solid #2f4d78; }
+  tr.cat-old td:first-child { border-left: 4px dashed #8b84a3; }
+  .ghost-grp { cursor: help; text-decoration: underline dotted; text-underline-offset: 3px; }
+  .ghost-grp.cat-ref-t { color: #1e3a8a; } .ghost-grp.cat-old-t { color: #5b5470; }
+  .ghost-pill.old-pill { opacity: .85; border-style: dashed !important; }
+  .hud-info { margin-left: 4px; border: 1px solid #c2410c; color: #fff; background: #c2410c; border-radius: 50%; width: 20px; height: 20px; font: 700 12px/18px Inter, sans-serif; cursor: pointer; padding: 0; }
+  /* info popover */
+  #qwInfoPop { position: fixed; z-index: 10050; max-width: 380px; background: #fff; border: 1px solid #d6d3cc; border-radius: 8px; box-shadow: 0 12px 36px rgba(0,0,0,.25);
+               padding: 10px 12px 10px; font: 12.5px/1.5 Inter, system-ui, sans-serif; color: #1f2937; display: none; }
+  #qwInfoPop.open { display: block; }
+  #qwInfoPop h4 { margin: 0 0 2px; font-size: 14px; color: #111827; }
+  #qwInfoPop .sub { color: #6b7280; font-size: 11.5px; margin-bottom: 6px; }
+  #qwInfoPop .grp { display: inline-block; margin: 0 0 6px; }
+  #qwInfoPop b.h { display: block; margin-top: 5px; color: #374151; font-size: 11.5px; text-transform: uppercase; letter-spacing: .03em; }
+  #qwInfoPop .x { position: absolute; top: 4px; right: 8px; border: 0; background: none; font-size: 16px; cursor: pointer; color: #6b7280; }
+  /* purpose modal */
+  #qwPurpose { position: fixed; inset: 0; z-index: 10040; background: rgba(17,24,39,.6); display: none; align-items: flex-start; justify-content: center; overflow: auto; padding: 4vh 2vw; }
+  #qwPurpose.open { display: flex; }
+  #qwPurpose .box { background: #fffdf9; border-radius: 12px; max-width: 900px; width: 100%; padding: 18px 22px 20px; box-shadow: 0 24px 70px rgba(0,0,0,.4); font: 14px/1.55 Inter, system-ui, sans-serif; color: #1f2937; }
+  #qwPurpose h2 { margin: 0 0 6px; font-size: 22px; color: #9a3412; }
+  #qwPurpose .lead { font-size: 15.5px; margin: 0 0 10px; }
+  #qwPurpose canvas { width: 100%; height: auto; display: block; border: 1px solid #eadfd3; border-radius: 8px; background: #fff; }
+  #qwPurpose .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }
+  @media (max-width: 760px) { #qwPurpose .steps { grid-template-columns: repeat(2, 1fr); } }
+  #qwPurpose .step { border: 1px solid #eadfd3; border-radius: 10px; padding: 10px; background: #fff; transition: transform .35s, box-shadow .35s, border-color .35s; }
+  #qwPurpose .step .ic { font-size: 28px; display: block; }
+  #qwPurpose .step b { display: block; font-size: 15px; margin: 2px 0; }
+  #qwPurpose .step.on { border-color: #ea580c; box-shadow: 0 6px 18px rgba(234,88,12,.25); transform: translateY(-3px); }
+  #qwPurpose .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 760px) { #qwPurpose .cols { grid-template-columns: 1fr; } }
+  #qwPurpose h3 { font-size: 15px; margin: 6px 0 4px; color: #1b2a41; }
+  #qwPurpose ul { margin: 0; padding-left: 18px; }
+  #qwPurpose .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; flex-wrap: wrap; }
+  #qwPurpose .acts button { font: 600 13px Inter, sans-serif; border-radius: 8px; padding: 7px 14px; cursor: pointer; border: 1px solid #d6d3cc; background: #fff; }
+  #qwPurpose .acts .go { background: #c2410c; color: #fff; border-color: #c2410c; }
+</style>
+
+<style id="qwR6css">
+  #benchMethodCard, #benchSuiteCard { grid-column: 1 / -1; }
+  #cardPaperPlayer { grid-column: 1 / -1; }
+  .qwModal { position: fixed; inset: 0; z-index: 10060; background: rgba(17,24,39,.62); display: none; align-items: flex-start; justify-content: center; overflow: auto; padding: 3vh 2vw; }
+  .qwModal.open { display: flex; }
+  .qwModal .box { position: relative; background: #fffdf9; border-radius: 12px; max-width: 1060px; width: 100%; padding: 18px 24px 22px; box-shadow: 0 24px 70px rgba(0,0,0,.4); font: 14.5px/1.6 Inter, system-ui, sans-serif; color: #1f2937; }
+  .qwModal .qx { position: absolute; top: 8px; right: 12px; border: 0; background: none; font-size: 26px; cursor: pointer; color: #6b7280; }
+  .qwModal h2 { margin: 0 34px 8px 0; font-size: 22px; color: #9a3412; }
+  .qwModal h3 { font-size: 18px; color: #1b2a41; margin: 14px 0 6px; }
+  .qwModal h3 .src { font-size: 12px; font-weight: 400; color: #6b7280; margin-left: 6px; }
+  .qwModal .big { font-size: 16.5px; }
+  .qwModal .lead { font-size: 15px; }
+  .qwModal .note { background: #f7f4ee; border-left: 4px solid #c2410c; padding: 8px 12px; border-radius: 4px; }
+  .qwModal canvas { width: 100%; height: auto; display: block; border: 1px solid #eadfd3; border-radius: 8px; background: #fff; margin: 8px 0; }
+  .qwModal button { font: 600 13.5px Inter, sans-serif; border-radius: 8px; padding: 7px 14px; cursor: pointer; border: 1px solid #d6d3cc; background: #fff; margin: 3px 4px 3px 0; }
+  .qwModal button.go { background: #c2410c; color: #fff; border-color: #c2410c; }
+  .qwModal button:disabled { opacity: .45; cursor: default; }
+  .qw-leg { list-style: none; padding: 0; margin: 4px 0 10px; display: grid; gap: 4px; }
+  .qw-leg li { display: flex; align-items: center; gap: 8px; font-size: 13.5px; }
+  .qw-leg .n { display: inline-block; min-width: 24px; height: 24px; border-radius: 50%; color: #fff; font-weight: 700; text-align: center; line-height: 24px; }
+  .qw-leg .sw { display: inline-block; width: 38px; }
+  .qw-tw { overflow-x: auto; }
+  .qw-t { border-collapse: collapse; width: 100%; font-size: 13px; margin: 6px 0; }
+  .qw-t th { background: #eef4f4; text-align: left; padding: 6px 8px; border-bottom: 1px solid #c9d6d6; }
+  .qw-t td { padding: 5px 8px; border-bottom: 1px solid #ece7df; vertical-align: top; }
+  .qw-t tr.ours td { background: #fff4ec; font-weight: 600; }
+  .qw-read { background: #f1f5ff; border: 1px solid #d5def5; border-radius: 8px; padding: 8px 14px; margin: 6px 0; }
+  .qw-read ol, .qw-steps { margin: 4px 0; padding-left: 22px; }
+  .qw-steps li, .qw-read li { margin: 3px 0; }
+  .qw-exp { border-top: 1px solid #eadfd3; padding-top: 6px; margin-top: 10px; }
+  .qw-exp .read { margin: 6px 0; }
+  .qw-exp .py code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; }
+  .qw-toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
+  .qw-toc a { font-size: 12.5px; background: #f3efe8; border-radius: 999px; padding: 3px 10px; color: #1b2a41; text-decoration: none; }
+  .qw-run { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; }
+  .qwModal .hint { font-size: 12.5px; color: #6b7280; margin: 2px 0 8px; }
+  .qw-chaps { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 8px; }
+  .qw-chaps button { font-size: 12.5px !important; padding: 4px 10px !important; }
+  .qw-chaps button.on { background: #1b2a41; color: #fff; border-color: #1b2a41; }
+  .qw-nav { display: flex; justify-content: space-between; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .qw-grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 0; }
+  @media (max-width: 800px) { .qw-grid4 { grid-template-columns: repeat(2, 1fr); } .qw-cols { grid-template-columns: 1fr !important; } }
+  .qw-grid4 .step { border: 1px solid #eadfd3; border-radius: 10px; padding: 10px; background: #fff; transition: transform .35s, box-shadow .35s, border-color .35s; font-size: 13.5px; }
+  .qw-grid4 .step .ic { font-size: 28px; display: block; }
+  .qw-grid4 .step b { display: block; font-size: 15px; margin: 2px 0; }
+  .qw-grid4 .step.on { border-color: #ea580c; box-shadow: 0 6px 18px rgba(234,88,12,.25); transform: translateY(-3px); }
+  .qw-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .qw-cols h4 { margin: 4px 0; }
+  .qw-shot { margin: 8px 0; } .qw-shot img { width: 100%; border: 1px solid #d6d3cc; border-radius: 8px; } .qw-shot figcaption { font-size: 12.5px; color: #6b7280; }
+  #qwRunStrip { position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 10055; background: #1b2a41; color: #fff; border-radius: 0 0 10px 10px; padding: 6px 12px; display: none; align-items: center; gap: 8px; font: 600 13px Inter, sans-serif; box-shadow: 0 6px 20px rgba(0,0,0,.3); }
+  #qwRunStrip.on { display: flex; }
+  #qwRunStrip .bar { display: inline-block; width: 160px; height: 8px; background: rgba(255,255,255,.25); border-radius: 4px; overflow: hidden; }
+  #qwRunStrip .bar i { display: block; height: 100%; width: 0; background: #f97316; }
+  #qwRunStrip button { border: 0; border-radius: 6px; padding: 3px 9px; cursor: pointer; font: 600 12px Inter, sans-serif; }
+  #qwRunStrip .stop { background: #f97316; color: #fff; }
+</style>
 </head>
 <body>
 <header>
   <div class="title-block">
     <h1>İnsansı Stereo Perspektif (Looming) &amp; Singularity Kontrollü Robot Laboratuvarı</h1>
     <p>Üç Reddiye (Enkodersiz Enerji Darbesi + Tutma Frenleri · Sabit XYZ Yerine Ordinal Perspektif Konisi · Kesintili S0–S6 Bakış + Çan-Eğrisi HDA/HLSL) Çalışma Tezgahı</p>
+    <div class="qw-hdr-row"><span class="qw-owner">Proje sahibi: <b>İskender Özkul</b> · Mersin Üniversitesi, Makine Mühendisliği Bölümü · © 2026</span><button type="button" class="qw-purpose" id="btnPurpose" title="Bu proje ne yapmaya çalışıyor? Tıklayın: animasyonlu kısa anlatım">🎯 Projenin amacı</button></div>
   </div>
   <div class="header-actions">
     <a class="btn" href="human_arm_workbench_en.html" title="English version" style="text-decoration:none">EN</a>
@@ -1679,6 +1793,7 @@
         <div class="pw-controls">
           <button class="pw-btn" data-act="toggle" title="Daralt / Genişlet">&#8211;</button>
           <button class="pw-btn" data-act="close" title="Kapat">&#10005;</button>
+          <button class="pw-btn" id="btnSceneDiagram" title="Kontrol döngüsü diyagramını bu 3B sahnenin yanına aç">⇱ Diyagram</button>
           <button class="pw-btn" id="btnSceneFS" title="Tam Ekran (iki göz + sahne + temel ayarlar)" aria-label="Tam Ekran">&#x26F6;</button>
         </div>
       </div>
@@ -1698,25 +1813,7 @@
           </div>
           <div class="hud hud-bl">
             <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#e8e6df;opacity:.85;margin-right:2px">Model</span>
-            <select id="selController" class="hud-select" title="Kontrol modeli: bu çalışma, önceki varyantlarımız veya literatürdeki klasik yöntemler">
-              <optgroup label="Bu çalışma (makalenin kontrolcüsü)">
-                <option value="pg" selected>Algısal 1/e Hız Yöneticisi — İskender Governor, ayrıcalıklı bilgisiz (yalnız piksel + zaman damgası)</option>
-              </optgroup>
-              <optgroup label="Önceki varyantlarımız (aynı 1/e gecikme yasası, ayrıcalıklı bilgiyle)">
-                <option value="governor">İskender Governor — ayrıcalıklı bilgili 1/e hız sınırı, k = 1/(e·δ)</option>
-                <option value="hlsl">HLSL — İnsansı Stereo Yaklaşma Algısı + çan eğrisi hız zarfı</option>
-                <option value="hdap">İnsan-HDA — İnsansı Dinamik Yaklaşım (uyarlamalı çan eğrisi, trifazik sıralama)</option>
-                <option value="bio">Biyo-Pulse — biyomimetik darbe (görev çevrimi) modeli</option>
-              </optgroup>
-              <optgroup label="Literatürdeki klasik yöntemler (rakipler)">
-                <option value="pid">PID — Oransal–İntegral–Türevsel kontrolcü (sabit kazançlı)</option>
-                <option value="lqr">LQR — Doğrusal Karesel Düzenleyici (durum geri beslemesi)</option>
-                <option value="fixed">Sabit kazanç P — oransal görsel servo, v = k·e</option>
-              </optgroup>
-              <optgroup label="Deneme">
-                <option value="custom">Özel matematiksel formül (alttaki kod kutusundan)</option>
-              </optgroup>
-            </select>
+            <select id="selController" class="hud-select"><optgroup label="★ Bu çalışma — aktif modelimiz (makalenin kontrolcüsü)"><option value="pg" selected>★ İskender Governor (bizim model) — yalnız piksel + zaman damgası</option></optgroup><optgroup label="Referans — aynı 1/e kuralı, ayrıcalıklı bilgiyle"><option value="governor">Ayrıcalıklı bilgili 1/e yöneticisi (referans) — k = 1/(e·δ)</option></optgroup><optgroup label="Ek keşif modellerimiz (makalede yok)"><option value="hlsl">HLSL — İnsansı Stereo Yaklaşma Algısı + çan eğrisi hız zarfı</option><option value="hdap">İnsan-HDA — İnsansı Dinamik Yaklaşım</option><option value="bio">Biyo-Pulse — biyomimetik darbe modeli</option></optgroup><optgroup label="Literatürdeki klasik yöntemler (rakipler)"><option value="pid">PID — Oransal–İntegral–Türevsel (sabit kazançlı)</option><option value="lqr">LQR — Doğrusal Karesel Düzenleyici</option><option value="fixed">Sabit kazanç P — oransal görsel servo, v = k·e</option></optgroup><optgroup label="Deneme"><option value="custom">Özel matematiksel formül (alttaki kod kutusundan)</option></optgroup></select><button type="button" class="hud-info" id="btnModelInfo" title="Seçili model nedir? Tıklayın">i</button>
           </div>
           <div class="hud hud-telemetry" id="telemetryHud" title="Sahne telemetrisi — ağır çekimde darbe/bakış sınırlarını ayırt etmek için">
             <div class="tel-title">TELEMETRİ <span id="telTimeScale" class="tel-badge">x1</span></div>
@@ -1881,15 +1978,10 @@
       <button class="btn" id="btnShowAllTabs" style="font-size:10.5px;padding:4px 9px;" title="Tüm sekme kartlarını tek sayfada alt alta göster">Tüm Sekmeleri Aç</button>
     </div>
     <div class="tab-panels" id="tabPanels">
-    <div class="card fs-basic" data-tab="tab1">
+    <div class="card fs-basic" data-tab="tab1" id="cardCtrlModel">
       <div class="card-title">1. İnsansı Kontrol Modeli <span class="sub">PID / LQR Alternatifi</span></div>
-      <div class="card-explain">Makalenin kontrolcüsü <b>Algısal 1/e Hız Yöneticisi</b>dir: <b>İskender Governor</b> adını verdiğimiz 1/e gecikme yasasının ayrıcalıklı bilgi kullanmayan biçimi. <b>HLSL</b> (İng. <i>Human-Like Stereo Looming</i>, insansı stereo yaklaşma algısı) ve <b>HDA</b> (İng. <i>Human-like Dynamic Approach</i>, insansı dinamik yaklaşım), aynı yasaya çan eğrisi biçimli bir hız zarfı ekleyen <b>önceki varyantlarımızdır</b>; makalede yer almazlar. Bunları literatürdeki klasik yöntemlerle karşılaştırın: <b>PID</b> (oransal–integral–türevsel), <b>LQR</b> (doğrusal karesel düzenleyici) ve <b>P</b> (sabit kazançlı oransal görsel servo). Hepsinin açıklaması aşağıdaki <b>“Karşılaştırılan yaklaşımlar ve kısaltmalar”</b> kartındadır. Bu kartta hız sınıfını ve tekillik (singularity) korumasını da seçersiniz.</div>
-    <div class="card concept-card-wide" data-tab="tab1" id="cardApproaches1">
-      <div class="card-title">Karşılaştırılan yaklaşımlar ve kısaltmalar <span class="sub">Neyi neyle karşılaştırıyoruz?</span></div>
-      <div class="card-explain">Her kontrolcü üç gruptan birindedir: <span class="cat-chip cat-this">Bu çalışma</span> makalenin katkısıdır. <span class="cat-chip cat-ours">Önceki varyantlarımız</span> aynı 1/<var>e</var> yasasına dayanır, ama simülatörün ayrıcalıklı bilgilerini kullanır. <span class="cat-chip cat-lit">Literatür</span> robot tekniğinde yerleşik klasik yöntemlerdir ve rakip olarak kullanılır. Makaledeki karşılaştırmalar bu çalışmayı İskender Governor ve literatür yöntemleriyle yapar.</div>
-      <div class="appr-wrap"><table class="appr-tab"><tr><th>Model</th><th>Açılımı</th><th>Grup</th><th>Kontrolcüye verilen bilgi</th><th>Robot tekniğindeki yeri</th></tr><tr class="cat-this"><td><b>Algısal 1/e Hız Yöneticisi</b></td><td>İng. <i>Perceptual 1/e Governor</i>; İskender Governor’ın ayrıcalıklı bilgisiz biçimi</td><td><b>Bu çalışma</b> (makalenin katkısı)</td><td>Yalnız iki kameradaki el ve hedef piksel konumları ve görüntü zaman damgaları. <var>Ĵ</var> ve servo gecikmesi <var>L</var>, öz-tanılama hareketiyle öğrenilir.</td><td>Kalibrasyonsuz görsel servo (Jacobian’ı ölçerek öğrenme) ile gecikmeli döngünün 1/<var>e</var> sınırını birleştirir. Eklem açısı, metrik mesafe ve gerçek gecikme kullanmaz.</td></tr><tr class="cat-ours"><td><b>İskender Governor</b></td><td>1/<var>e</var> gecikme sınırlı hız yöneticisi, <var>k</var> = 1/(<var>e</var>·<var>δ</var><sub>eff</sub>)</td><td>Önceki sürümümüz (makalede “ayrıcalıklı bilgili yönetici” olarak karşılaştırma referansı)</td><td>Metrik el–hedef hatası, analitik Jacobian, gerçek gecikme.</td><td>Aynı yasa, ama simülatörün verdiği ayrıcalıklı bilgilerle. Algısal sürümün bu bilgilerden vazgeçmesinin bedelini ölçmek için üst referans.</td></tr><tr class="cat-ours"><td><b>HLSL</b></td><td>İng. <i>Human-Like Stereo Looming</i>: insansı stereo yaklaşma algısı + çan eğrisi hız zarfı</td><td>Önceki varyantımız (makalede yok)</td><td>Stereo ve görünen boyuttan metrik geri çatım, gerçek gecikme.</td><td>1/<var>e</var> sınırının üzerine yumuşak kalkış ve duruşlu bir hız zarfı <var>φ</var>(<var>t</var>) koyar. İnsan uzanmalarının çan biçimli hız profilinden esinlenir (Flash & Hogan, 1985).</td></tr><tr class="cat-ours"><td><b>İnsan-HDA</b></td><td>İng. <i>Human-like Dynamic Approach</i>: insansı dinamik yaklaşım</td><td>Önceki varyantımız (makalede yok)</td><td>HLSL ile aynı.</td><td>HLSL’ye ek olarak mesafe ve aciliyete göre hız tavanı, sinyale bağlı motor gürültüsü (Harris & Wolpert, 1998) ve omuz → dirsek → bilek sıralı (trifazik) eklem aktivasyonu.</td></tr><tr class="cat-ours"><td><b>Biyo-Pulse</b></td><td>Biyomimetik darbe (kas seğirmesi) modeli</td><td>Önceki varyantımız (makalede yok)</td><td>HLSL ile aynı.</td><td>Hızı sürekli bir komutla değil, görev çevrimi ayarlı darbe treniyle üretir. Makaledeki enkodersiz bak–darbe–fren denetleyicisinin (§8.9) öncülüdür.</td></tr><tr class="cat-lit"><td><b>PID</b></td><td>Oransal–İntegral–Türevsel kontrolcü</td><td>Literatür (klasik rakip)</td><td>Metrik hata (ölçülen el–hedef farkı).</td><td>Endüstride en yaygın geri besleme kontrolcüsüdür. Kazançları bir çalışma noktasında ayarlanır; gecikme veya bitki değişince yeniden ayar gerekir.</td></tr><tr class="cat-lit"><td><b>LQR</b></td><td>Doğrusal Karesel Düzenleyici (İng. <i>Linear Quadratic Regulator</i>)</td><td>Literatür (klasik rakip)</td><td>Metrik hata ve hızı (durum vektörü).</td><td>Bir bitki modelinden hesaplanan optimal durum geri beslemesidir. Burada çift integratör modeli kullanılır; gecikmeyi modelde taşımazsa gecikmeye duyarlıdır.</td></tr><tr class="cat-lit"><td><b>Sabit kazanç P</b></td><td>Oransal görsel servo, <var>v</var> = <var>k</var>·<var>e</var></td><td>Literatür (klasik rakip)</td><td>Metrik hata.</td><td>Görsel servonun klasik üstel azalma yasasıdır (Chaumette & Hutchinson, 2006); görsel servo kütüphanelerinde varsayılan yasadır. Kazanç tek bir gecikmeye göre seçilir.</td></tr></table></div>
-      <details class="abbr-details"><summary>Kısaltmalar ve terimler</summary><table class="appr-tab abbr-tab"><tr><td>1/<var>e</var> yasası</td><td>Gecikmeli döngüde hedefi geçmeden yaklaşmanın en hızlı kazancı: <var>k</var>·<var>δ</var> ≤ 1/<var>e</var> ≈ 0.368</td></tr><tr><td><var>δ</var><sub>eff</sub></td><td>Etkin gecikme: ölçülen görsel gecikme + servo gecikmesi + ortalama ve örnekleme gecikmesi</td></tr><tr><td>Ayrıcalıklı bilgi</td><td>Gerçek robotun kendiliğinden bilemeyeceği, simülatörün kontrolcüye verdiği bilgi: eklem açısı, metrik mesafe, gerçek gecikme, analitik Jacobian (İng. <i>oracle / privileged information</i>)</td></tr><tr><td>Öz-tanılama hareketi</td><td>Kolun her eklemini sırayla biraz oynatıp görüntünün nasıl değiştiğini izleyerek kendi modelini çıkarması (İng. <i>motor babbling</i>)</td></tr><tr><td>Efferent kopya</td><td>Kontrolcünün gönderdiği komutun içeride tutulan kopyası; görüntü yokken elin nerede olduğunu tahmin etmekte kullanılır</td></tr><tr><td><var>Ĵ</var>, <var>Ĵ</var><sup>+</sup></td><td>Öğrenilen görüntü Jacobian’ı ve onun sönümlü tersi</td></tr><tr><td>SD (DOF)</td><td>Serbestlik derecesi (İng. <i>degrees of freedom</i>); bu kol 6 SD’lidir</td></tr><tr><td>DH</td><td>Denavit–Hartenberg: eklem çerçevelerini dört parametreyle (<var>θ</var>, <var>d</var>, <var>a</var>, <var>α</var>) tanımlama kuralı</td></tr><tr><td>DK / TK (FK / IK)</td><td>Düz kinematik (açılardan el konumu) ve ters kinematik (el konumundan açılar)</td></tr><tr><td>DLS</td><td>Sönümlü en küçük kareler (İng. <i>Damped Least Squares</i>): tekilliğe yakın ters kinematik</td></tr><tr><td><var>w</var>(<var>q</var>)</td><td>Manipülabilite (Yoshikawa): 0’a yaklaşırsa kol tekilliktedir</td></tr><tr><td>SO(3), SE(3)</td><td>3B dönmeler kümesi ve 3B konum + dönme (katı cisim hareketi)</td></tr><tr><td>IBVS</td><td>Görüntü tabanlı görsel servo (İng. <i>Image-Based Visual Servoing</i>)</td></tr><tr><td><var>ρ</var><sub>s</sub></td><td>Elin ve hedefin görünen boy oranı; 1 olunca el hedefin derinliğindedir</td></tr><tr><td>Sakkad</td><td>Gözün iki bakış noktası arasındaki hızlı sıçraması; arada görüntü alınmaz</td></tr><tr><td>Paralaks</td><td>Bakış noktası kayınca yakın nesnenin uzaktakinden daha çok yer değiştirmesi</td></tr><tr><td>MT, <var>T</var><sub>s</sub></td><td>Hareket süresi ve yerleşme süresi</td></tr><tr><td>TP</td><td>Fitts verimi (bit/s), ISO 9241-9 standardına göre</td></tr><tr><td><var>E</var><sub>init</sub>, %<var>T</var><sub>comp</sub></td><td>İlk (balistik) evre sonundaki hata ve toplam sürenin düzeltme evresinde geçen yüzdesi</td></tr><tr><td>Z1–Z4</td><td>Çalışma hacmi kabukları: yakın, orta, sınır, erişilemez</td></tr><tr><td>FOV, px, HUD</td><td>Görüş açısı, piksel, sahne üstü gösterge paneli</td></tr></table></details>
-    </div>
+      <div class="card-explain"><b>Hangi model bizim?</b> Aktif olarak geliştirdiğimiz ve makalede sunduğumuz model <b>★ İskender Governor (bizim model)</b>dir (seçicide en üstte). <b>Ayrıcalıklı bilgili 1/e yöneticisi</b>, literatürde bilinen 1/e gecikme sınırını gerçek gecikme ve gerçek mesafeyle uygulayan <b>referanstır</b>. <b>HLSL</b> (İnsansı Stereo Yaklaşma Algısı), <b>İnsan-HDA</b> (İnsansı Dinamik Yaklaşım) ve <b>Biyo-Pulse</b> aynı fikrin <b>ek keşif modellerimizdir</b>; makalede değerlendirilmezler. <b>PID</b> (oransal–integral–türevsel), <b>LQR</b> (doğrusal karesel düzenleyici) ve <b>P</b> (sabit kazançlı görsel servo) <b>literatürdeki rakiplerdir</b>. Herhangi bir model adına tıklarsanız kısa açıklaması açılır.</div>
+    
     
       <div class="ctrl-group">
         <label>Singularity & Eklem Koordinasyonu</label>
@@ -1965,6 +2057,12 @@
         <button class="preset-btn" data-preset="mononeck">5. Tek Göz + Yavaş Boyun–Göz Senkronu</button>
         <button class="preset-btn" data-preset="waist_sync">6. Belden (Sütun) + Kol Senkron Ulaşma</button>
       </div>
+    </div>
+    <div class="card concept-card-wide" data-tab="tab1" id="cardApproaches1">
+      <div class="card-title">Karşılaştırılan yaklaşımlar ve kısaltmalar <span class="sub">Neyi neyle karşılaştırıyoruz?</span></div>
+      <div class="card-explain">Her kontrolcü dört gruptan birindedir: <span class="cat-chip cat-this">★ Bu çalışma</span> makalenin katkısıdır. <span class="cat-chip cat-ref">Referans</span> aynı 1/<var>e</var> kuralını simülatörün ayrıcalıklı bilgileriyle uygular. <span class="cat-chip cat-old">Ek keşif modellerimiz</span> aynı 1/<var>e</var> fikrinin başka biçimleridir; makalede değerlendirilmez. <span class="cat-chip cat-lit">Literatür</span> robot tekniğindeki klasik rakiplerdir. Makaledeki karşılaştırmalar bu çalışmayı referansla ve literatür yöntemleriyle yapar.</div>
+      <div class="appr-wrap"><table class="appr-tab"><tr><th>Model</th><th>Açılımı</th><th>Grup</th><th>Kontrolcüye verilen bilgi</th><th>Robot tekniğindeki yeri</th></tr><tr class="cat-this"><td><b>★ İskender Governor</b> (bizim model)</td><td>Algısal 1/e hız yöneticisi; yalnız piksel ve zaman damgası kullanır</td><td><b>Bu çalışma</b> (makalenin katkısı)</td><td>Yalnız iki kameradaki el ve hedef piksel konumları ve görüntü zaman damgaları. <var>Ĵ</var> ve servo gecikmesi <var>L</var>, öz-tanılama hareketiyle öğrenilir.</td><td>Kalibrasyonsuz görsel servo (Jacobian’ı ölçerek öğrenme) ile gecikmeli döngünün 1/<var>e</var> sınırını birleştirir. Eklem açısı, metrik mesafe ve gerçek gecikme kullanmaz.</td></tr><tr class="cat-ref"><td><b>Ayrıcalıklı bilgili 1/e yöneticisi (referans)</b></td><td>1/<var>e</var> gecikme sınırlı hız yöneticisi, <var>k</var> = 1/(<var>e</var>·<var>δ</var><sub>eff</sub>)</td><td>Referans (makalede “ayrıcalıklı bilgili yönetici”)</td><td>Metrik el–hedef hatası, analitik Jacobian, gerçek gecikme.</td><td>Aynı yasa, ama simülatörün verdiği ayrıcalıklı bilgilerle. Bizim modelin bu bilgilerden vazgeçmesinin bedelini ölçmek için üst referans.</td></tr><tr class="cat-old"><td><b>HLSL</b></td><td>İng. <i>Human-Like Stereo Looming</i>: insansı stereo yaklaşma algısı + çan eğrisi hız zarfı</td><td>Ek keşif modelimiz (makalede yok)</td><td>Stereo ve görünen boyuttan metrik geri çatım, gerçek gecikme.</td><td>1/<var>e</var> sınırının üzerine yumuşak kalkış ve duruşlu bir hız zarfı <var>φ</var>(<var>t</var>) koyar. İnsan uzanmalarının çan biçimli hız profilinden esinlenir (Flash & Hogan, 1985).</td></tr><tr class="cat-old"><td><b>İnsan-HDA</b></td><td>İng. <i>Human-like Dynamic Approach</i>: insansı dinamik yaklaşım</td><td>Ek keşif modelimiz (makalede yok)</td><td>HLSL ile aynı.</td><td>HLSL’ye ek olarak mesafe ve aciliyete göre hız tavanı, sinyale bağlı motor gürültüsü (Harris & Wolpert, 1998) ve omuz → dirsek → bilek sıralı (trifazik) eklem aktivasyonu.</td></tr><tr class="cat-old"><td><b>Biyo-Pulse</b></td><td>Biyomimetik darbe (kas seğirmesi) modeli</td><td>Ek keşif modelimiz (makalede yok)</td><td>HLSL ile aynı.</td><td>Hızı sürekli bir komutla değil, görev çevrimi ayarlı darbe treniyle üretir. Makaledeki enkodersiz bak–darbe–fren denetleyicisinin (§8.9) öncülüdür.</td></tr><tr class="cat-lit"><td><b>PID</b></td><td>Oransal–İntegral–Türevsel kontrolcü</td><td>Literatür (klasik rakip)</td><td>Metrik hata (ölçülen el–hedef farkı).</td><td>Endüstride en yaygın geri besleme kontrolcüsüdür. Kazançları bir çalışma noktasında ayarlanır; gecikme veya bitki değişince yeniden ayar gerekir.</td></tr><tr class="cat-lit"><td><b>LQR</b></td><td>Doğrusal Karesel Düzenleyici (İng. <i>Linear Quadratic Regulator</i>)</td><td>Literatür (klasik rakip)</td><td>Metrik hata ve hızı (durum vektörü).</td><td>Bir bitki modelinden hesaplanan optimal durum geri beslemesidir. Burada çift integratör modeli kullanılır; gecikmeyi modelde taşımazsa gecikmeye duyarlıdır.</td></tr><tr class="cat-lit"><td><b>Sabit kazanç P</b></td><td>Oransal görsel servo, <var>v</var> = <var>k</var>·<var>e</var></td><td>Literatür (klasik rakip)</td><td>Metrik hata.</td><td>Görsel servonun klasik üstel azalma yasasıdır (Chaumette & Hutchinson, 2006); görsel servo kütüphanelerinde varsayılan yasadır. Kazanç tek bir gecikmeye göre seçilir.</td></tr></table></div>
+      <details class="abbr-details"><summary>Kısaltmalar ve terimler</summary><table class="appr-tab abbr-tab"><tr><td>1/<var>e</var> yasası</td><td>Gecikmeli döngüde hedefi geçmeden yaklaşmanın en hızlı kazancı: <var>k</var>·<var>δ</var> ≤ 1/<var>e</var> ≈ 0.368</td></tr><tr><td><var>δ</var><sub>eff</sub></td><td>Etkin gecikme: ölçülen görsel gecikme + servo gecikmesi + ortalama ve örnekleme gecikmesi</td></tr><tr><td>Ayrıcalıklı bilgi</td><td>Gerçek robotun kendiliğinden bilemeyeceği, simülatörün kontrolcüye verdiği bilgi: eklem açısı, metrik mesafe, gerçek gecikme, analitik Jacobian (İng. <i>oracle / privileged information</i>)</td></tr><tr><td>Öz-tanılama hareketi</td><td>Kolun her eklemini sırayla biraz oynatıp görüntünün nasıl değiştiğini izleyerek kendi modelini çıkarması (İng. <i>motor babbling</i>)</td></tr><tr><td>Efferent kopya</td><td>Kontrolcünün gönderdiği komutun içeride tutulan kopyası; görüntü yokken elin nerede olduğunu tahmin etmekte kullanılır</td></tr><tr><td><var>Ĵ</var>, <var>Ĵ</var><sup>+</sup></td><td>Öğrenilen görüntü Jacobian’ı ve onun sönümlü tersi</td></tr><tr><td>SD (DOF)</td><td>Serbestlik derecesi (İng. <i>degrees of freedom</i>); bu kol 6 SD’lidir</td></tr><tr><td>DH</td><td>Denavit–Hartenberg: eklem çerçevelerini dört parametreyle (<var>θ</var>, <var>d</var>, <var>a</var>, <var>α</var>) tanımlama kuralı</td></tr><tr><td>DK / TK (FK / IK)</td><td>Düz kinematik (açılardan el konumu) ve ters kinematik (el konumundan açılar)</td></tr><tr><td>DLS</td><td>Sönümlü en küçük kareler (İng. <i>Damped Least Squares</i>): tekilliğe yakın ters kinematik</td></tr><tr><td><var>w</var>(<var>q</var>)</td><td>Manipülabilite (Yoshikawa): 0’a yaklaşırsa kol tekilliktedir</td></tr><tr><td>SO(3), SE(3)</td><td>3B dönmeler kümesi ve 3B konum + dönme (katı cisim hareketi)</td></tr><tr><td>IBVS</td><td>Görüntü tabanlı görsel servo (İng. <i>Image-Based Visual Servoing</i>)</td></tr><tr><td><var>ρ</var><sub>s</sub></td><td>Elin ve hedefin görünen boy oranı; 1 olunca el hedefin derinliğindedir</td></tr><tr><td>Sakkad</td><td>Gözün iki bakış noktası arasındaki hızlı sıçraması; arada görüntü alınmaz</td></tr><tr><td>Paralaks</td><td>Bakış noktası kayınca yakın nesnenin uzaktakinden daha çok yer değiştirmesi</td></tr><tr><td>MT, <var>T</var><sub>s</sub></td><td>Hareket süresi ve yerleşme süresi</td></tr><tr><td>TP</td><td>Fitts verimi (bit/s), ISO 9241-9 standardına göre</td></tr><tr><td><var>E</var><sub>init</sub>, %<var>T</var><sub>comp</sub></td><td>İlk (balistik) evre sonundaki hata ve toplam sürenin düzeltme evresinde geçen yüzdesi</td></tr><tr><td>Z1–Z4</td><td>Çalışma hacmi kabukları: yakın, orta, sınır, erişilemez</td></tr><tr><td>FOV, px, HUD</td><td>Görüş açısı, piksel, sahne üstü gösterge paneli</td></tr></table></details>
     </div>
     <div class="card concept-card-wide" data-tab="tab1" id="cardConceptGuide">
       <div class="card-title">XYZ Koordinatsız Retinal Looming Kontrol Döngüsü, Matematiksel İzah &amp; Kinematik Şema <span class="sub">Senaryoya Uyarlanan Lisans Düzeyi Anlatım · Enkoder=YOK · (X,Y,Z)=YOK</span></div>
@@ -2197,7 +2295,7 @@
 </table>
 </div>
 <div class="math-mini-card">
-<b class="mi-title">5. Algısal 1/<var>e</var> yasası (İskender Governor, ayrıcalıklı bilgisiz): yalnız piksel ve zaman damgası — makalenin ana kontrolcüsü</b>
+<b class="mi-title">5. İskender Governor (bizim model): algısal 1/<var>e</var> yasası: yalnız piksel ve zaman damgası — makalenin ana kontrolcüsü</b>
 <svg class="math-illu" viewBox="0 0 320 175" role="img" aria-label="Algısal 1/e yasasının döngüsü"><defs><marker id="arrPg" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0, 7 3, 0 6" fill="#555b64"/></marker></defs><rect x="6" y="20" width="96" height="34" rx="5" fill="#e9eef5"/><g class="bd"><circle cx="19" cy="37.0" r="8"/><text x="19" y="40.6">1</text></g><text class="bx" x="32" y="41.0">Kameralar</text><rect x="112" y="20" width="96" height="34" rx="5" fill="#e9eef5"/><g class="bd"><circle cx="125" cy="37.0" r="8"/><text x="125" y="40.6">2</text></g><text class="bx" x="138" y="41.0">Ortalama</text><rect x="218" y="20" width="96" height="34" rx="5" fill="#f6e9e4"/><g class="bd"><circle cx="231" cy="37.0" r="8"/><text x="231" y="40.6">3</text></g><text class="bx" x="244" y="41.0">Kazanç k</text><rect x="218" y="112" width="96" height="34" rx="5" fill="#f6e9e4"/><g class="bd"><circle cx="231" cy="129.0" r="8"/><text x="231" y="132.6">4</text></g><text class="bx" x="244" y="133.0">Komut</text><rect x="6" y="112" width="96" height="34" rx="5" fill="#e7efe9"/><g class="bd"><circle cx="19" cy="129.0" r="8"/><text x="19" y="132.6">5</text></g><text class="bx" x="32" y="133.0">Kol</text><rect x="112" y="70" width="96" height="30" rx="5" fill="#f3f1ec"/><g class="bd"><circle cx="125" cy="85.0" r="8"/><text x="125" y="88.6">6</text></g><text class="bx" x="138" y="89.0">Öz-tanılama</text><g stroke="#555b64" stroke-width="1.5" fill="none"><line x1="102" y1="37" x2="110" y2="37" marker-end="url(#arrPg)"/><line x1="208" y1="37" x2="216" y2="37" marker-end="url(#arrPg)"/><line x1="266" y1="54" x2="266" y2="110" marker-end="url(#arrPg)"/><polyline points="266,146 266,160 54,160 54,148" marker-end="url(#arrPg)"/><line x1="54" y1="112" x2="54" y2="56" marker-end="url(#arrPg)"/><line x1="208" y1="78" x2="226" y2="56" stroke-dasharray="3 2" marker-end="url(#arrPg)"/><line x1="208" y1="94" x2="226" y2="112" stroke-dasharray="3 2" marker-end="url(#arrPg)"/></g></svg>
 <ol class="mi-legend">
   <li><b>Kameralar:</b> iki gözde elin ve hedefin piksel konumu, görüntünün çekilme anı <var>t</var><sub>cap</sub> ve kullanılma anı <var>t</var><sub>now</sub>. Kontrolcünün aldığı her şey yalnız bu kadardır.</li>
@@ -2625,14 +2723,14 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
     </div>
     <div class="card concept-card-wide tab-hidden" data-tab="tab5" id="cardApproaches5">
       <div class="card-title">Karşılaştırılan yaklaşımlar ve kısaltmalar <span class="sub">Neyi neyle karşılaştırıyoruz?</span></div>
-      <div class="card-explain">Her kontrolcü üç gruptan birindedir: <span class="cat-chip cat-this">Bu çalışma</span> makalenin katkısıdır. <span class="cat-chip cat-ours">Önceki varyantlarımız</span> aynı 1/<var>e</var> yasasına dayanır, ama simülatörün ayrıcalıklı bilgilerini kullanır. <span class="cat-chip cat-lit">Literatür</span> robot tekniğinde yerleşik klasik yöntemlerdir ve rakip olarak kullanılır. Makaledeki karşılaştırmalar bu çalışmayı İskender Governor ve literatür yöntemleriyle yapar.</div>
-      <div class="appr-wrap"><table class="appr-tab"><tr><th>Model</th><th>Açılımı</th><th>Grup</th><th>Kontrolcüye verilen bilgi</th><th>Robot tekniğindeki yeri</th></tr><tr class="cat-this"><td><b>Algısal 1/e Hız Yöneticisi</b></td><td>İng. <i>Perceptual 1/e Governor</i>; İskender Governor’ın ayrıcalıklı bilgisiz biçimi</td><td><b>Bu çalışma</b> (makalenin katkısı)</td><td>Yalnız iki kameradaki el ve hedef piksel konumları ve görüntü zaman damgaları. <var>Ĵ</var> ve servo gecikmesi <var>L</var>, öz-tanılama hareketiyle öğrenilir.</td><td>Kalibrasyonsuz görsel servo (Jacobian’ı ölçerek öğrenme) ile gecikmeli döngünün 1/<var>e</var> sınırını birleştirir. Eklem açısı, metrik mesafe ve gerçek gecikme kullanmaz.</td></tr><tr class="cat-ours"><td><b>İskender Governor</b></td><td>1/<var>e</var> gecikme sınırlı hız yöneticisi, <var>k</var> = 1/(<var>e</var>·<var>δ</var><sub>eff</sub>)</td><td>Önceki sürümümüz (makalede “ayrıcalıklı bilgili yönetici” olarak karşılaştırma referansı)</td><td>Metrik el–hedef hatası, analitik Jacobian, gerçek gecikme.</td><td>Aynı yasa, ama simülatörün verdiği ayrıcalıklı bilgilerle. Algısal sürümün bu bilgilerden vazgeçmesinin bedelini ölçmek için üst referans.</td></tr><tr class="cat-ours"><td><b>HLSL</b></td><td>İng. <i>Human-Like Stereo Looming</i>: insansı stereo yaklaşma algısı + çan eğrisi hız zarfı</td><td>Önceki varyantımız (makalede yok)</td><td>Stereo ve görünen boyuttan metrik geri çatım, gerçek gecikme.</td><td>1/<var>e</var> sınırının üzerine yumuşak kalkış ve duruşlu bir hız zarfı <var>φ</var>(<var>t</var>) koyar. İnsan uzanmalarının çan biçimli hız profilinden esinlenir (Flash & Hogan, 1985).</td></tr><tr class="cat-ours"><td><b>İnsan-HDA</b></td><td>İng. <i>Human-like Dynamic Approach</i>: insansı dinamik yaklaşım</td><td>Önceki varyantımız (makalede yok)</td><td>HLSL ile aynı.</td><td>HLSL’ye ek olarak mesafe ve aciliyete göre hız tavanı, sinyale bağlı motor gürültüsü (Harris & Wolpert, 1998) ve omuz → dirsek → bilek sıralı (trifazik) eklem aktivasyonu.</td></tr><tr class="cat-ours"><td><b>Biyo-Pulse</b></td><td>Biyomimetik darbe (kas seğirmesi) modeli</td><td>Önceki varyantımız (makalede yok)</td><td>HLSL ile aynı.</td><td>Hızı sürekli bir komutla değil, görev çevrimi ayarlı darbe treniyle üretir. Makaledeki enkodersiz bak–darbe–fren denetleyicisinin (§8.9) öncülüdür.</td></tr><tr class="cat-lit"><td><b>PID</b></td><td>Oransal–İntegral–Türevsel kontrolcü</td><td>Literatür (klasik rakip)</td><td>Metrik hata (ölçülen el–hedef farkı).</td><td>Endüstride en yaygın geri besleme kontrolcüsüdür. Kazançları bir çalışma noktasında ayarlanır; gecikme veya bitki değişince yeniden ayar gerekir.</td></tr><tr class="cat-lit"><td><b>LQR</b></td><td>Doğrusal Karesel Düzenleyici (İng. <i>Linear Quadratic Regulator</i>)</td><td>Literatür (klasik rakip)</td><td>Metrik hata ve hızı (durum vektörü).</td><td>Bir bitki modelinden hesaplanan optimal durum geri beslemesidir. Burada çift integratör modeli kullanılır; gecikmeyi modelde taşımazsa gecikmeye duyarlıdır.</td></tr><tr class="cat-lit"><td><b>Sabit kazanç P</b></td><td>Oransal görsel servo, <var>v</var> = <var>k</var>·<var>e</var></td><td>Literatür (klasik rakip)</td><td>Metrik hata.</td><td>Görsel servonun klasik üstel azalma yasasıdır (Chaumette & Hutchinson, 2006); görsel servo kütüphanelerinde varsayılan yasadır. Kazanç tek bir gecikmeye göre seçilir.</td></tr></table></div>
+      <div class="card-explain">Her kontrolcü dört gruptan birindedir: <span class="cat-chip cat-this">★ Bu çalışma</span> makalenin katkısıdır. <span class="cat-chip cat-ref">Referans</span> aynı 1/<var>e</var> kuralını simülatörün ayrıcalıklı bilgileriyle uygular. <span class="cat-chip cat-old">Ek keşif modellerimiz</span> aynı 1/<var>e</var> fikrinin başka biçimleridir; makalede değerlendirilmez. <span class="cat-chip cat-lit">Literatür</span> robot tekniğindeki klasik rakiplerdir. Makaledeki karşılaştırmalar bu çalışmayı referansla ve literatür yöntemleriyle yapar.</div>
+      <div class="appr-wrap"><table class="appr-tab"><tr><th>Model</th><th>Açılımı</th><th>Grup</th><th>Kontrolcüye verilen bilgi</th><th>Robot tekniğindeki yeri</th></tr><tr class="cat-this"><td><b>★ İskender Governor</b> (bizim model)</td><td>Algısal 1/e hız yöneticisi; yalnız piksel ve zaman damgası kullanır</td><td><b>Bu çalışma</b> (makalenin katkısı)</td><td>Yalnız iki kameradaki el ve hedef piksel konumları ve görüntü zaman damgaları. <var>Ĵ</var> ve servo gecikmesi <var>L</var>, öz-tanılama hareketiyle öğrenilir.</td><td>Kalibrasyonsuz görsel servo (Jacobian’ı ölçerek öğrenme) ile gecikmeli döngünün 1/<var>e</var> sınırını birleştirir. Eklem açısı, metrik mesafe ve gerçek gecikme kullanmaz.</td></tr><tr class="cat-ref"><td><b>Ayrıcalıklı bilgili 1/e yöneticisi (referans)</b></td><td>1/<var>e</var> gecikme sınırlı hız yöneticisi, <var>k</var> = 1/(<var>e</var>·<var>δ</var><sub>eff</sub>)</td><td>Referans (makalede “ayrıcalıklı bilgili yönetici”)</td><td>Metrik el–hedef hatası, analitik Jacobian, gerçek gecikme.</td><td>Aynı yasa, ama simülatörün verdiği ayrıcalıklı bilgilerle. Bizim modelin bu bilgilerden vazgeçmesinin bedelini ölçmek için üst referans.</td></tr><tr class="cat-old"><td><b>HLSL</b></td><td>İng. <i>Human-Like Stereo Looming</i>: insansı stereo yaklaşma algısı + çan eğrisi hız zarfı</td><td>Ek keşif modelimiz (makalede yok)</td><td>Stereo ve görünen boyuttan metrik geri çatım, gerçek gecikme.</td><td>1/<var>e</var> sınırının üzerine yumuşak kalkış ve duruşlu bir hız zarfı <var>φ</var>(<var>t</var>) koyar. İnsan uzanmalarının çan biçimli hız profilinden esinlenir (Flash & Hogan, 1985).</td></tr><tr class="cat-old"><td><b>İnsan-HDA</b></td><td>İng. <i>Human-like Dynamic Approach</i>: insansı dinamik yaklaşım</td><td>Ek keşif modelimiz (makalede yok)</td><td>HLSL ile aynı.</td><td>HLSL’ye ek olarak mesafe ve aciliyete göre hız tavanı, sinyale bağlı motor gürültüsü (Harris & Wolpert, 1998) ve omuz → dirsek → bilek sıralı (trifazik) eklem aktivasyonu.</td></tr><tr class="cat-old"><td><b>Biyo-Pulse</b></td><td>Biyomimetik darbe (kas seğirmesi) modeli</td><td>Ek keşif modelimiz (makalede yok)</td><td>HLSL ile aynı.</td><td>Hızı sürekli bir komutla değil, görev çevrimi ayarlı darbe treniyle üretir. Makaledeki enkodersiz bak–darbe–fren denetleyicisinin (§8.9) öncülüdür.</td></tr><tr class="cat-lit"><td><b>PID</b></td><td>Oransal–İntegral–Türevsel kontrolcü</td><td>Literatür (klasik rakip)</td><td>Metrik hata (ölçülen el–hedef farkı).</td><td>Endüstride en yaygın geri besleme kontrolcüsüdür. Kazançları bir çalışma noktasında ayarlanır; gecikme veya bitki değişince yeniden ayar gerekir.</td></tr><tr class="cat-lit"><td><b>LQR</b></td><td>Doğrusal Karesel Düzenleyici (İng. <i>Linear Quadratic Regulator</i>)</td><td>Literatür (klasik rakip)</td><td>Metrik hata ve hızı (durum vektörü).</td><td>Bir bitki modelinden hesaplanan optimal durum geri beslemesidir. Burada çift integratör modeli kullanılır; gecikmeyi modelde taşımazsa gecikmeye duyarlıdır.</td></tr><tr class="cat-lit"><td><b>Sabit kazanç P</b></td><td>Oransal görsel servo, <var>v</var> = <var>k</var>·<var>e</var></td><td>Literatür (klasik rakip)</td><td>Metrik hata.</td><td>Görsel servonun klasik üstel azalma yasasıdır (Chaumette & Hutchinson, 2006); görsel servo kütüphanelerinde varsayılan yasadır. Kazanç tek bir gecikmeye göre seçilir.</td></tr></table></div>
       <details class="abbr-details"><summary>Kısaltmalar ve terimler</summary><table class="appr-tab abbr-tab"><tr><td>1/<var>e</var> yasası</td><td>Gecikmeli döngüde hedefi geçmeden yaklaşmanın en hızlı kazancı: <var>k</var>·<var>δ</var> ≤ 1/<var>e</var> ≈ 0.368</td></tr><tr><td><var>δ</var><sub>eff</sub></td><td>Etkin gecikme: ölçülen görsel gecikme + servo gecikmesi + ortalama ve örnekleme gecikmesi</td></tr><tr><td>Ayrıcalıklı bilgi</td><td>Gerçek robotun kendiliğinden bilemeyeceği, simülatörün kontrolcüye verdiği bilgi: eklem açısı, metrik mesafe, gerçek gecikme, analitik Jacobian (İng. <i>oracle / privileged information</i>)</td></tr><tr><td>Öz-tanılama hareketi</td><td>Kolun her eklemini sırayla biraz oynatıp görüntünün nasıl değiştiğini izleyerek kendi modelini çıkarması (İng. <i>motor babbling</i>)</td></tr><tr><td>Efferent kopya</td><td>Kontrolcünün gönderdiği komutun içeride tutulan kopyası; görüntü yokken elin nerede olduğunu tahmin etmekte kullanılır</td></tr><tr><td><var>Ĵ</var>, <var>Ĵ</var><sup>+</sup></td><td>Öğrenilen görüntü Jacobian’ı ve onun sönümlü tersi</td></tr><tr><td>SD (DOF)</td><td>Serbestlik derecesi (İng. <i>degrees of freedom</i>); bu kol 6 SD’lidir</td></tr><tr><td>DH</td><td>Denavit–Hartenberg: eklem çerçevelerini dört parametreyle (<var>θ</var>, <var>d</var>, <var>a</var>, <var>α</var>) tanımlama kuralı</td></tr><tr><td>DK / TK (FK / IK)</td><td>Düz kinematik (açılardan el konumu) ve ters kinematik (el konumundan açılar)</td></tr><tr><td>DLS</td><td>Sönümlü en küçük kareler (İng. <i>Damped Least Squares</i>): tekilliğe yakın ters kinematik</td></tr><tr><td><var>w</var>(<var>q</var>)</td><td>Manipülabilite (Yoshikawa): 0’a yaklaşırsa kol tekilliktedir</td></tr><tr><td>SO(3), SE(3)</td><td>3B dönmeler kümesi ve 3B konum + dönme (katı cisim hareketi)</td></tr><tr><td>IBVS</td><td>Görüntü tabanlı görsel servo (İng. <i>Image-Based Visual Servoing</i>)</td></tr><tr><td><var>ρ</var><sub>s</sub></td><td>Elin ve hedefin görünen boy oranı; 1 olunca el hedefin derinliğindedir</td></tr><tr><td>Sakkad</td><td>Gözün iki bakış noktası arasındaki hızlı sıçraması; arada görüntü alınmaz</td></tr><tr><td>Paralaks</td><td>Bakış noktası kayınca yakın nesnenin uzaktakinden daha çok yer değiştirmesi</td></tr><tr><td>MT, <var>T</var><sub>s</sub></td><td>Hareket süresi ve yerleşme süresi</td></tr><tr><td>TP</td><td>Fitts verimi (bit/s), ISO 9241-9 standardına göre</td></tr><tr><td><var>E</var><sub>init</sub>, %<var>T</var><sub>comp</sub></td><td>İlk (balistik) evre sonundaki hata ve toplam sürenin düzeltme evresinde geçen yüzdesi</td></tr><tr><td>Z1–Z4</td><td>Çalışma hacmi kabukları: yakın, orta, sınır, erişilemez</td></tr><tr><td>FOV, px, HUD</td><td>Görüş açısı, piksel, sahne üstü gösterge paneli</td></tr></table></details>
     </div>
     <div class="card fs-academic tab-hidden" data-tab="tab5" id="cardPaperPlayer">
       <div class="card-title">Makale deneylerini izle: rastgele çalışma hacmi protokolü <span class="sub">Makale §8.11 · Tablo 12 · aynı hedefler, aynı başlangıç duruşları, aynı gürültü tohumları</span></div>
       <div class="card-explain">
-        Kolun ulaşabildiği hacim, 20 000 rastgele eklem açısından çıkarılan bir haritayla omuz çevresinde <b>dört kabuğa</b> bölünür. Her uzanmada kol <b>12 rastgele başlangıç duruşundan</b> birinden başlar (el iki kamerada görünür, kol tekillikten uzaktır). Hedef, seçilen kabuğun içinde rastgele bir noktadır. Her hedef <b>dört kontrolcüyle</b> (<span class="cat-chip cat-this">bu çalışma</span> algısal 1/<var>e</var>, <span class="cat-chip cat-ours">önceki sürümümüz</span> İskender Governor, <span class="cat-chip cat-lit">literatür</span> sabit kazanç P ve PID) art arda ve aynı gürültüyle denenir (eşleştirilmiş tasarım), yalnız konum görevi. <b>Başarı:</b> 5 s içinde hedefe 6 mm içinde yerleşmek. <b>Erişilemez kabuk Z4:</b> hiçbir kontrolcü varamaz. Ölçülen, kolun tam açılıp tekilliğe girmeden durup durmadığıdır (<var>w</var><sub>min</sub> ≥ 0.001).
+        Kolun ulaşabildiği hacim, 20 000 rastgele eklem açısından çıkarılan bir haritayla omuz çevresinde <b>dört kabuğa</b> bölünür. Her uzanmada kol <b>12 rastgele başlangıç duruşundan</b> birinden başlar (el iki kamerada görünür, kol tekillikten uzaktır). Hedef, seçilen kabuğun içinde rastgele bir noktadır. Her hedef <b>dört kontrolcüyle</b> (<span class="cat-chip cat-this">bu çalışma</span> algısal 1/<var>e</var>, <span class="cat-chip cat-ref">referans</span> ayrıcalıklı bilgili 1/e yöneticisi, <span class="cat-chip cat-lit">literatür</span> sabit kazanç P ve PID) art arda ve aynı gürültüyle denenir (eşleştirilmiş tasarım), yalnız konum görevi. <b>Başarı:</b> 5 s içinde hedefe 6 mm içinde yerleşmek. <b>Erişilemez kabuk Z4:</b> hiçbir kontrolcü varamaz. Ölçülen, kolun tam açılıp tekilliğe girmeden durup durmadığıdır (<var>w</var><sub>min</sub> ≥ 0.001).
         Hareket sayfanın üstündeki <b>3B sahnede, göz pencerelerinde ve yandan/üstten görünüşlerde</b> izlenir. Sonuçlar aşağıda makaledeki değerlerle yan yana birikir.
       </div>
       <div class="pp-zones" id="ppZones"><span data-z="Z1">Z1 yakın · 0.25–0.45 m</span><span data-z="Z2">Z2 orta · 0.45–0.58 m</span><span data-z="Z3">Z3 sınır · 0.58–0.69 m</span><span data-z="Z4">Z4 erişilemez · 0.75–0.95 m</span></div>
@@ -2640,6 +2738,7 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
         <label><input type="radio" name="ppMode" value="w60" checked> <b>İzlenebilir set A</b>: iki göz, 60 ms. 4 bölge × 3 hedef × 4 kontrolcü = <b>48 uzanma</b>, animasyonlu (x1 hızda yaklaşık 7 dakika).</label>
         <label><input type="radio" name="ppMode" value="w150m"> <b>İzlenebilir set B</b>: tek göz, 150 ms. 48 uzanma, animasyonlu. Metrik yasaların tek gözde hedefi deldiği koşul.</label>
         <label><input type="radio" name="ppMode" value="full"> <b>Tam protokol (makale Tablo 12)</b>: 3 tohum × 2 görme × 2 gecikme × 4 bölge × 12 hedef × 4 kontrolcü = <b>2304 uzanma</b>, animasyonsuz hızlı hesap (birkaç dakika).</label>
+        <label><input type="radio" name="ppMode" value="delay"> <b>Gecikme taraması</b> (makale Tablo 6’nın tarayıcı kolundaki karşılığı): iki göz, 30/60/100/150/200 ms × 6 hedef × 4 kontrolcü = <b>120 uzanma</b>, animasyonlu.</label>
       </div>
       <div class="pp-ctl">
         <button class="btn btn-accent" id="ppStart">&#9654; Başlat</button>
@@ -5863,7 +5962,7 @@ function draw3DScene(idx) {
     const legX = 10;
     const legY = 44;
     const actMeta = GHOST_MODEL_MAP[state.controller];
-    const actLabel = `Aktif: ${actMeta ? actMeta.short : state.controller}` + ((typeof MODEL_CAT !== 'undefined' && MODEL_CAT[state.controller]) ? ' · ' + { this: 'BU ÇALIŞMA', ours: 'önceki sürümümüz', lit: 'literatür' }[MODEL_CAT[state.controller]] : '')
+    const actLabel = `Aktif: ${actMeta ? actMeta.short : state.controller}` + ((typeof MODEL_CAT !== 'undefined' && MODEL_CAT[state.controller]) ? ' · ' + (window.__modelTag ? window.__modelTag(state.controller) : '') : '')
       + ((!state.theoremMode && tr) ? ` · e=${(tr.err[idx] * 100).toFixed(1)} cm` : '');
     const legendRows = [{ kind: 'primary', color: '#3a3f47', accent: '#a9844d', text: actLabel }];
     activeGhostIds.forEach(gmId => {
@@ -7350,7 +7449,7 @@ function drawKin3D(idx) {
    'J_ω,i = ẑᵢ₋₁                  (açısal Jacobian)',
    'w(q) = √det(J_v J_vᵀ) = ' + jm.w.toFixed(4),
    'q̇ = J_vᵀ(J_vJ_vᵀ+λ²I)⁻¹ v   (DLS, tekillik)',
-   'Algısal: q̇ = −k Ĵᵀ(ĴĴᵀ+λ²I)⁻¹ e_px',
+   'İskender Gov.: q̇ = −k Ĵᵀ(ĴĴᵀ+λ²I)⁻¹ e_px',
    '         k = (1/e)/δ_eff,  Ĵ: öz-tanılama'].forEach(t => { ctx.fillText(t, x0, y); y += 13; });
   }
   ctx.fillStyle = '#f3efe7'; ctx.font = '600 12px Inter, system-ui';
@@ -9547,7 +9646,7 @@ document.getElementById('rngScrub').addEventListener('input', e => {
 function bindSettingsStore() {
   const KEY = 'ikjal_ayarlar_v1';
   const WANTED = new Set(['range', 'number', 'text', 'checkbox', 'radio']);
-  const wanted = el => !!(el && el.id && !/^(rngScrub|brk_|arm_j|limb|jp)/.test(el.id))
+  const wanted = el => !!(el && el.id && !/^(rngScrub|brk_|arm_j|limb|jp|selController)/.test(el.id))
     && (el.tagName === 'SELECT' || el.tagName === 'TEXTAREA'
         || (el.tagName === 'INPUT' && WANTED.has(el.type)));
   const controls = () => Array.from(document.querySelectorAll('input, select, textarea')).filter(wanted);
@@ -10378,7 +10477,7 @@ const BENCHMARK_SCENARIOS_JS = [
   }
 ];
 const BENCHMARK_CTRL_LABELS = {
-  pg: 'Algısal 1/e (bu çalışma)',
+  pg: 'İskender Governor (bizim model)',
   hdap: 'İnsan-HDA',
   hlsl: 'HLSL',
   governor: 'Governor',
@@ -10682,7 +10781,7 @@ function __runZoneBenchmarkFixed(targets, posts, opts) {
           Q0 = posts[i].slice(); state.target = tg.slice();
           const reachSeed = 100003 * (opts.seed || 0) + 7919 * (vm === 'binocular' ? 0 : 1) + 997 * Math.round(dl * 1000) + 101 * zi + i;
           const o = projectStereoAndLooming(tg, state.targetRealM, 0, 0, 0, 0.0);
-          const inView = o.uL >= 0 && o.uL <= state.imgW && o.vL >= 0 && o.vL <= state.imgH && o.zCam > 0.15;
+          const inView = window.__qwInView ? window.__qwInView(j) : (o.uL >= 0 && o.uL <= state.imgW && o.vL >= 0 && o.vL <= state.imgH && o.zCam > 0.15);
           (opts.ctrls || ['pg', 'governor', 'hlsl', 'fixed', 'pid']).forEach(c => {
             __rand = __seededRandom(reachSeed);   // same noise for every controller on this reach (paired design)
             const m = runSimulationForController(c, 'human_wdls', { isGhost: true, disableWaistSync: true }).metrics;
@@ -11438,7 +11537,7 @@ runAndAnimate();
   if (!$('cardPaperPlayer') || typeof ZONE_BENCH_PAPER === 'undefined') return;
   const ZN = { Z1: 'yakın', Z2: 'orta', Z3: 'sınır', Z4: 'erişilemez' };
   const CTRL = ['pg', 'governor', 'fixed', 'pid'];
-  const CL = { pg: 'Algısal 1/e — bu çalışma', governor: 'İskender Governor, ayrıcalıklı bilgili — önceki sürümümüz', fixed: 'Sabit kazanç P — literatür', pid: 'PID — literatür' };
+  const CL = { pg: '① İskender Governor (bizim model)', governor: '② Ayrıcalıklı bilgili 1/e yöneticisi (referans)', fixed: '④ Sabit kazanç P (literatür)', pid: '③ PID (literatür)' };
   const PAPER = {
     'binocular|0.06': { pg: [88, 5.3, 2.50], governor: [100, 1.6, 0.84], fixed: [100, 11.5, 0.87], pid: [44, 10.8, 0.60] },
     'binocular|0.15': { pg: [97, 3.2, 2.02], governor: [100, 1.5, 1.08], fixed: [6, 66.3, null], pid: [3, 65.8, null] },
@@ -11452,6 +11551,7 @@ runAndAnimate();
     const add = (seed, vm, dl, nT) => zs.forEach((z, zi) => { for (let i = 0; i < nT; i++) CTRL.forEach(c => out.push({ seed, vm, dl, z, zi, i, c })); });
     if (mode === 'w60') add(0, 'binocular', 0.06, 3);
     else if (mode === 'w150m') add(0, 'mono_left', 0.15, 3);
+    else if (mode === 'delay') { const PICK = { Z1: [0, 1], Z2: [0, 1], Z3: [0, 2] }; [0.03, 0.06, 0.1, 0.15, 0.2].forEach(dl => ['Z1', 'Z2', 'Z3'].forEach((z, zi) => PICK[z].forEach(i => CTRL.forEach(c => out.push({ seed: 0, vm: 'binocular', dl, z, zi, i, c }))))); }
     else [0, 1, 2].forEach(sd => ['binocular', 'mono_left'].forEach(vm => [0.06, 0.15].forEach(dl => add(sd, vm, dl, 12))));
     return out;
   }
@@ -11493,7 +11593,7 @@ runAndAnimate();
       CTRL.forEach(c => {
         const R = rs.filter(r => r.c === c && r.z !== 'Z4' && r.inView), U = rs.filter(r => r.c === c && r.z === 'Z4');
         if (!R.length && !U.length) return;
-        const pp = (PAPER[k] || {})[c] || [null, null, null];
+        const pp = ((P.mode === 'delay' && window.__qwPaperDelay) ? window.__qwPaperDelay : PAPER)[k] ? (((P.mode === 'delay' && window.__qwPaperDelay) ? window.__qwPaperDelay : PAPER)[k][c] || [null, null, null]) : [null, null, null];
         const succ = R.length ? 100 * R.filter(r => r.ok).length / R.length : null;
         const mos = R.length ? Math.max(...R.map(r => r.overshootPct)) : null;
         const mt = med(R.filter(r => r.ok).map(r => r.mt));
@@ -11507,7 +11607,8 @@ runAndAnimate();
       });
       html += '</table>';
     });
-    if (html && P.mode !== 'full') html += '<div style="font-size:11px;color:#6b6258">Makale değerleri tam protokolden (her hücrede n = 78 ulaşılabilir uzanma, 3 tohum) gelir. İzlenebilir set bunun bir alt kümesidir; sayılar yakın ama aynı olmayabilir. Birebir karşılaştırma için "Tam protokol"ü çalıştırın.</div>';
+    if (html && P.mode === 'delay') html += (window.__qwDelayNote || '');
+    if (html && P.mode !== 'full' && P.mode !== 'delay') html += '<div style="font-size:11px;color:#6b6258">Makale değerleri tam protokolden (her hücrede n = 78 ulaşılabilir uzanma, 3 tohum) gelir. İzlenebilir set bunun bir alt kümesidir; sayılar yakın ama aynı olmayabilir. Birebir karşılaştırma için "Tam protokol"ü çalıştırın.</div>';
     $('ppTable').innerHTML = html;
   }
   function log(r) {
@@ -11640,20 +11741,20 @@ runAndAnimate();
 <script>
 // ===== R3: model categories (this work / our earlier variants / literature) =====
 var MODEL_CAT = { pg: 'this', governor: 'ours', hlsl: 'ours', hdap: 'ours', bio: 'ours', pid: 'lit', lqr: 'lit', fixed: 'lit' };
-var MODEL_CAT_LABEL = { this: 'Bu çalışma', ours: 'Önceki varyantlarımız', lit: 'Literatür (rakip)' };
+var MODEL_CAT_LABEL = { this: 'Bu çalışma', ours: 'Ek keşif modellerimiz', lit: 'Literatür (rakip)' };
 (function relabelModels() {
-  const L = { pid: ['PID', 'PID — Oransal–İntegral–Türevsel (literatür)'], hdap: ['İnsan-HDA', 'İnsan-HDA — İnsansı Dinamik Yaklaşım (önceki varyantımız)'],
-    hlsl: ['HLSL', 'HLSL — İnsansı Stereo Yaklaşma Algısı (önceki varyantımız)'], governor: ['İskender Governor', 'İskender Governor — ayrıcalıklı bilgili 1/e (önceki sürümümüz)'],
+  const L = { pid: ['PID', 'PID — Oransal–İntegral–Türevsel (literatür)'], hdap: ['İnsan-HDA', 'İnsan-HDA — İnsansı Dinamik Yaklaşım (ek keşif modeli)'],
+    hlsl: ['HLSL', 'HLSL — İnsansı Stereo Yaklaşma Algısı (ek keşif modeli)'], governor: ['1/e referans', 'Ayrıcalıklı bilgili 1/e yöneticisi (referans)'],
     lqr: ['LQR', 'LQR — Doğrusal Karesel Düzenleyici (literatür)'], fixed: ['Sabit (P)', 'Sabit kazanç P — oransal görsel servo (literatür)'],
-    bio: ['Biyo-Pulse', 'Biyo-Pulse — biyomimetik darbe (önceki varyantımız)'] };
+    bio: ['Biyo-Pulse', 'Biyo-Pulse — biyomimetik darbe (ek keşif modeli)'] };
   GHOST_MODELS.forEach(m => { if (L[m.id]) { m.short = L[m.id][0]; m.label = L[m.id][1]; } });
   if (!GHOST_MODEL_MAP.pg) {
-    const pg = { id: 'pg', short: 'Algısal 1/e', label: 'Algısal 1/e Hız Yöneticisi — bu çalışma (makale)', color: '#c2410c', rgba: 'rgba(194, 65, 12, 0.55)', dash: [8, 3] };
+    const pg = { id: 'pg', short: 'İskender Gov. (bizim)', label: 'İskender Governor — Algısal 1/e hız yöneticisi (bizim model)', color: '#c2410c', rgba: 'rgba(194, 65, 12, 0.55)', dash: [8, 3] };
     GHOST_MODELS.unshift(pg); GHOST_MODEL_MAP.pg = pg;
   }
   if (typeof BENCHMARK_CTRL_LABELS !== 'undefined') Object.assign(BENCHMARK_CTRL_LABELS, {
-    pg: 'Algısal 1/e (bu çalışma)', governor: 'İskender Governor (önceki sürümümüz)', hdap: 'İnsan-HDA (önceki varyantımız)', hlsl: 'HLSL (önceki varyantımız)',
-    bio: 'Biyo-Pulse (önceki varyantımız)', pid: 'PID (literatür)', lqr: 'LQR (literatür)', fixed: 'Sabit kazanç P (literatür)' });
+    pg: 'İskender Governor (bizim model)', governor: 'Ayrıcalıklı bilgili 1/e yöneticisi (referans)', hdap: 'İnsan-HDA (ek keşif modeli)', hlsl: 'HLSL (ek keşif modeli)',
+    bio: 'Biyo-Pulse (ek keşif modeli)', pid: 'PID (literatür)', lqr: 'LQR (literatür)', fixed: 'Sabit kazanç P (literatür)' });
   if (state.ghostModels && state.ghostModels.indexOf('pg') < 0 && state.controller !== 'pg') state.ghostModels.unshift('pg');
   if (state.controller === 'pg') state.ghostModels = ['governor', 'pid'];
 })();
@@ -11809,7 +11910,7 @@ try { renderGhostModelBar(); } catch (e) { }
     if (window.ResizeObserver) new ResizeObserver(() => save()).observe(card);
     // shortcut in the page header, next to the other header buttons
     const bar = document.querySelector('.header-actions'); let hb = null;
-    if (bar) { hb = document.createElement('button'); hb.type = 'button'; hb.className = 'btn'; hb.textContent = L.head; hb.title = L.hint;
+    if (bar) { hb = document.createElement('button'); hb.type = 'button'; hb.className = 'btn qw-float-head'; hb.id = 'btnFloatDiagram'; hb.textContent = L.head; hb.title = L.hint;
       hb.addEventListener('click', () => floating ? dock() : pop()); bar.insertBefore(hb, bar.firstChild); }
   } catch (e) { if (window.console) console.warn('floatConcept', e); }
 })();
@@ -11831,9 +11932,400 @@ try { renderGhostModelBar(); } catch (e) { }
     runAndAnimate = function () {
       const blind = (state.controller === 'pg') && !handInView();
       orig.apply(this, arguments);
-      if (blind && typeof setModeBanner === 'function') setTimeout(() => setModeBanner('', 'BİZİM MODEL ELİ GÖREMİYOR — Algısal 1/e yalnız kameraların gördüğünü kullanır; başlangıçta el görüntünün dışında. Elin göründüğü bir başlangıç duruşu seçin (örn. Masa Başı Hazır Duruş).'), 60);
+      if (blind && typeof setModeBanner === 'function') setTimeout(() => setModeBanner('', 'BİZİM MODEL ELİ GÖREMİYOR — İskender Governor (bizim model) yalnız kameraların gördüğünü kullanır; başlangıçta el görüntünün dışında. Elin göründüğü bir başlangıç duruşu seçin (örn. Masa Başı Hazır Duruş).'), 60);
     };
   } catch (e) { if (window.console) console.warn('visibleStart', e); }
+})();
+</script>
+
+<script>
+// ===== R5: model groups with explanations, purpose modal, scene diagram button =====
+(function R5() {
+  const T = {"owner": "Proje sahibi: <b>İskender Özkul</b> · Mersin Üniversitesi, Makine Mühendisliği Bölümü · © 2026", "purpose_btn": "🎯 Projenin amacı", "purpose_tip": "Bu proje ne yapmaya çalışıyor? Tıklayın: animasyonlu kısa anlatım", "diag_scene": "⇱ Diyagram", "diag_scene_tip": "Kontrol döngüsü diyagramını bu 3B sahnenin yanına aç", "model_info_tip": "Seçili model nedir? Tıklayın", "groups": {"this": "★ Bu çalışma: İskender Governor (bizim model)", "ref": "Referans: aynı kural, ayrıcalıklı bilgiyle", "old": "Ek keşif modellerimiz (makalede yok)", "lit": "Literatür (rakip)"}, "groups_short": {"this": "BİZİM MODEL", "ref": "referans", "old": "ek keşif", "lit": "literatür", "ours": "ek keşif"}, "group_info": {"this": "Şu anda aktif olarak geliştirdiğimiz ve makalede sunduğumuz model budur. Yalnız kameraların gördüğünü ve görüntülerin zaman damgalarını kullanır.", "ref": "Aynı 1/e hız kuralının, simülatörden “kopya çeken” sürümüdür: gerçek mesafeyi, gerçek gecikmeyi ve kolun tam geometrisini bedava alır. Bizim modelin bu bilgilerden vazgeçmesinin bedelini ölçmek için karşılaştırma referansı olarak tutulur.", "old": "Aynı 1/e fikrinin başka biçimleriyle kurduğumuz keşif modelleridir. Ayrıcalıklı bilgi kullanırlar ve makalede değerlendirilmezler; karşılaştırma için simülasyonda dururlar.", "lit": "Robot tekniğinde yaygın olarak kullanılan klasik yöntemlerdir. Bizim modelin rakipleri olarak aynı koşullarda karşılaştırılır."}, "ghost_label": "İkiz modeller (numara/renk; tıklayınca açıklama):", "all_on": "Tümü", "all_off": "Yalnız bizim model + referans + PID", "info": {"pg": ["★ İskender Governor (bizim model)", "Algısal 1/e hız yöneticisi; yalnız piksel ve zaman damgası kullanır", "Yalnız iki kameradaki el ve hedef piksellerini ve görüntülerin zaman damgalarını kullanır. Gecikmeyi kendisi ölçer, kolun nasıl hareket ettiğini 2,6 saniyelik bir öz-tanılama hareketiyle öğrenir ve hızını k = (1/e) / δ<sub>eff</sub> kuralıyla seçer.", "Hedefi geçmeden yaklaşır; eklem açısı, metrik mesafe ve gerçek gecikme bilgisi gerekmez. Bedeli: daha yavaştır.", "Makalenin ana kontrolcüsü. Not: eli görmesi gerekir; el kamerada görünmüyorsa uzanamaz."], "governor": ["② Ayrıcalıklı bilgili 1/e yöneticisi (referans)", "k = 1 / (e·δ); 1/e gecikme sınırı literatürde bilinir, burada gerçek gecikme ve mesafeyle uygulanır", "Aynı 1/e hız kuralını, simülatörün verdiği gerçek mesafe, gerçek gecikme ve analitik Jacobian ile uygular.", "“Bu bilgileri bedava alsaydık ne olurdu?” sorusunu cevaplar. Daha hızlıdır ama gerçek robotta bu bilgiler hazır değildir.", "Makalede üst referans (“ayrıcalıklı bilgili yönetici”)."], "hlsl": ["HLSL", "İnsansı Stereo Yaklaşma Algısı (İng. Human-Like Stereo Looming)", "1/e kuralına yumuşak kalkış ve duruşlu bir çan eğrisi hız zarfı ekler; mesafeyi stereo ve görünen boydan metrik olarak hesaplar.", "İnsan uzanmalarının çan biçimli hız profilini taklit etmeyi dener.", "Ek keşif modelimiz; makalede değerlendirilmez."], "hdap": ["İnsan-HDA", "İnsansı Dinamik Yaklaşım (İng. Human-like Dynamic Approach)", "HLSL’ye ek olarak mesafeye ve aciliyete göre hız tavanı, insan kası gibi sinyale bağlı gürültü ve omuz → dirsek → bilek sıralı hareket ekler.", "İnsan hareketine daha çok benzemeyi amaçlar.", "Ek keşif modelimiz; makalede değerlendirilmez."], "bio": ["Biyo-Pulse", "Biyomimetik darbe (kas seğirmesi) modeli", "Hızı sürekli bir komutla değil, kas seğirmesi gibi kısa darbelerle (görev çevrimi) üretir.", "Makaledeki enkodersiz “bak–darbe–fren” denetleyicisiyle aynı darbe fikrini kullanır.", "Ek keşif modelimiz; makalede değerlendirilmez."], "pid": ["PID", "Oransal–İntegral–Türevsel kontrolcü", "Hatanın kendisi, birikimi ve değişim hızıyla komut üretir. Kazançlar 30 ms gecikmede ayarlanıp sabit bırakılmıştır.", "Endüstride en yaygın kontrolcüdür. Gecikme büyüyünce hedefi aşar ve yeniden ayar ister.", "Literatürdeki klasik rakip."], "lqr": ["LQR", "Doğrusal Karesel Düzenleyici (İng. Linear Quadratic Regulator)", "Kolun basit bir matematiksel modelinden hesaplanan en iyi durum geri beslemesidir (hata ve hız).", "Model doğruysa iyi çalışır; burada gecikmeyi modellemediği için gecikmeye duyarlıdır.", "Literatürdeki klasik rakip (yalnız simülasyonda)."], "fixed": ["Sabit kazanç P", "Oransal görsel servo, v = k · e", "Hız = sabit × hata. Görsel servonun klasik yasası ve görsel servo yazılımlarının varsayılanıdır.", "Kazanç tek bir gecikmeye göre seçilir; gecikme ya da robot değişince güvenliğini kaybeder.", "Literatürdeki klasik rakip."]}, "info_heads": ["Ne yapar?", "Neden var?", "Makaledeki rolü"], "card1_explain": "<b>Hangi model bizim?</b> Aktif olarak geliştirdiğimiz ve makalede sunduğumuz model <b>★ İskender Governor (bizim model)</b>dir (seçicide en üstte). <b>Ayrıcalıklı bilgili 1/e yöneticisi</b>, literatürde bilinen 1/e gecikme sınırını gerçek gecikme ve gerçek mesafeyle uygulayan <b>referanstır</b>. <b>HLSL</b> (İnsansı Stereo Yaklaşma Algısı), <b>İnsan-HDA</b> (İnsansı Dinamik Yaklaşım) ve <b>Biyo-Pulse</b> aynı fikrin <b>ek keşif modellerimizdir</b>; makalede değerlendirilmezler. <b>PID</b> (oransal–integral–türevsel), <b>LQR</b> (doğrusal karesel düzenleyici) ve <b>P</b> (sabit kazançlı görsel servo) <b>literatürdeki rakiplerdir</b>. Herhangi bir model adına tıklarsanız kısa açıklaması açılır.", "appr_explain": "Her kontrolcü dört gruptan birindedir: <span class=\"cat-chip cat-this\">★ Bu çalışma</span> makalenin katkısıdır. <span class=\"cat-chip cat-ref\">Referans</span> aynı 1/<var>e</var> kuralını simülatörün ayrıcalıklı bilgileriyle uygular. <span class=\"cat-chip cat-old\">Ek keşif modellerimiz</span> aynı 1/<var>e</var> fikrinin başka biçimleridir; makalede değerlendirilmez. <span class=\"cat-chip cat-lit\">Literatür</span> robot tekniğindeki klasik rakiplerdir. Makaledeki karşılaştırmalar bu çalışmayı referansla ve literatür yöntemleriyle yapar.", "old_phrase": ["Önceki varyantımız (makalede yok)", "Ek keşif modelimiz (makalede yok)"], "sel_groups": ["★ Bu çalışma — aktif modelimiz (makalenin kontrolcüsü)", "Referans — aynı 1/e kuralı, ayrıcalıklı bilgiyle", "Ek keşif modellerimiz (makalede yok)", "Literatürdeki klasik yöntemler (rakipler)", "Deneme"], "sel_opts": {"pg": "★ İskender Governor (bizim model) — yalnız piksel + zaman damgası", "governor": "Ayrıcalıklı bilgili 1/e yöneticisi (referans) — k = 1/(e·δ)", "hlsl": "HLSL — İnsansı Stereo Yaklaşma Algısı + çan eğrisi hız zarfı", "hdap": "İnsan-HDA — İnsansı Dinamik Yaklaşım", "bio": "Biyo-Pulse — biyomimetik darbe modeli", "pid": "PID — Oransal–İntegral–Türevsel (sabit kazançlı)", "lqr": "LQR — Doğrusal Karesel Düzenleyici", "fixed": "Sabit kazanç P — oransal görsel servo, v = k·e", "custom": "Özel matematiksel formül (alttaki kod kutusundan)"}, "modal": {"title": "Bu projenin amacı", "lead": "Bir robot kolunu <b>yalnızca iki kameranın gördüğüne bakarak</b> bir hedefe götürmek — ve kamera görüntüsü geç geldiği hâlde <b>hedefi asla delip geçmemek</b>.", "lane_a": "Klasik kontrolcü: gecikmeyi hesaba katmaz (k·δ = 1,2) → hedefi deler, salınır", "lane_b": "★ Bizim model: k·δ = 1/e ≈ 0,37 → hedefi geçmeden en hızlı yaklaşma", "ghost": "kameranın gördüğü (gecikmeli)", "target": "hedef", "over": "HEDEF DELİNDİ", "steps": [["👀", "Görür", "İki kameradan yalnız el ve hedefin piksel konumu. Eklem açısı yok, cetvel yok."], ["⏱️", "Ölçer", "Görüntünün zaman damgasından gecikmeyi kendisi ölçer."], ["🧮", "Hesaplar", "Hızını k = (1/e) / gecikme kuralıyla seçer: gecikme iki kat ⇒ hız yarı."], ["🎯", "Yaklaşır", "Hedefe geçmeden varır. Robot ya da gecikme değişirse kendini yeniden ayarlar."]], "why_t": "Neden önemli?", "why": ["Ucuz robotlarda eklem sensörü (enkoder) olmayabilir ya da kalibrasyonu bozulabilir.", "Kamera gecikmesi her sistemde vardır ve zamanla değişir.", "Hedefi delmek; bardak devirmek, parçaya ya da insana çarpmak demektir."], "now_t": "Bugün nerede?", "now": "Simülasyonda 30–200 ms gecikmede 120 uzanmanın 118’inde hedefe 5 mm içinde yerleşti; hedefi en fazla %3,5 aştı. Bedeli hızdır: hareketler 1,9–3,1 kat daha uzun sürer. Gerçek robotta henüz denenmedi.", "try_btn": "▶ Bizim modeli hemen dene", "close": "Kapat", "replay": "↻ Animasyonu yeniden oynat"}};
+  try {
+    MODEL_CAT = { pg: 'this', governor: 'ref', hlsl: 'old', hdap: 'old', bio: 'old', pid: 'lit', lqr: 'lit', fixed: 'lit' };
+    MODEL_CAT_LABEL = T.groups;
+    window.__modelTag = id => T.groups_short[MODEL_CAT[id]] || '';
+  } catch (e) { }
+  // ---------- popover ----------
+  const pop = document.createElement('div'); pop.id = 'qwInfoPop'; document.body.appendChild(pop);
+  let popFor = null;
+  function closePop() { pop.classList.remove('open'); popFor = null; }
+  function showPop(anchor, html) {
+    pop.innerHTML = '<button class="x" aria-label="close">×</button>' + html; pop.classList.add('open'); popFor = anchor;
+    pop.querySelector('.x').onclick = closePop;
+    const r = anchor.getBoundingClientRect(), w = Math.min(380, innerWidth - 16);
+    let left = Math.min(innerWidth - w - 8, Math.max(8, r.left)), top = r.bottom + 8;
+    pop.style.left = left + 'px'; pop.style.top = top + 'px';
+    const ph = pop.getBoundingClientRect().height; if (top + ph > innerHeight - 8) pop.style.top = Math.max(8, r.top - ph - 8) + 'px';
+  }
+  document.addEventListener('mousedown', e => { if (popFor && !pop.contains(e.target) && !popFor.contains(e.target)) closePop(); }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePop(); });
+  function modelHtml(id) {
+    const I = T.info[id]; if (!I) return '';
+    const cat = MODEL_CAT[id] || 'lit';
+    return '<h4>' + I[0] + '</h4><div class="sub">' + I[1] + '</div><span class="cat-chip cat-' + cat + ' grp">' + T.groups[cat] + '</span>'
+      + '<b class="h">' + T.info_heads[0] + '</b>' + I[2] + '<b class="h">' + T.info_heads[1] + '</b>' + I[3] + '<b class="h">' + T.info_heads[2] + '</b>' + I[4];
+  }
+  window.__showModelInfo = (anchor, id) => showPop(anchor, modelHtml(id));
+  // ---------- ghost bar with four groups ----------
+  renderGhostModelBar = function () {
+    const bar = document.getElementById('ghostModelBar'); if (!bar) return;
+    bar.classList.toggle('hidden', !state.showGhost); bar.innerHTML = '';
+    const lbl = document.createElement('span'); lbl.className = 'ghost-bar-lbl'; lbl.textContent = T.ghost_label; bar.appendChild(lbl);
+    const others = GHOST_MODELS.map(m => m.id).filter(id => id !== state.controller);
+    const refresh = () => { renderGhostModelBar(); if (state.traj) { syncGhostTrajs(); updateKPIs(); renderCompareTable(); updateUIFrame(state.frameIdx); } else { renderSetupPreview(); } };
+    ['this', 'ref', 'old', 'lit'].forEach(cat => {
+      const g = document.createElement('span'); g.className = 'ghost-grp cat-' + cat + '-t'; g.textContent = T.groups[cat] + ':'; g.title = T.group_info[cat];
+      g.addEventListener('click', () => showPop(g, '<h4>' + T.groups[cat] + '</h4>' + T.group_info[cat])); bar.appendChild(g);
+      GHOST_MODELS.filter(m => (MODEL_CAT[m.id] || 'lit') === cat).forEach(m => {
+        const isOn = state.ghostModels.includes(m.id), isPrimary = (m.id === state.controller);
+        const btn = document.createElement('button'); btn.type = 'button';
+        btn.className = 'ghost-pill' + (isOn ? ' active' : '') + (isPrimary ? ' is-primary-ctrl' : '') + (m.id === 'pg' ? ' ours-pill' : '') + (cat === 'old' ? ' old-pill' : '');
+        btn.dataset.ghostModel = m.id; btn.style.color = (isOn || isPrimary) ? m.color : '#555b64';
+        const I = T.info[m.id]; btn.title = I ? (I[0] + ' — ' + I[1]) : m.label;
+        const sw = document.createElement('span'); sw.className = 'ghost-swatch'; sw.style.background = 'repeating-linear-gradient(to right, ' + m.color + ' 0 4px, transparent 4px 6px)';
+        const tx = document.createElement('span'); tx.textContent = (m.id === 'pg' ? '★ ' : '') + m.short + (isPrimary ? ' ●' : '');
+        btn.appendChild(sw); btn.appendChild(tx);
+        btn.addEventListener('click', () => {
+          if (!isPrimary) { const i = state.ghostModels.indexOf(m.id); if (i >= 0) state.ghostModels.splice(i, 1); else state.ghostModels.push(m.id); refresh(); }
+          const nb = bar.querySelector('[data-ghost-model="' + m.id + '"]') || btn; showPop(nb, modelHtml(m.id));
+        });
+        bar.appendChild(btn);
+      });
+    });
+    const allActive = others.length > 0 && others.every(id => state.ghostModels.includes(id));
+    const b = document.createElement('button'); b.type = 'button'; b.id = 'btnGhostAll'; b.className = 'ghost-pill' + (allActive ? ' active' : '');
+    b.style.color = allActive ? '#1b2a41' : '#555b64'; b.textContent = allActive ? T.all_off : T.all_on;
+    b.addEventListener('click', () => { state.ghostModels = allActive ? ['pg', 'governor', 'pid'].filter(x => x !== state.controller) : others.slice(); refresh(); });
+    bar.appendChild(b);
+  };
+  renderCompareTable = function () {
+    const tbody = document.getElementById('tbodyCompare'); if (!tbody) return;
+    const order = ['pg', 'governor', 'hlsl', 'hdap', 'bio', 'pid', 'lqr', 'fixed'];
+    const keys = order.filter(k => state.compareResults[k]); if (!keys.length) return;
+    tbody.innerHTML = keys.map(k => {
+      const m = state.compareResults[k], meta = GHOST_MODEL_MAP[k] || { short: k }, cat = MODEL_CAT[k] || 'lit';
+      return '<tr class="cat-' + cat + (k === state.controller ? ' active-row' : '') + '"><td>' + (k === 'pg' ? '★ ' : '') + meta.short + ' <span class="cat-chip cat-' + cat + '">' + T.groups_short[cat] + '</span></td>'
+        + '<td>' + m.mt.toFixed(2) + '</td><td>' + m.overshootPct.toFixed(1) + '%</td><td>' + (m.onsetAcc || 0).toFixed(1) + ' m/s²</td>'
+        + '<td>' + m.minW.toFixed(3) + '</td><td>' + m.peakTau.toFixed(1) + '</td><td>' + (m.eInitMm || 0).toFixed(1) + '</td>'
+        + '<td>' + (m.tCompPct || 0).toFixed(0) + '</td><td>' + (m.visualLoadHz || 100).toFixed(1) + '</td><td>' + (m.pulseEffPct || 0).toFixed(0) + '%</td></tr>';
+    }).join('');
+  };
+  try { renderGhostModelBar(); renderCompareTable(); } catch (e) { }
+  // info button next to the model selector
+  const ib = document.getElementById('btnModelInfo'), selC = document.getElementById('selController');
+  if (ib && selC) ib.addEventListener('click', e => { e.stopPropagation(); showPop(ib, modelHtml(selC.value) || ('<h4>' + selC.options[selC.selectedIndex].text + '</h4>')); });
+  // diagram button on the 3D scene
+  const sb = document.getElementById('btnSceneDiagram');
+  if (sb) sb.addEventListener('click', e => { e.stopPropagation(); const h = document.getElementById('btnFloatDiagram'); if (h) h.click(); });
+
+  // ---------- purpose modal with animation ----------
+  const MD = T.modal;
+  const ov = document.createElement('div'); ov.id = 'qwPurpose'; ov.setAttribute('role', 'dialog');
+  ov.innerHTML = '<div class="box"><h2>🎯 ' + MD.title + '</h2><p class="lead">' + MD.lead + '</p>'
+    + '<canvas id="qwPurposeCv" width="1720" height="600"></canvas>'
+    + '<div class="steps">' + MD.steps.map((s, i) => '<div class="step" data-i="' + i + '"><span class="ic">' + s[0] + '</span><b>' + (i + 1) + '. ' + s[1] + '</b>' + s[2] + '</div>').join('') + '</div>'
+    + '<div class="cols"><div><h3>' + MD.why_t + '</h3><ul>' + MD.why.map(w => '<li>' + w + '</li>').join('') + '</ul></div><div><h3>' + MD.now_t + '</h3><p style="margin:0">' + MD.now + '</p></div></div>'
+    + '<div class="acts"><button class="rp">' + MD.replay + '</button><button class="go">' + MD.try_btn + '</button><button class="cl">' + MD.close + '</button></div></div>';
+  document.body.appendChild(ov);
+  const cv = ov.querySelector('canvas') || document.getElementById('qwPurposeCv'); if (!cv || !cv.getContext) return; const ctx = cv.getContext('2d');
+  // e'(t) = -k e(t - d), d = 1 (time in units of the delay); history e = 1
+  function sim(kd) { const h = 1 / 120, lag = 120, n = 9 * 120, e = new Array(n + lag).fill(1);
+    for (let i = lag; i < n + lag - 1; i++) e[i + 1] = e[i] - h * kd * e[i - lag]; return e; }
+  const EA = sim(1.2), EB = sim(1 / Math.E), LAG = 120;
+  let f = 0, raf = null, stepT = null;
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function lane(y, E, label, col, i) {
+    const W = cv.width, x0 = 150, x1 = Math.round(W * 0.58), X = e => Math.min(W - 60, x0 + (1 - e) * (x1 - x0));
+    ctx.fillStyle = '#1f2937'; ctx.font = '600 30px Inter, system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.fillText(label, 40, y - 78);
+    ctx.strokeStyle = '#e5e1da'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(W - 70, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(220,38,38,.08)'; ctx.fillRect(x1, y - 46, W - 70 - x1, 92);
+    ctx.strokeStyle = '#e0a04a'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(x1, y, 30, 0, 7); ctx.stroke();
+    ctx.fillStyle = '#9a6a1f'; ctx.font = '500 22px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.fillText(MD.target, x1, y + 62);
+    // trail
+    ctx.strokeStyle = col; ctx.globalAlpha = .35; ctx.lineWidth = 5; ctx.beginPath();
+    for (let j = Math.max(LAG, i - 160); j <= i; j += 2) { const xx = X(E[j]); if (j === Math.max(LAG, i - 160)) ctx.moveTo(xx, y); else ctx.lineTo(xx, y); } ctx.stroke(); ctx.globalAlpha = 1;
+    // delayed view (what the camera reports)
+    const xg = X(E[Math.max(0, i - LAG)]);
+    ctx.fillStyle = 'rgba(47,95,167,.28)'; ctx.beginPath(); ctx.arc(xg, y, 22, 0, 7); ctx.fill();
+    ctx.fillStyle = '#2f5fa7'; ctx.font = '500 20px Inter, sans-serif'; ctx.fillText('👁 ' + MD.ghost, xg, y - 34);
+    const xh = X(E[i]); ctx.fillStyle = col; ctx.beginPath(); ctx.arc(xh, y, 24, 0, 7); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '700 22px Inter, sans-serif'; ctx.fillText('✋', xh, y + 8);
+    if (xh > x1 + 6) { ctx.fillStyle = '#b91c1c'; ctx.font = '800 28px Inter, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('⚠ ' + MD.over, W - 70, y - 78); ctx.textAlign = 'center'; }
+  }
+  function draw() {
+    const i = Math.min(EA.length - 1, LAG + f);
+    ctx.clearRect(0, 0, cv.width, cv.height); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cv.width, cv.height);
+    lane(170, EA, MD.lane_a, '#8f2d2d', i); lane(450, EB, MD.lane_b, '#c2410c', i);
+    ctx.fillStyle = '#e5e1da'; ctx.fillRect(40, cv.height - 22, cv.width - 80, 8);
+    ctx.fillStyle = '#c2410c'; ctx.fillRect(40, cv.height - 22, (cv.width - 80) * (i - LAG) / (EA.length - 1 - LAG), 8);
+  }
+  function loop() { f += 2; draw(); if (LAG + f >= EA.length - 1) { raf = setTimeout(() => { f = 0; loop(); }, 1600); return; } raf = requestAnimationFrame(loop); }
+  function startAnim() { stopAnim(); f = reduce ? EA.length : 0; if (reduce) { draw(); } else loop();
+    const steps = ov.querySelectorAll('.step'); let k = 0; if (!steps.length) return; steps.forEach(s => s.classList.remove('on')); steps[0].classList.add('on');
+    stepT = setInterval(() => { steps.forEach(s => s.classList.remove('on')); k = (k + 1) % steps.length; steps[k].classList.add('on'); }, 1800); }
+  function stopAnim() { if (raf) { cancelAnimationFrame(raf); clearTimeout(raf); raf = null; } if (stepT) { clearInterval(stepT); stepT = null; } }
+  function openP() { ov.classList.add('open'); startAnim(); }
+  function closeP() { ov.classList.remove('open'); stopAnim(); }
+  ov.addEventListener('click', e => { if (e.target === ov) closeP(); });
+  ov.querySelector('.cl').onclick = closeP; ov.querySelector('.rp').onclick = startAnim;
+  ov.querySelector('.go').onclick = () => {
+    closeP();
+    const s = document.getElementById('selController'); if (s) { s.value = 'pg'; s.dispatchEvent(new Event('change', { bubbles: true })); s.dispatchEvent(new Event('input', { bubbles: true })); }
+    state.controller = 'pg';
+    try { renderGhostModelBar(); } catch (e) { }
+    const run = document.getElementById('btnRunReach'); if (run) run.click();
+    const sc = document.getElementById('pwScene'); if (sc) sc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && ov.classList.contains('open')) closeP(); });
+  const pb = document.getElementById('btnPurpose'); if (pb) pb.addEventListener('click', openP);
+})();
+</script>
+
+<script>
+// ===== R6: naming, paper-experiment hub, delay sweep, correct in-view flags, animated project story =====
+(function R6() {
+  const L = {"groups": {"this": "★ Bu çalışma: İskender Governor (bizim model)", "ref": "Referans: aynı 1/e sınırı, ayrıcalıklı bilgiyle", "old": "Ek keşif modellerimiz (makalede yok)", "lit": "Literatür (rakip)"}, "short_tag": {"this": "BİZİM MODEL", "ref": "referans", "old": "ek keşif", "lit": "literatür"}, "names": {"pg": ["İskender Gov. (bizim)", "İskender Governor — Algısal 1/e hız yöneticisi (bizim model)"], "governor": ["1/e referans", "Ayrıcalıklı bilgili 1/e yöneticisi (referans)"], "hlsl": ["HLSL", "HLSL — İnsansı Stereo Yaklaşma Algısı (ek keşif modeli)"], "hdap": ["İnsan-HDA", "İnsan-HDA — İnsansı Dinamik Yaklaşım (ek keşif modeli)"], "bio": ["Biyo-Pulse", "Biyo-Pulse — biyomimetik darbe (ek keşif modeli)"], "pid": ["PID", "PID — Oransal–İntegral–Türevsel (literatür)"], "lqr": ["LQR", "LQR — Doğrusal Karesel Düzenleyici (literatür)"], "fixed": ["Sabit (P)", "Sabit kazanç P — oransal görsel servo (literatür)"]}, "colors": ["#c2410c", "#1e3a8a", "#6b7280", "#0f766e", "#7c3aed"], "delay_note": "<div style=\"font-size:11.5px;color:#6b6258\">Bu tarama tarayıcıdaki insansı kolda çalışır. Gri “makale” değerleri makalenin Tablo 6’sından, yani <b>altı eksenli kol</b> üzerindeki Python deneyinden gelir: kol farklı olduğu için sayıların aynı olması beklenmez; karşılaştırılan <b>eğilimdir</b> (gecikme büyüdükçe kim aşıyor, kim güvenli kalıyor).</div>", "strip": {"show": "Kartı göster", "stop": "■ Durdur", "next": "sırada:", "label": {"delay": "Gecikme taraması", "w60": "Çalışma hacmi, set A", "w150m": "Çalışma hacmi, set B", "full": "Çalışma hacmi, tam protokol"}}, "charts": {"ett": {"xlab": "Zaman, gecikme cinsinden (t/δ)", "ylab": "Kalan mesafe e(t)/e₀", "xticks": [0, 2, 4, 6, 8, 10, 12], "yticks": [-0.8, -0.4, 0, 0.4, 0.8, 1], "ymin": -0.85, "ymax": 1.05, "zero": true, "xmin": 0, "xmax": 12, "series": [{"kd": 0.2, "color": "#0f766e", "tag": "kδ = 0,2", "label": "kδ = 0,2 — küçük kazanç: hedefi geçmez ama çok yavaş yaklaşır", "pts": [], "lx": 6.0, "dy": -26}, {"kd": 0.36787944117144233, "color": "#c2410c", "tag": "kδ = 1/e", "label": "kδ = 1/e ≈ 0,37 — hedefi geçmeden yaklaşmanın en hızlısı (İskender Governor bu değeri seçer)", "pts": [], "w": 7, "lx": 2.4, "dy": -24}, {"kd": 0.6, "color": "#2f5fa7", "tag": "kδ = 0,6", "label": "kδ = 0,6 — sınırın biraz üstü: el hedefi az geçer, sonra geri gelir", "pts": [], "dash": [14, 8], "dy": 26, "lx": 3.0}, {"kd": 1.2, "color": "#6b7280", "tag": "kδ = 1,2", "label": "kδ = 1,2 — sınırın üç katı: el hedefi delip salınır", "pts": [], "lx": 1.8, "dy": 30}]}, "os_delay": {"xlab": "Görsel gecikme (ms)", "ylab": "En büyük aşma (%), logaritmik", "logy": true, "ymin": 0.4, "ymax": 400, "yticks": [0.5, 1, 2, 5, 10, 20, 50, 100, 200], "xticks": [30, 60, 100, 150, 200], "markers": true, "xmin": 30, "xmax": 200, "series": [{"label": "① İskender Governor (bizim model)", "tag": "", "color": "#c2410c", "pts": [[30, 3.5], [60, 2.8], [100, 2.0], [150, 0.9], [200, 0.6]], "dy": 0, "w": 7}, {"label": "② Ayrıcalıklı bilgili 1/e yöneticisi (referans)", "tag": "", "color": "#1e3a8a", "pts": [[30, 18.6], [60, 9.9], [100, 5.3], [150, 3.7], [200, 3.0]], "dy": 0}, {"label": "③ PID, 30 ms’de ayarlı (literatür)", "tag": "", "color": "#6b7280", "pts": [[30, 29.7], [60, 53.3], [100, 134.8], [150, 211.1], [200, 250.7]], "dy": -14}, {"label": "④ Sabit kazanç P, 30 ms’de ayarlı (literatür)", "tag": "", "color": "#0f766e", "pts": [[30, 29.7], [60, 53.7], [100, 135.0], [150, 212.5], [200, 251.1]], "dy": 18, "dash": [14, 8]}, {"label": "⑤ Sabit kazanç P, bu kol için yeniden ayarlı k = 1,5 (literatür)", "tag": "", "color": "#7c3aed", "pts": [[30, 4.6], [60, 4.9], [100, 5.2], [150, 5.6], [200, 6.0]], "dy": -10, "dash": [6, 6]}]}, "succ_delay": {"xlab": "Görsel gecikme (ms)", "ylab": "Başarı (%)", "ymin": 0, "ymax": 105, "yticks": [0, 20, 40, 60, 80, 100], "xticks": [30, 60, 100, 150, 200], "markers": true, "xmin": 30, "xmax": 200, "series": [{"label": "① İskender Governor (bizim model)", "tag": "", "color": "#c2410c", "pts": [[30, 100], [60, 100], [100, 100], [150, 100], [200, 92]], "dy": 0, "w": 7}, {"label": "② Ayrıcalıklı bilgili 1/e yöneticisi (referans)", "tag": "", "color": "#1e3a8a", "pts": [[30, 92], [60, 100], [100, 100], [150, 100], [200, 100]], "dy": -14}, {"label": "③ PID, 30 ms’de ayarlı (literatür)", "tag": "", "color": "#6b7280", "pts": [[30, 83], [60, 58], [100, 17], [150, 0], [200, 0]], "dy": -12}, {"label": "④ Sabit kazanç P, 30 ms’de ayarlı (literatür)", "tag": "", "color": "#0f766e", "pts": [[30, 83], [60, 67], [100, 17], [150, 0], [200, 0]], "dy": 16, "dash": [14, 8]}, {"label": "⑤ Sabit kazanç P, bu kol için yeniden ayarlı k = 1,5 (literatür)", "tag": "", "color": "#7c3aed", "pts": [[30, 100], [60, 100], [100, 100], [150, 100], [200, 100]], "dy": 20, "dash": [6, 6]}]}, "fps_os": {"xlab": "Kamera hızı (kare/saniye, fps)", "ylab": "En büyük aşma (%)", "ymin": 0, "ymax": 36, "yticks": [0, 5, 10, 15, 20, 25, 30, 35], "xticks": [0, 1, 2, 3, 4], "xtl": ["15", "30", "60", "100", "200"], "markers": true, "xmin": 0, "xmax": 4, "series": [{"label": "İskender Governor (bizim model), 60 ms görsel gecikme", "tag": "60 ms", "color": "#c2410c", "pts": [[0, 31.9], [1, 6.6], [2, 7.0], [3, 2.6], [4, 3.6]], "dy": 0, "w": 7}, {"label": "İskender Governor (bizim model), 150 ms görsel gecikme", "tag": "150 ms", "color": "#1e3a8a", "pts": [[0, 34.0], [1, 6.1], [2, 6.6], [3, 0.8], [4, 2.6]], "dy": 18, "dash": [14, 8]}]}, "fps_succ": {"xlab": "Kamera hızı (kare/saniye, fps)", "ylab": "Başarı (%)", "ymin": 0, "ymax": 105, "yticks": [0, 20, 40, 60, 80, 100], "xticks": [0, 1, 2, 3, 4], "xtl": ["15", "30", "60", "100", "200"], "markers": true, "xmin": 0, "xmax": 4, "series": [{"label": "İskender Governor (bizim model), 60 ms görsel gecikme", "tag": "60 ms", "color": "#c2410c", "pts": [[0, 79], [1, 100], [2, 100], [3, 100], [4, 100]], "dy": 0, "w": 7}, {"label": "İskender Governor (bizim model), 150 ms görsel gecikme", "tag": "150 ms", "color": "#1e3a8a", "pts": [[0, 50], [1, 100], [2, 100], [3, 96], [4, 100]], "dy": 18, "dash": [14, 8]}]}, "fps_k": {"xlab": "Kamera hızı (kare/saniye, fps)", "ylab": "Seçilen kazanç k (1/s)", "ymin": 0, "ymax": 3.2, "yticks": [0, 0.5, 1, 1.5, 2, 2.5, 3], "xticks": [0, 1, 2, 3, 4], "xtl": ["15", "30", "60", "100", "200"], "markers": true, "xmin": 0, "xmax": 4, "series": [{"label": "İskender Governor (bizim model), 60 ms görsel gecikme", "tag": "60 ms", "color": "#c2410c", "pts": [[0, 1.13], [1, 1.81], [2, 2.43], [3, 2.45], [4, 2.83]], "dy": 0, "w": 7}, {"label": "İskender Governor (bizim model), 150 ms görsel gecikme", "tag": "150 ms", "color": "#1e3a8a", "pts": [[0, 0.88], [1, 1.25], [2, 1.52], [3, 1.53], [4, 1.67]], "dy": 18, "dash": [14, 8]}]}, "pred_obs": {"xlab": "Deney (Tablo 8)", "ylab": "En büyük aşma (%)", "ymin": 0, "ymax": 50, "yticks": [0, 10, 20, 30, 40, 50], "xticks": [0, 1, 2, 3, 4, 5, 6], "xtl": ["GT 60", "GT 150", "Y 30", "Y 60", "Y 100", "Y 150", "Y 200"], "xmin": -0.5, "xmax": 6.5, "series": [{"label": "Kuramın önceden söylediği (simülatörden hiçbir sayı ayarlanmadan)", "tag": "öngörü", "color": "#1e3a8a", "pts": [[0, 12.2], [1, 46.7], [2, 0.5], [3, 1.9], [4, 4.1], [5, 6.5], [6, 8.5]], "dy": 0, "noline": true, "dx": -9}, {"label": "Simülatörde ölçülen", "tag": "ölçüm", "color": "#c2410c", "pts": [[0, 11.6], [1, 41.9], [2, 3.9], [3, 3.7], [4, 3.3], [5, 3.0], [6, 2.5]], "dy": 22, "noline": true, "dx": 9}]}}, "hub": {"title": "📊 Makale deneyleri — hepsi tek yerde", "lead": "Makalede raporladığımız <b>bütün karşılaştırmalar</b> aşağıda. Her deneyde: ne sınandığı, sonuç tablosu, numaralı çizgili bir grafik ve nasıl okunacağı var. Çizgilerin <b>numarası</b> tablodaki numarayla aynıdır: ① her zaman <b>İskender Governor (bizim model)</b>dir. Tarayıcıda çalıştırılabilen deneylerin altında <b>▶</b> düğmesi vardır; kol 3B sahnede gerçekten hareket eder ve sonuçlar makaledeki değerlerin yanında birikir. Diğer deneyler altı eksenli kolun Python simülasyonundadır; onları üreten komut yazılıdır.", "run_all": "▶ Tarayıcıda çalışanların hepsini sırayla çalıştır", "run_delay": "▶ Gecikme taraması (120 uzanma)", "run_a": "▶ Çalışma hacmi, set A (48)", "run_b": "▶ Çalışma hacmi, set B — tek göz (48)", "run_full": "▶ Tam protokol (1728 + 576, animasyonsuz)", "run_hint": "Çalışırken sayfanın üstünde turuncu bir ilerleme şeridi görünür; oradan durdurabilir ya da sonuç kartına gidebilirsiniz.", "read": "Nasıl okunur:", "run_this": "Bu deneyi tarayıcıda çalıştır", "python": "Bu deney Python simülasyonundadır. Komut veya ham veri:", "btn_tip": "Makaledeki bütün deneyleri aç: tablolar, numaralı grafikler ve tarayıcıda toplu çalıştırma", "header_btn": "📊 Makale deneyleri"}, "exps": [{"id": "D1", "title": "Ana karşılaştırma: gecikme büyüdükçe kim güvenli kalıyor?", "src": "Makale Tablo 6 · altı eksenli kol · 12 hedef × 2 tohum", "what": "Aynı 12 hedef beş gecikmede (30–200 ms) beş kontrolcüyle denenir. Hücre: başarı / en büyük aşma / medyan hareket süresi. ① İskender Governor (bizim model); ② Ayrıcalıklı bilgili 1/e yöneticisi (referans); ③ PID, 30 ms’de ayarlı (literatür); ④ Sabit kazanç P, 30 ms’de ayarlı (literatür); ⑤ Sabit kazanç P, bu kol için yeniden ayarlı k = 1,5 (literatür)", "chart": "os_delay", "table": {"h": ["Gecikme", "①", "②", "③", "④", "⑤"], "r": [{"c": ["30 ms", "100 % / 3,5 % / 1,06 s", "92 % / 18,6 % / 3,71 s", "83 % / 29,7 % / 4,50 s", "83 % / 29,7 % / 4,50 s", "100 % / 4,6 % / 1,53 s"]}, {"c": ["60 ms", "100 % / 2,8 % / 1,30 s", "100 % / 9,9 % / 0,42 s", "58 % / 53,3 % / 4,84 s", "67 % / 53,7 % / 4,81 s", "100 % / 4,9 % / 1,50 s"]}, {"c": ["100 ms", "100 % / 2,0 % / 1,67 s", "100 % / 5,3 % / 0,61 s", "17 % / 134,8 % / —", "17 % / 135,0 % / —", "100 % / 5,2 % / 1,40 s"]}, {"c": ["150 ms", "100 % / 0,9 % / 2,12 s", "100 % / 3,7 % / 0,96 s", "0 % / 211 % / —", "0 % / 213 % / —", "100 % / 5,6 % / 1,31 s"]}, {"c": ["200 ms", "92 % / 0,6 % / 2,40 s", "100 % / 3,0 % / 1,27 s", "0 % / 251 % / —", "0 % / 251 % / —", "100 % / 6,0 % / 1,12 s"]}]}, "read": "Önce ① turuncu kalın çizgiye bakın: her gecikmede %4’ün altında kalır. ③ gri ve ④ yeşil kesikli çizgiler (30 ms’de ayarlanıp bırakılan klasik yöntemler) 100 ms’den sonra %135–251’e çıkar; tablo bu kontrolcülerin o gecikmelerde neredeyse hiç yerleşemediğini gösterir. ② lacivert çizgi (aynı 1/e sınırı, ama gerçek gecikmeyi bedava alıyor) 30 ms’de %18,6 aşar, çünkü servo gecikmesini ve ortalamayı hesaba katmaz. ⑤ mor kesikli çizgi bu kol için yeniden ayarlanmış sabit kazançtır: eşit güvenilir ve 60 ms’den sonra daha hızlıdır. ①’in bedeli süredir: 60–200 ms’de ②’ye göre 1,9–3,1 kat uzun sürer.", "run": "delay", "cmd": "python scripts/run_v5.py"}, {"id": "D2", "title": "Güvenliği ne taşıyor? (ablasyon)", "src": "Makale Tablo 7 · 12 hedef", "what": "İskender Governor’ın parçaları tek tek çıkarılır. Hücre: en büyük aşma / medyan süre / başarı.", "table": {"h": ["Değişken", "60 ms", "150 ms"], "r": [{"ours": true, "c": ["① Tam yasa (bizim model)", "2,8 % / 1,30 s / 100 %", "0,9 % / 2,12 s / 100 %"]}, {"c": ["Ortalama yok (n = 1)", "5,6 % / 1,24 s / 100 %", "5,0 % / 1,99 s / 100 %"]}, {"c": ["Jacobian’ı hareket sırasında güncelle (Broyden)", "33,8 % / 0,84 s / 100 %", "9,5 % / 1,39 s / 92 %"]}, {"c": ["Gecikme terimi çıkarıldı", "11,5 % / 0,88 s / 100 %", "41,9 % / 0,80 s / 100 %"]}, {"c": ["Öğrenilen servo gecikmesi yerine sabit 200 ms", "0,2 % / 2,77 s / 83 %", "0,0 % / 3,24 s / 75 %"]}]}, "read": "Gecikme terimini çıkarmak aşmayı %42’ye çıkarır: güvenliği taşıyan şey odur. Jacobian’ı yolda güncellemek hızlandırır ama güvenliği bozar. Gecikmeyi fazla tahmin etmek hiç aşmaz ama uzanmaların dörtte birini zamanında bitiremez.", "cmd": "python scripts/run_v5.py"}, {"id": "D3", "title": "Kuram sonucu önceden söylüyor mu?", "src": "Makale Tablo 8", "what": "Bir parça çıkarılınca kazancın kaç katına çıktığı formülden hesaplanır ve bundan beklenen aşma, ölçülenle karşılaştırılır. GT: gecikme terimi yok; Y: gecikme yarım bildirildi; sayı: gecikme (ms).", "chart": "pred_obs", "table": {"h": ["Deney", "Kazanç ×", "Öngörü", "Ölçüm"], "r": [{"c": ["Gecikme terimi yok, 60 ms", "1,65", "12,2 %", "11,6 %"]}, {"c": ["Gecikme terimi yok, 150 ms", "2,64", "46,7 %", "41,9 %"]}, {"c": ["Yarım bildirilen gecikme, 30 ms", "1,14", "0,5 %", "3,9 %"]}, {"c": ["Yarım bildirilen gecikme, 60 ms", "1,25", "1,9 %", "3,7 %"]}, {"c": ["Yarım bildirilen gecikme, 100 ms", "1,36", "4,1 %", "3,3 %"]}, {"c": ["Yarım bildirilen gecikme, 150 ms", "1,45", "6,5 %", "3,0 %"]}, {"c": ["Yarım bildirilen gecikme, 200 ms", "1,53", "8,5 %", "2,5 %"]}]}, "read": "Mavi noktalar (1) kuramın, turuncu noktalar (2) simülatörün sayısıdır. İlk iki deneyde iki nokta neredeyse üst üstedir: kuram %12 ve %47 dedi, ölçülen %12 ve %42. Yarım bildirilen gecikmede ölçülen aşma %2,5–3,9’da kalır, çünkü gecikme etkin gecikmenin dört parçasından yalnız biridir.", "cmd": "python scripts/verify_margin_theory.py"}, {"id": "D4", "title": "Robot değişirse ne olur?", "src": "Makale Tablo 9 · 8 hedef", "what": "Eklem servosu yavaşlatılır (10 → 5 rad/s) ya da hızlandırılır (30 rad/s); sabit kazanç yeniden ayarlanmaz. Hücre: başarı / en büyük aşma / medyan süre.", "table": {"h": ["Servo, gecikme", "① bizim model", "⑤ k = 1.5"], "r": [{"c": ["5 rad/s, 60 ms", "100 % / 6,4 % / 1,84 s", "88 % / 11,5 % / 1,95 s"]}, {"c": ["5 rad/s, 150 ms", "100 % / 3,8 % / 2,62 s", "75 % / 14,4 % / 3,21 s"]}, {"c": ["10 rad/s, 60 ms", "100 % / 1,8 % / 1,67 s", "100 % / 4,9 % / 1,42 s"]}, {"c": ["10 rad/s, 150 ms", "100 % / 0,7 % / 2,43 s", "100 % / 5,6 % / 1,25 s"]}, {"c": ["30 rad/s, 60 ms", "100 % / 2,7 % / 1,10 s", "100 % / 1,9 % / 1,42 s"]}, {"c": ["30 rad/s, 150 ms", "100 % / 1,7 % / 1,78 s", "100 % / 2,4 % / 1,25 s"]}]}, "read": "Servo yavaşlayınca ayarlı sabit kazanç uzanmaların dörtte birinde başarısız olur ve %14’e kadar aşar. İskender Governor 2,6 saniyelik öz-tanılamayı tekrarlar, yeni servo gecikmesini (75 ms) öğrenir ve hepsinde başarılı olur. Üstünlüğü hız değil, ayar gerektirmeden güvenli kalmasıdır.", "cmd": "python scripts/run_v5_robustness.py"}, {"id": "D5", "title": "İkinci bir kol: insansı kol", "src": "Makale Tablo 10 · 48 uzanma", "what": "Gövde, omuz, dirsek ve bilek eklemleri olan insansı kol; kameralar omzun üstünde ve arkasında.", "table": {"h": ["Kontrolcü", "Başarı (%95 GA)", "En büyük / ortalama aşma", "Medyan süre"], "r": [{"ours": true, "c": ["① İskender Governor (bizim model)", "44/48 (80–97 %)", "2,7 % / 0,8 %", "1,37 s"]}, {"c": ["② Ayrıcalıklı bilgili 1/e yöneticisi (referans)", "48/48 (93–100 %)", "21,8 % / 5,6 %", "0,69 s"]}, {"c": ["⑤ Sabit k = 1,5 (ilk kolda ayarlı)", "48/48 (93–100 %)", "3,6 % / 1,7 %", "1,36 s"]}]}, "read": "① yine en az aşan modeldir. Dört başarısızlığın hepsi hedefe 6–7,5 mm kala biten yavaş yaklaşmalardır; ikisinde dirsek eklem sınırına dayanmıştır.", "cmd": "python scripts/run_v5_robustness.py"}, {"id": "D6", "title": "Göz sürekli bakmazsa (kesintili bakış)", "src": "Makale Tablo 11 · 24 uzanma", "what": "Kameralar her 0,62 saniyenin 0,34 saniyesinde kördür (insan gözünün sıçraması gibi).", "table": {"h": ["Kontrolcü", "60 ms", "150 ms"], "r": [{"ours": true, "c": ["① İskender Governor + ileri model (bizim model)", "92 % / 3,1 % / 2,57 s", "75 % / 0,9 % / 2,85 s"]}, {"c": ["İskender Governor, yalnız son komutu tutar", "96 % / 32,1 % / 2,11 s", "92 % / 9,1 % / 2,59 s"]}, {"c": ["② Ayrıcalıklı bilgili 1/e yöneticisi (referans)", "100 % / 68,9 % / 5,85 s", "100 % / 20,4 % / 1,90 s"]}, {"c": ["⑤ Sabit k = 1,5", "75 % / 20,5 % / 4,97 s", "79 % / 20,3 % / 5,16 s"]}]}, "read": "Görüş kesilince ② %69’a kadar aşar. ① kör anlarda kendi gönderdiği komutlardan elin nereye gittiğini tahmin eder (ileri model) ve %3,1’in altında kalır. Bedeli 150 ms’de başarının %75’e düşmesidir.", "cmd": "python scripts/run_v5_robustness.py"}, {"id": "D7", "title": "Tek göz", "src": "Makale §8.7 · 12 hedef, 60 ms", "what": "Tek kamerada derinlik, el ile hedefin görünen boy oranından okunur (r₀).", "table": {"h": ["r₀ hatası", "Başarı", "Medyan son hata", "En büyük aşma"], "r": [{"ours": true, "c": ["0 %", "100 %", "0,4 mm", "2,1 %"]}, {"c": ["5 %", "0 %", "46 mm", "79 %"]}, {"c": ["10 %", "0 %", "88 mm", "151 %"]}, {"c": ["28 %", "0 %", "211 mm", "358 %"]}]}, "read": "Boy oranı doğruysa tek göz de yeter. %5 yanlışsa model güvenle ama yanlış derinliğe gider: 1/e kuralı gecikmeden doğan aşmaya karşı korur, yanlış ölçen bir algılayıcıya karşı korumaz.", "cmd": "reports/v6_mono_size_prior.jsonl"}, {"id": "D8", "title": "Gecikme yanlış ölçülürse", "src": "Makale §8.8 · 24 uzanma", "what": "Zaman damgası gecikmeyi gerçeğin yarısı kadar bildirir.", "table": {"h": ["Gecikme", "Başarı", "En büyük aşma", "Medyan süre"], "r": [{"c": ["30 ms", "100 %", "3,9 %", "0,94 s"]}, {"c": ["60 ms", "100 %", "3,7 %", "1,02 s"]}, {"c": ["100 ms", "100 %", "3,3 %", "1,17 s"]}, {"c": ["150 ms", "100 %", "3,0 %", "1,36 s"]}, {"c": ["200 ms", "100 %", "2,5 %", "1,52 s"]}]}, "read": "Gecikme yarım bildirilse bile hiçbir uzanma başarısız olmaz ve aşma %4’ün altında kalır, çünkü kazanç 2 değil yalnız 1,14–1,53 kat artar.", "cmd": "python scripts/run_v5.py"}, {"id": "D9", "title": "Eklem sensörü olmadan: bak, darbe ver, frenle", "src": "Makale Tablo 12 · 12 hedef", "what": "Motor yalnız hız komutu alır, eklem açısı hiç okunmaz; durunca fren tutar. Hücre: 5 mm içinde biten uzanma payı / en büyük aşma.", "table": {"h": ["Motor, gecikme", "Bak–darbe–fren (bizim model)", "Sürüklenme öğrenmeden", "Sürekli yasa"], "r": [{"c": ["Güçlü motor, 60 ms", "83 % / 9,2 %", "0 % / 32,9 %", "0 % / 60,7 %"]}, {"c": ["Güçlü motor, 150 ms", "92 % / 7,6 %", "0 % / 33,2 %", "0 % / 112,7 %"]}, {"c": ["Zayıf motor, 60 ms", "58 % / 42,6 %", "0 % / 103,3 %", "0 % / 211,3 %"]}, {"c": ["Zayıf motor, 150 ms", "58 % / 42,9 %", "0 % / 103,1 %", "0 % / 365,4 %"]}]}, "read": "Güçlü motorla eklem sensörü olmadan uzanmaların %83–92’si 5 mm’de biter. Sürüklenmeyi öğrenmek şarttır; zayıf motorda başarı %58’e düşer.", "cmd": "python scripts/run_v6_encoderless.py"}, {"id": "D10", "title": "Rastgele çalışma hacmi (bağımsız test)", "src": "Makale Tablo 13 · tarayıcıdaki insansı kol · 1728 + 576 uzanma", "what": "Kolun erişim hacmi dört kabuğa bölünür (Z1 yakın, Z2 orta, Z3 sınır, Z4 erişilemez). Her hedef dört kontrolcüyle, aynı gürültüyle denenir. Hücre: başarı / en büyük aşma / medyan süre.", "table": {"h": ["Koşul", "①", "②", "④", "③"], "r": [{"c": ["İki göz, 60 ms", "88 % / 5,3 % / 2,50 s", "100 % / 1,6 % / 0,81 s", "100 % / 11,5 % / 0,80 s", "44 % / 10,8 % / 0,59 s"]}, {"c": ["İki göz, 150 ms", "97 % / 3,2 % / 2,02 s", "100 % / 1,5 % / 1,06 s", "6 % / 66,3 % / —", "3 % / 65,8 % / —"]}, {"c": ["Tek göz, 60 ms", "91 % / 8,4 % / 2,37 s", "99 % / 97,0 % / 0,92 s", "99 % / 83,9 % / 0,85 s", "31 % / 81,6 % / 0,76 s"]}, {"c": ["Tek göz, 150 ms", "99 % / 3,7 % / 2,02 s", "100 % / 114,3 % / 1,21 s", "0 % / 125,9 % / —", "0 % / 124,9 % / —"]}]}, "read": "İki gözle ② daha hızlı ve güvenilirdir. Tek gözde metrik yöntemler %84–126 aşarken ① %8,4’ün altında kalır. Erişilemez hedeflerde ① kolu tam gerip tekilliğe sokmadan durur (uzanmaların %94–100’ünde); diğerleri hiç durmaz.", "run": "w60", "cmd": ""}, {"id": "D11", "title": "Kamera hızı (fps) artarsa ulaşma kalitesi artar mı?", "src": "Yeni deney · reports/v8_framerate.md · 480 uzanma", "what": "Altı eksenli kol, 12 hedef × 2 tohum; kamera ve kontrol hızı 15, 30, 60, 100, 200 fps; görsel gecikme 60 ve 150 ms. Her hızda öz-tanılama yeniden yapılır.", "chart": "fps_os", "table": {"h": ["fps", "Öğrenilen servo gecikmesi L", "k (1/s), 60 / 150 ms", "Başarı, 60 / 150 ms", "En büyük aşma, 60 / 150 ms", "Medyan süre, 60 / 150 ms"], "r": [{"c": ["15", "0 ms", "1,13 / 0,88", "79 % / 50 %", "31,9 % / 34,0 %", "2,73 / 2,13 s"]}, {"c": ["30", "10 ms", "1,81 / 1,25", "100 % / 100 %", "6,6 % / 6,1 %", "1,00 / 1,32 s"]}, {"c": ["60", "25 ms", "2,43 / 1,52", "100 % / 100 %", "7,0 % / 6,6 %", "0,88 / 0,97 s"]}, {"c": ["100", "50 ms", "2,45 / 1,53", "100 % / 96 %", "2,6 % / 0,8 %", "1,38 / 2,18 s"]}, {"c": ["200", "50 ms", "2,83 / 1,67", "100 % / 100 %", "3,6 % / 2,6 %", "0,72 / 1,04 s"]}]}, "read": "Evet, ama bir noktaya kadar. 15 fps’de bir kare 67 ms sürer; robot 50 ms’lik kendi servo gecikmesini göremez, kazancı fazla seçer ve %32–34 aşar. 30 fps’den itibaren bütün uzanmalar başarılıdır. En az aşma, servo gecikmesinin doğru öğrenildiği 100–200 fps’dedir. 100’den 200 fps’e çıkmak az şey değiştirir, çünkü etkin gecikmenin büyük kısmı görüntü gecikmesi ve servo gecikmesidir; bunlar kamera hızıyla küçülmez.", "cmd": "python scripts/run_v8_framerate.py"}], "story": {"title": "Bu projenin amacı — 8 kısa bölümde", "prev": "Önceki", "next": "Sonraki", "replay": "Animasyonu yeniden oynat", "try_btn": "Bizim modeli simülasyonda dene", "fog_a": "Geç gördüğü hâlde hızlı giden sürücü", "fog_b": "Gecikmeye göre yavaşlayan sürücü (1/e kuralı)", "obstacle": "engel", "seen": "sürücünün gördüğü (geç)", "crash": "ÇARPTI", "lane_a": "Gecikmeyi hesaba katmayan kontrolcü (kδ = 1,2)", "lane_b": "İskender Governor (bizim model), kδ = 1/e", "target": "hedef", "ghost": "kameranın gördüğü (gecikmeli)", "over": "HEDEF DELİNDİ", "deff_title": "Etkin gecikme: dört parça üst üste eklenir (60 ms görsel gecikme)", "deff_parts": [["görüntü gecikmesi δ_obs", 60, "#2f5fa7"], ["servo gecikmesi L", 50, "#0f766e"], ["8 kare ortalama", 35, "#7c3aed"], ["yarım kare", 5, "#c2410c"]], "ch": [{"short": "Sorun", "title": "Sorun: robot dünyayı biraz geç görür", "html": "<p class=\"big\">Bir robot kolunu <b>yalnızca iki kameranın gördüğüne bakarak</b> bir hedefe götürmek istiyoruz. Zorluk şu: kamera görüntüsü robota her zaman <b>biraz geç</b> ulaşır (0,03–0,2 saniye).</p><p><b>Sisli yol benzetmesi.</b> Sisli bir yolda ancak birkaç saniye önceki görüntüyü görebildiğinizi düşünün. Önünüzdeki engele ne kadar yaklaştığınızı <b>geç</b> öğrenirsiniz. Aşağıdaki animasyonda iki sürücü aynı anda yola çıkıyor. Soluk mavi araba, sürücünün o an gördüğü (geç) konumdur.</p><canvas class=\"fog\" width=\"1500\" height=\"420\"></canvas><ol class=\"qw-steps\"><li><b>1. sürücü</b> geç gördüğünü hesaba katmaz. Gördüğü görüntüde engel hâlâ uzak olduğu için hızlı gider; görüntü yetiştiğinde artık engelin üstündedir: <b>çarpar</b>.</li><li><b>2. sürücü</b> görüşü ne kadar gecikmeliyse o kadar yavaş yaklaşır. Engele, çarpmadan ve mümkün olan en kısa sürede varır.</li></ol><p>Robot kolunda “çarpmak”, eli <b>hedefin ötesine geçirmek</b> demektir: bardağı devirmek, bir parçaya ya da bir insana çarpmak. Bu projenin amacı, robota 2. sürücünün davranışını <b>tam bir sayıyla</b> kazandırmaktır.</p>"}, {"short": "1/e kuralı", "title": "Kural: kazanç × gecikme = 1/e", "html": "<p class=\"big\">Kalan mesafeyi her saniye belli bir oranda kapatırız. Bu orana <b>kazanç k</b> denir. Kural: <b>k = (1/e) / δ</b>. Burada δ gecikme, e = 2,718… (Euler sayısı), 1/e ≈ 0,37.</p><p>Gecikme iki katına çıkarsa kazanç yarıya iner, robot yarı hızla yaklaşır. Örnek: δ = 0,15 s ise k = 0,37 / 0,15 ≈ 2,45; yani her saniye kalan mesafenin yaklaşık 2,45 katı hızla yaklaşılır ve mesafe küçüldükçe hız da küçülür.</p><canvas class=\"qw-cv\" width=\"1500\" height=\"560\" data-chart=\"ett\"></canvas><div class=\"leg\" data-leg=\"ett\"></div><div class=\"qw-read\"><b>Grafik adım adım nasıl okunur?</b><ol><li>Yatay eksen zamandır, gecikme cinsinden: “2” iki gecikme süresi demektir.</li><li>Dikey eksen kalan mesafedir: 1 başlangıç, 0 hedef. <b>0’ın altına inen çizgi, elin hedefi geçtiği</b> anlamına gelir.</li><li><b>1 numaralı yeşil çizgi</b> (kδ = 0,2) hiç 0’ın altına inmez ama 12 gecikme süresinde bile hedefe varamaz: güvenli ama çok yavaş.</li><li><b>2 numaralı kalın turuncu çizgi</b> (kδ = 1/e) 0’ın altına inmeyen çizgilerin <b>en hızlısıdır</b>. İskender Governor tam bu değeri kullanır.</li><li><b>3 numaralı mavi kesikli çizgi</b> (kδ = 0,6) sınırın biraz üstündedir: 2 civarında 0’ın biraz altına iner (el hedefi az geçer), sonra geri gelir.</li><li><b>4 numaralı gri çizgi</b> (kδ = 1,2) sınırın üç katıdır: −0,7’ye kadar iner, yukarı-aşağı salınır. El hedefi delip tekrar tekrar geçer.</li></ol></div><p class=\"note\">Bu sınır 1950’lerden beri bilinir. Yeni olan, robotun bu sınırı yalnız kendi ölçtüğü bilgiden hesaplaması ve gerçek, saniyede 100 kare alan bir döngüde de kesin sınırın %1,2 içinde kalmasıdır.</p>"}, {"short": "Bizim model", "title": "İskender Governor (bizim model): yalnız gördüğünü kullanır", "html": "<p class=\"big\">Robotlar çoğu zaman simülatörden dört bilgiyi “bedava” alır: eklem açıları, kolun tam geometrisi, santimetre cinsinden mesafe ve gerçek gecikme. <b>İskender Governor bunların hiçbirini kullanmaz.</b></p><div class=\"qw-grid4\"><div class=\"step\"><span class=\"ic\">👀</span><b>1. Görür</b>İki kameradan yalnız el ve hedefin piksel konumu. Eklem açısı yok, cetvel yok.</div><div class=\"step\"><span class=\"ic\">🤚</span><b>2. Kendini tanır</b>Bir kez, 2,6 saniye boyunca her eklemini biraz oynatır ve görüntünün nasıl değiştiğini izler (öz-tanılama). Böylece hangi eklemin eli hangi yöne götürdüğünü ve kendi motorunun ne kadar geç tepki verdiğini öğrenir.</div><div class=\"step\"><span class=\"ic\">⏱️</span><b>3. Gecikmeyi ölçer</b>Her görüntünün zaman damgasından ne kadar eski olduğunu hesaplar.</div><div class=\"step\"><span class=\"ic\">🎯</span><b>4. Yaklaşır</b>Hızını k = (1/e) / δ<sub>eff</sub> kuralıyla seçer ve hedefe geçmeden varır.</div></div><p>Animasyonda üstte gecikmeyi hesaba katmayan bir kontrolcü (1), altta İskender Governor (2) aynı hedefe uzanıyor. Soluk mavi daire kameranın o an gördüğü, gecikmeli el konumudur.</p><canvas class=\"lanes\" width=\"1500\" height=\"460\"></canvas>"}, {"short": "Etkin gecikme", "title": "Neden dört parçalı gecikme?", "html": "<p class=\"big\">Kolun “geç kalması” tek bir kaynaktan gelmez. Dört parçanın hepsi toplanmazsa kazanç olması gerekenden büyük çıkar ve el hedefi deler.</p><canvas class=\"deff\" width=\"1500\" height=\"260\"></canvas><ol class=\"qw-steps\"><li><b>1. Görüntü gecikmesi δ<sub>obs</sub></b>: görüntünün çekilmesiyle robota ulaşması arasındaki süre; zaman damgasından ölçülür.</li><li><b>2. Servo gecikmesi L</b>: motora komut verildikten sonra kolun gerçekten hareket etmesine kadar geçen süre; öz-tanılamada öğrenilir.</li><li><b>3. Ortalama gecikmesi</b>: titreşimi azaltmak için son 8 görüntünün ortalaması alınır; ortalama, ortadaki görüntü kadar eskidir.</li><li><b>4. Yarım kare</b>: saniyede 100 kare alınırken bir kare 10 ms sürer; ortalamada yarısı kadar geç kalınır.</li></ol><p class=\"note\">Sadece 1. parçayı kullanan bir yönetici (makaledeki ayrıcalıklı bilgili referans) bu yüzden 30 ms’de hedefi %18,6 aşar; dört parçayı toplayan İskender Governor %3,5’in altında kalır.</p>"}, {"short": "Diğer yöntemler", "title": "Bilinen yöntemlerle karşılaştırma", "html": "<div class=\"qw-tw\"><table class=\"qw-t\"><tr><th>No</th><th>Yöntem</th><th>Ne bilir?</th><th>Robot tekniğinde yeri</th></tr><tr class=\"ours\"><td>①</td><td><b>İskender Governor (bizim model)</b></td><td>Yalnız piksel ve zaman damgası</td><td>Bu çalışmanın katkısı</td></tr><tr><td>②</td><td>Ayrıcalıklı bilgili 1/e yöneticisi (referans)</td><td>Gerçek gecikme, gerçek mesafe, kolun tam geometrisi</td><td>Aynı 1/e sınırını bilinen biçimde uygular; bilgileri bedava alsaydık ne olurdu sorusunu cevaplar</td></tr><tr><td>③</td><td>PID (literatür)</td><td>Gerçek mesafe; kazançlar 30 ms’de ayarlanıp bırakılmış</td><td>Endüstride en yaygın kontrolcü</td></tr><tr><td>④</td><td>Sabit kazanç P (literatür)</td><td>Gerçek mesafe; tek kazanç, 30 ms’de ayarlı</td><td>Görsel servonun klasik yasası</td></tr><tr><td>⑤</td><td>Sabit kazanç P, yeniden ayarlı (literatür)</td><td>Gerçek mesafe; bu kol için en iyi kazanç k = 1,5</td><td>Uzman ayarı yapılmış klasik yöntem: en güçlü rakip</td></tr></table></div><canvas class=\"qw-cv\" width=\"1500\" height=\"560\" data-chart=\"os_delay\"></canvas><div class=\"leg\" data-leg=\"os_delay\"></div><div class=\"qw-read\"><b>Grafik adım adım</b><ol><li>Yatay eksen görsel gecikme, dikey eksen en büyük aşmadır (logaritmik: her çizgi aralığı yaklaşık 2–2,5 kat).</li><li>① turuncu kalın çizgi bütün gecikmelerde en alttadır: %0,6–3,5.</li><li>③ ve ④ (gri ve yeşil kesikli) neredeyse üst üstedir; 100 ms’den sonra %135–251’e fırlar.</li><li>② lacivert çizgi gecikme büyüdükçe iyileşir ama her noktada ①’in üstündedir.</li><li>⑤ mor kesikli çizgi %5–6 civarında düz kalır.</li></ol></div><canvas class=\"qw-cv\" width=\"1500\" height=\"560\" data-chart=\"succ_delay\"></canvas><div class=\"leg\" data-leg=\"succ_delay\"></div><p class=\"note\">İkinci grafik başarıyı (hedefe 5 mm içinde yerleşme) gösterir: ③ ve ④ 100 ms’de %17’ye, 150 ms’de %0’a düşer.</p>"}, {"short": "Başarı durumu", "title": "Gerçekten işe yarıyor mu?", "html": "<p class=\"big\"><b>Kısa cevap:</b> simülasyonda evet; ama her konuda en iyisi değil ve henüz gerçek robotta denenmedi.</p><div class=\"qw-cols\"><div><h4>✅ Kazandığı yerler</h4><ul><li>30–200 ms gecikmede 120 uzanmanın 118’inde hedefe 5 mm içinde yerleşti; en fazla %3,5 aştı.</li><li>Robotun motoru değişince kendini yeniden ayarladı; ayarlı klasik yöntem uzanmaların dörtte birini kaçırdı.</li><li>Göz kesintili bakınca bile %3,1’in altında kaldı; referans %69 aştı.</li><li>Ulaşılamayan hedefte kolu tekilliğe zorlamadan durdu.</li><li>Kuram, parçalar çıkarılınca ne kadar aşacağını önceden söyledi (%12 ve %47 öngörü, %12 ve %42 ölçüm).</li></ul></div><div><h4>⚠️ Kaybettiği yerler</h4><ul><li><b>Yavaş:</b> 60–200 ms’de 1,9–3,1 kat uzun sürer. Asıl neden derinlik algısıdır (iki kamera arası 6,5 cm).</li><li>Uzmanca yeniden ayarlanmış klasik yöntem, robot değişmedikçe eşit güvenilir ve daha hızlıdır.</li><li>Tek gözde boy oranı %5 yanlışsa yanlış derinliğe gider.</li><li>Eklem sınırına dayanınca öğrendiği model bozulur.</li><li>Bütün sonuçlar simülasyondur.</li></ul></div></div><p><button class=\"go\" data-hub=\"1\">📊 Makaledeki bütün deneyleri gör ve tarayıcıda çalıştır</button></p>"}, {"short": "Kamera hızı", "title": "Soru: kamera daha hızlı olursa (fps artarsa) ulaşma da iyileşir mi?", "html": "<p class=\"big\"><b>Cevap: evet, ama bir noktaya kadar.</b> Bunu ölçmek için 480 uzanmalık yeni bir deney yaptık: 15, 30, 60, 100 ve 200 fps; 60 ve 150 ms görsel gecikme.</p><canvas class=\"qw-cv\" width=\"1500\" height=\"560\" data-chart=\"fps_os\"></canvas><div class=\"leg\" data-leg=\"fps_os\"></div><div class=\"qw-read\"><b>Grafik adım adım</b><ol><li>Yatay eksen kamera hızı (saniyedeki kare), dikey eksen en büyük aşmadır.</li><li><b>15 fps:</b> iki çizgi de %32–34’tedir. Bir kare 67 ms sürer; robot 50 ms’lik kendi motor gecikmesini göremez, kazancı fazla seçer ve hedefi geçer.</li><li><b>30–60 fps:</b> aşma %6–7’ye iner, bütün uzanmalar başarılıdır. Motor gecikmesi hâlâ olduğundan küçük öğrenilir (10–25 ms).</li><li><b>100–200 fps:</b> motor gecikmesi doğru öğrenilir (50 ms) ve aşma %0,8–3,6’ya iner.</li><li><b>100 → 200 fps</b> az şey değiştirir: etkin gecikmenin %85–95’i görüntü gecikmesi ve motor gecikmesidir, bunlar kamera hızıyla küçülmez.</li></ol></div><canvas class=\"qw-cv\" width=\"1500\" height=\"560\" data-chart=\"fps_succ\"></canvas><div class=\"leg\" data-leg=\"fps_succ\"></div><p class=\"note\"><b>Pratik kural:</b> kamera, motor gecikmesini en az iki kareyle görebilecek hızda olmalı (50 ms için en az 40 fps; 100 fps rahattır). Bundan sonra görüntüyü daha hızlı aktarmak ve işlemek, kamerayı hızlandırmaktan daha çok işe yarar. Hareket süresi kamera hızıyla düzenli değişmez (0,7–2,2 s), çünkü asıl sınırlayıcı derinlik algısıdır.</p>"}, {"short": "Simülasyon", "title": "Bu sayfa ne işe yarar, nasıl kullanılır?", "html": "<p class=\"big\">Bu sayfa, kurulum gerektirmeden tarayıcıda çalışan bir robot laboratuvarıdır. Kolu, iki kamerayı ve modelleri yan yana görürsünüz.</p><figure class=\"qw-shot\"><img src=\"shots/sim_overview.png\" alt=\"Sayfanın genel görünüşü\" loading=\"lazy\" onerror=\"this.parentNode.style.display='none'\"><figcaption>Sayfanın genel görünüşü</figcaption></figure><figure class=\"qw-shot\"><img src=\"shots/sim_eyes_scene.png\" alt=\"Göz pencereleri ve 3B sahne\" loading=\"lazy\" onerror=\"this.parentNode.style.display='none'\"><figcaption>Göz pencereleri ve 3B sahne</figcaption></figure><figure class=\"qw-shot\"><img src=\"shots/sim_hub.png\" alt=\"Makale deneyleri penceresi\" loading=\"lazy\" onerror=\"this.parentNode.style.display='none'\"><figcaption>Makale deneyleri penceresi</figcaption></figure><ol class=\"qw-steps\"><li><b>Göz pencereleri:</b> iki kameranın gördüğü görüntü. El ve hedefin pikselleri buradadır; İskender Governor yalnız bunu kullanır.</li><li><b>3B sahne:</b> kol, hedef, kameralar. Kesikli renkli kollar diğer modellerin aynı hedefe uzanışıdır (hayalet ikizler).</li><li><b>İkiz modeller çubuğu:</b> ★ İskender Governor (bizim model) her zaman seçilidir. Bir model adına tıklayınca kısa açıklaması açılır.</li><li><b>▶ Simülasyonu Başlat:</b> kol hedefe uzanır. Sekme 4’ten gecikmeyi büyütüp tekrar deneyin: bizim model yavaşlar ama hedefi geçmez.</li><li><b>📊 Makale deneyleri:</b> makaledeki bütün deneylerin tabloları, numaralı grafikleri ve tarayıcıda toplu çalıştırma.</li><li><b>⇱ Kontrol döngüsü diyagramı:</b> modelin içindeki hesap adımlarını 3B sahnenin yanında canlı gösterir.</li></ol>"}]}};
+  const NUM = ['①', '②', '③', '④', '⑤', '⑥'];
+  // ---------- 1. names and groups ----------
+  try {
+    MODEL_CAT = { pg: 'this', governor: 'ref', hlsl: 'old', hdap: 'old', bio: 'old', pid: 'lit', lqr: 'lit', fixed: 'lit' };
+    MODEL_CAT_LABEL = L.groups;
+    GHOST_MODELS.forEach(m => { const n = L.names[m.id]; if (n) { m.short = n[0]; m.label = n[1]; } });
+    if (typeof BENCHMARK_CTRL_LABELS !== 'undefined') Object.keys(L.names).forEach(k => { BENCHMARK_CTRL_LABELS[k] = L.names[k][1]; });
+    window.__modelTag = id => L.short_tag[MODEL_CAT[id]] || '';
+  } catch (e) { }
+  // ---------- 2. correct in-view flags of the randomised-workspace benchmark (from reports/v6_zone_benchmark.csv) ----------
+  const IN_VIEW = { Z1: [1,1,1,0,1,1,0,1,1,0,1,1], Z2: [1,1,1,1,1,0,1,1,0,0,1,1], Z3: [1,0,1,1,0,1,1,0,1,0,1,1], Z4: [0,0,0,1,0,0,0,1,1,1,1,1] };
+  window.__qwInView = j => !!(IN_VIEW[j.z] && IN_VIEW[j.z][j.i]);
+  // six-axis paper values (Table 6) for the delay sweep
+  window.__qwPaperDelay = {
+    'binocular|0.03': { pg: [100, 3.5, 1.06], governor: [92, 18.6, 3.71], pid: [83, 29.7, 4.50], fixed: [83, 29.7, 4.50] },
+    'binocular|0.06': { pg: [100, 2.8, 1.30], governor: [100, 9.9, 0.42], pid: [58, 53.3, 4.84], fixed: [67, 53.7, 4.81] },
+    'binocular|0.1':  { pg: [100, 2.0, 1.67], governor: [100, 5.3, 0.61], pid: [17, 134.8, null], fixed: [17, 135.0, null] },
+    'binocular|0.15': { pg: [100, 0.9, 2.12], governor: [100, 3.7, 0.96], pid: [0, 211.1, null], fixed: [0, 212.5, null] },
+    'binocular|0.2':  { pg: [92, 0.6, 2.40], governor: [100, 3.0, 1.27], pid: [0, 250.7, null], fixed: [0, 251.1, null] } };
+  window.__qwDelayNote = L.delay_note;
+
+  // ---------- 3. modal helper ----------
+  function modal(id, title) {
+    let ov = document.getElementById(id); if (ov) return ov;
+    ov = document.createElement('div'); ov.id = id; ov.className = 'qwModal'; ov.setAttribute('role', 'dialog');
+    ov.innerHTML = '<div class="box"><button class="qx" aria-label="close">×</button><h2>' + title + '</h2><div class="body"></div></div>';
+    document.body.appendChild(ov);
+    const close = () => { ov.classList.remove('open'); if (ov.__onclose) ov.__onclose(); };
+    ov.addEventListener('click', e => { if (e.target === ov) close(); });
+    ov.querySelector('.qx').onclick = close; ov.__close = close;
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && ov.classList.contains('open')) close(); });
+    return ov;
+  }
+  // ---------- 4. small chart library (numbered series) ----------
+  function lineChart(cv, o, prog) {
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height, m = { l: 92, r: 150, t: 36, b: 70 };
+    c.clearRect(0, 0, W, H); c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+    const xs = o.series.flatMap(s => s.pts.map(p => p[0])), ys = o.series.flatMap(s => s.pts.map(p => p[1])).filter(v => v !== null);
+    const x0 = o.xmin !== undefined ? o.xmin : Math.min(...xs), x1 = o.xmax !== undefined ? o.xmax : Math.max(...xs);
+    const tf = v => o.logy ? Math.log10(Math.max(v, o.ymin)) : v;
+    const y0 = tf(o.ymin !== undefined ? o.ymin : Math.min(...ys)), y1 = tf(o.ymax !== undefined ? o.ymax : Math.max(...ys));
+    const X = v => m.l + (v - x0) / (x1 - x0) * (W - m.l - m.r), Y = v => H - m.b - (tf(v) - y0) / (y1 - y0) * (H - m.t - m.b);
+    c.strokeStyle = '#e5e1da'; c.lineWidth = 1.5; c.font = '22px Inter, system-ui, sans-serif'; c.fillStyle = '#374151'; c.textAlign = 'right';
+    (o.yticks || []).forEach(v => { const y = Y(v); c.beginPath(); c.moveTo(m.l, y); c.lineTo(W - m.r, y); c.stroke(); c.fillText(String(v), m.l - 10, y + 7); });
+    c.textAlign = 'center'; (o.xticks || []).forEach((v, i) => { const x = X(v); c.fillText(o.xtl ? o.xtl[i] : String(v), x, H - m.b + 30); });
+    if (o.zero) { c.strokeStyle = '#9ca3af'; c.lineWidth = 2; c.beginPath(); c.moveTo(m.l, Y(0)); c.lineTo(W - m.r, Y(0)); c.stroke(); }
+    c.strokeStyle = '#374151'; c.lineWidth = 2; c.beginPath(); c.moveTo(m.l, m.t); c.lineTo(m.l, H - m.b); c.lineTo(W - m.r, H - m.b); c.stroke();
+    c.fillStyle = '#111827'; c.font = '600 23px Inter, sans-serif'; c.fillText(o.xlab, (m.l + W - m.r) / 2, H - 14);
+    c.save(); c.translate(26, (m.t + H - m.b) / 2); c.rotate(-Math.PI / 2); c.fillText(o.ylab, 0, 0); c.restore();
+    const pr = prog === undefined ? 1 : prog;
+    o.series.forEach((s, si) => {
+      const pts = s.pts.filter(p => p[1] !== null), n = Math.max(1, Math.round(pts.length * pr));
+      c.strokeStyle = s.color; c.lineWidth = s.w || 5; c.setLineDash(s.dash || []); c.beginPath();
+      pts.slice(0, n).forEach((p, i) => { if (i) c.lineTo(X(p[0]), Y(p[1])); else c.moveTo(X(p[0]), Y(p[1])); }); if (!s.noline) c.stroke(); c.setLineDash([]);
+      if (o.markers || s.noline) pts.slice(0, n).forEach(p => { c.fillStyle = s.color; c.beginPath(); c.arc(X(p[0]) + (s.dx || 0), Y(p[1]), s.noline ? 11 : 7, 0, 7); c.fill(); });
+      let lp = pts[n - 1]; if (!lp) return;
+      if (s.lx !== undefined) { const cand = pts.slice(0, n).reduce((b, p) => Math.abs(p[0] - s.lx) < Math.abs(b[0] - s.lx) ? p : b, pts[0]); if (Math.abs(cand[0] - s.lx) < 0.6) lp = cand; else return; }
+      const lx = X(lp[0]) + 14, ly = Y(lp[1]) + (s.dy || 0);
+      c.fillStyle = s.color; c.beginPath(); c.arc(lx + 14, ly, 16, 0, 7); c.fill();
+      c.fillStyle = '#fff'; c.font = '700 20px Inter, sans-serif'; c.textAlign = 'center'; c.fillText(String(si + 1), lx + 14, ly + 7);
+      c.fillStyle = s.color; c.textAlign = 'left'; c.font = '600 20px Inter, sans-serif'; c.fillText(s.tag || '', lx + 36, ly + 7);
+    });
+  }
+  function legend(series) {
+    return '<ol class="qw-leg">' + series.map((s, i) => '<li><span class="n" style="background:' + s.color + '">' + (i + 1) + '</span><span class="sw" style="border-top:5px ' + (s.dash ? 'dashed' : 'solid') + ' ' + s.color + '"></span>' + s.label + '</li>').join('') + '</ol>';
+  }
+  function animate(cv, o, ms) {
+    if (cv.__raf) cancelAnimationFrame(cv.__raf);
+    const t0 = performance.now();
+    const f = () => { const p = Math.min(1, (performance.now() - t0) / ms); lineChart(cv, o, p); if (p < 1) cv.__raf = requestAnimationFrame(f); };
+    f();
+  }
+  // delayed loop e' = -k e(t - 1), time in units of the delay
+  function dde(kd, tmax) { const h = 1 / 50, lag = 50, n = Math.round(tmax * 50), e = new Array(n + lag + 1).fill(1);
+    for (let i = lag; i < n + lag; i++) e[i + 1] = e[i] - h * kd * e[i - lag];
+    const pts = []; for (let i = lag; i <= n + lag; i += 2) pts.push([(i - lag) / 50, e[i]]); return pts; }
+
+  // ---------- 5. paper-experiment hub ----------
+  const C = L.colors;
+  function tableHtml(t) {
+    return '<div class="qw-tw"><table class="qw-t"><tr>' + t.h.map(x => '<th>' + x + '</th>').join('') + '</tr>'
+      + t.r.map(r => '<tr' + (r.ours ? ' class="ours"' : '') + '>' + r.c.map(x => '<td>' + x + '</td>').join('') + '</tr>').join('') + '</table></div>';
+  }
+  const hub = modal('qwHub', L.hub.title);
+  function buildHub() {
+    const b = hub.querySelector('.body');
+    b.innerHTML = '<p class="lead">' + L.hub.lead + '</p>'
+      + '<div class="qw-run"><button class="go" data-run="queue">' + L.hub.run_all + '</button><button data-run="delay">' + L.hub.run_delay + '</button><button data-run="w60">' + L.hub.run_a + '</button><button data-run="w150m">' + L.hub.run_b + '</button><button data-run="full">' + L.hub.run_full + '</button></div>'
+      + '<p class="hint">' + L.hub.run_hint + '</p>'
+      + '<nav class="qw-toc">' + L.exps.map((x, i) => '<a href="#qwE' + i + '">' + x.id + ' ' + x.title + '</a>').join('') + '</nav>'
+      + L.exps.map((x, i) => '<section class="qw-exp" id="qwE' + i + '"><h3>' + x.id + ' · ' + x.title + ' <span class="src">' + x.src + '</span></h3>'
+        + '<p>' + x.what + '</p>' + (x.chart ? '<canvas class="qw-cv" width="1500" height="560" data-chart="' + x.chart + '"></canvas><div class="leg" data-leg="' + x.chart + '"></div>' : '')
+        + tableHtml(x.table) + '<p class="read"><b>' + L.hub.read + '</b> ' + x.read + '</p>'
+        + (x.run ? '<div class="qw-run"><button class="go" data-run="' + x.run + '">▶ ' + L.hub.run_this + '</button></div>' : '<p class="py">' + L.hub.python + ' <code>' + x.cmd + '</code></p>') + '</section>').join('');
+    b.querySelectorAll('[data-run]').forEach(el => el.addEventListener('click', () => runModes(el.dataset.run === 'queue' ? ['delay', 'w60', 'w150m'] : [el.dataset.run])));
+    b.querySelectorAll('canvas[data-chart]').forEach(cv => { const o = L.charts[cv.dataset.chart]; if (!o) return; const lg = b.querySelector('[data-leg="' + cv.dataset.chart + '"]'); if (lg) lg.innerHTML = legend(o.series); lineChart(cv, o, 1); });
+    b.querySelectorAll('.qw-toc a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); const t = b.querySelector(a.getAttribute('href')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+  }
+  let queue = [];
+  function runModes(modes) {
+    hub.__close(); queue = modes.slice(); startNext();
+  }
+  function startNext() {
+    const P = window.__qwPaperPlayer; if (!P || P.running || !queue.length) return;
+    const mode = queue.shift();
+    const r = document.querySelector('input[name=ppMode][value="' + mode + '"]'); if (r) r.checked = true;
+    const tb = document.querySelector('.tab-btn[data-tab="tab5"]'); if (tb) tb.click();
+    const sp = document.getElementById('ppSpeed'); if (sp && mode === 'delay' && sp.value === '1') sp.value = '2';
+    setTimeout(() => { const st = document.getElementById('ppStart'); if (st) st.click(); const sc = document.getElementById('pwScene'); if (sc) sc.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 200);
+  }
+  // progress strip + queue runner
+  const strip = document.createElement('div'); strip.id = 'qwRunStrip';
+  strip.innerHTML = '<b>📊</b> <span class="t"></span> <i class="bar"><i></i></i> <button class="show">' + L.strip.show + '</button><button class="stop">' + L.strip.stop + '</button>';
+  document.body.appendChild(strip);
+  strip.querySelector('.show').onclick = () => { const c = document.getElementById('cardPaperPlayer'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  strip.querySelector('.stop').onclick = () => { queue = []; const s = document.getElementById('ppStop'); if (s) s.click(); };
+  let wasRunning = false;
+  setInterval(() => {
+    const P = window.__qwPaperPlayer; if (!P) return;
+    if (P.running) {
+      strip.classList.add('on'); const n = P.jobs.length || 1;
+      strip.querySelector('.t').textContent = L.strip.label[P.mode] + ' · ' + Math.min(P.i + 1, n) + ' / ' + n + (queue.length ? ' · ' + L.strip.next + ' ' + queue.map(q => L.strip.label[q]).join(', ') : '');
+      strip.querySelector('.bar i').style.width = (100 * P.i / n).toFixed(1) + '%';
+    } else strip.classList.remove('on');
+    if (wasRunning && !P.running && queue.length) setTimeout(startNext, 900);
+    wasRunning = P.running;
+  }, 400);
+  const bb = document.getElementById('btnOpenBenchmark');
+  if (bb) {
+    const nb = bb.parentNode ? bb.cloneNode(true) : bb; if (bb.parentNode) bb.parentNode.replaceChild(nb, bb);   // drop the old handlers
+    nb.title = L.hub.btn_tip;
+    nb.addEventListener('click', () => { buildHub(); hub.classList.add('open'); });
+  }
+  const hb = document.createElement('button'); hb.type = 'button'; hb.className = 'btn qw-float-head'; hb.textContent = L.hub.header_btn; hb.title = L.hub.btn_tip;
+  hb.addEventListener('click', () => { buildHub(); hub.classList.add('open'); });
+  const ha = document.querySelector('.header-actions'); if (ha) ha.insertBefore(hb, ha.firstChild);
+  window.__qwOpenHub = () => { buildHub(); hub.classList.add('open'); };
+
+  // ---------- 6. project story (purpose) ----------
+  const st = modal('qwStory', '🎯 ' + L.story.title);
+  let chap = 0, timers = [];
+  function clearT() { timers.forEach(t => { clearInterval(t); clearTimeout(t); cancelAnimationFrame(t); }); timers = []; }
+  st.__onclose = clearT;
+  function showChap(i) {
+    clearT(); chap = Math.max(0, Math.min(L.story.ch.length - 1, i));
+    const ch = L.story.ch[chap], b = st.querySelector('.body');
+    b.innerHTML = '<nav class="qw-chaps">' + L.story.ch.map((c, k) => '<button class="' + (k === chap ? 'on' : '') + '" data-k="' + k + '">' + (k + 1) + '. ' + c.short + '</button>').join('') + '</nav>'
+      + '<h3>' + (chap + 1) + '. ' + ch.title + '</h3>' + ch.html
+      + '<div class="qw-nav"><button class="pv"' + (chap ? '' : ' disabled') + '>‹ ' + L.story.prev + '</button><button class="rp">↻ ' + L.story.replay + '</button>'
+      + (chap < L.story.ch.length - 1 ? '<button class="go nx">' + L.story.next + ' ›</button>' : '<button class="go try">▶ ' + L.story.try_btn + '</button>') + '</div>';
+    b.querySelectorAll('.qw-chaps button').forEach(x => x.onclick = () => showChap(+x.dataset.k));
+    b.querySelector('.pv').onclick = () => showChap(chap - 1); b.querySelector('.rp').onclick = () => showChap(chap);
+    const nx = b.querySelector('.nx'); if (nx) nx.onclick = () => showChap(chap + 1);
+    const tr = b.querySelector('.try'); if (tr) tr.onclick = tryOurs;
+    b.querySelectorAll('[data-hub]').forEach(x => x.onclick = () => { st.__close(); window.__qwOpenHub(); });
+    // animations
+    b.querySelectorAll('canvas[data-chart]').forEach(cv => { const o = L.charts[cv.dataset.chart]; if (!o) return; const lg = b.querySelector('[data-leg="' + cv.dataset.chart + '"]'); if (lg) lg.innerHTML = legend(o.series); animate(cv, o, 2600); });
+    const fog = b.querySelector('canvas.fog'); if (fog) fogAnim(fog);
+    const lanes = b.querySelector('canvas.lanes'); if (lanes) lanesAnim(lanes);
+    const bar = b.querySelector('canvas.deff'); if (bar) deffAnim(bar);
+    const steps = b.querySelectorAll('.step'); if (steps.length) { let k = 0; steps[0].classList.add('on'); timers.push(setInterval(() => { steps.forEach(s => s.classList.remove('on')); k = (k + 1) % steps.length; steps[k].classList.add('on'); }, 1700)); }
+    b.scrollTop = 0; st.querySelector('.box').scrollTop = 0;
+  }
+  function tryOurs() {
+    st.__close();
+    const s = document.getElementById('selController'); if (s) { s.value = 'pg'; s.dispatchEvent(new Event('change', { bubbles: true })); }
+    state.controller = 'pg'; try { renderGhostModelBar(); } catch (e) { }
+    const run = document.getElementById('btnRunReach'); if (run) run.click();
+    const sc = document.getElementById('pwScene'); if (sc) sc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  // chapter 1: fog road — the driver sees the obstacle late
+  function fogAnim(cv) {
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height, LAG = 45; let f = 0;
+    const runs = [{ kd: 1.3, y: H * 0.3, col: '#8f2d2d', lab: L.story.fog_a }, { kd: 1 / Math.E, y: H * 0.74, col: '#c2410c', lab: L.story.fog_b }];
+    const sims = runs.map(r => { const h = 1 / LAG, n = 9 * LAG, e = new Array(n + LAG).fill(1); for (let i = LAG; i < n + LAG - 1; i++) e[i + 1] = e[i] - h * r.kd * e[i - LAG]; return e; });
+    const x0 = 120, x1 = W * 0.7, X = e => x0 + (1 - e) * (x1 - x0);
+    const draw = () => {
+      c.clearRect(0, 0, W, H); c.fillStyle = '#f3f4f6'; c.fillRect(0, 0, W, H);
+      runs.forEach((r, k) => {
+        const E = sims[k], i = Math.min(E.length - 1, LAG + f), y = r.y;
+        c.fillStyle = '#4b5563'; c.fillRect(40, y - 40, W - 80, 80); c.strokeStyle = '#fff'; c.setLineDash([30, 24]); c.lineWidth = 4; c.beginPath(); c.moveTo(40, y); c.lineTo(W - 40, y); c.stroke(); c.setLineDash([]);
+        c.fillStyle = '#b45309'; c.fillRect(x1 + 30, y - 46, 26, 92); c.fillStyle = '#111827'; c.font = '600 22px Inter, sans-serif'; c.textAlign = 'center'; c.fillText(L.story.obstacle, x1 + 43, y + 72);
+        const xg = X(E[Math.max(0, i - LAG)]); c.globalAlpha = .35; car(c, xg, y, '#2f5fa7'); c.globalAlpha = 1;
+        c.fillStyle = '#2f5fa7'; c.font = '500 19px Inter, sans-serif'; c.fillText(L.story.seen, xg, y - 50);
+        const xh = X(E[i]); car(c, xh, y, r.col);
+        const g = c.createLinearGradient(xh + 30, 0, W, 0); g.addColorStop(0, 'rgba(243,244,246,0)'); g.addColorStop(.25, 'rgba(229,231,235,.85)'); c.fillStyle = g; c.fillRect(xh + 30, y - 44, W - xh, 88);
+        c.fillStyle = r.col; c.font = '700 24px Inter, sans-serif'; c.textAlign = 'left'; c.fillText((k + 1) + '. ' + r.lab, 40, y - 54);
+        if (xh + 40 > x1 + 30) { c.fillStyle = '#b91c1c'; c.font = '800 26px Inter, sans-serif'; c.textAlign = 'right'; c.fillText('⚠ ' + L.story.crash, W - 50, y - 54); }
+      });
+    };
+    const loop = () => { f += 1; draw(); if (LAG + f < sims[0].length - 1) timers.push(requestAnimationFrame(loop)); else timers.push(setTimeout(() => { f = 0; loop(); }, 1500)); };
+    loop();
+  }
+  function car(c, x, y, col) { c.fillStyle = col; c.beginPath(); c.roundRect ? c.roundRect(x - 34, y - 20, 68, 40, 10) : c.rect(x - 34, y - 20, 68, 40); c.fill(); c.fillStyle = '#111'; c.beginPath(); c.arc(x - 18, y + 22, 8, 0, 7); c.arc(x + 18, y + 22, 8, 0, 7); c.fill(); }
+  // chapter 3: robot hand lanes
+  function lanesAnim(cv) {
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height, LAG = 60; let f = 0;
+    const runs = [{ kd: 1.2, y: H * 0.3, col: '#6b7280', lab: L.story.lane_a }, { kd: 1 / Math.E, y: H * 0.74, col: '#c2410c', lab: L.story.lane_b }];
+    const sims = runs.map(r => { const h = 1 / LAG, n = 9 * LAG, e = new Array(n + LAG).fill(1); for (let i = LAG; i < n + LAG - 1; i++) e[i + 1] = e[i] - h * r.kd * e[i - LAG]; return e; });
+    const x0 = 140, x1 = W * 0.6, X = e => Math.min(W - 60, x0 + (1 - e) * (x1 - x0));
+    const draw = () => {
+      c.clearRect(0, 0, W, H); c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+      runs.forEach((r, k) => {
+        const E = sims[k], i = Math.min(E.length - 1, LAG + f), y = r.y;
+        c.strokeStyle = '#e5e1da'; c.lineWidth = 6; c.beginPath(); c.moveTo(x0, y); c.lineTo(W - 60, y); c.stroke();
+        c.fillStyle = 'rgba(220,38,38,.08)'; c.fillRect(x1, y - 44, W - 60 - x1, 88);
+        c.strokeStyle = '#e0a04a'; c.lineWidth = 7; c.beginPath(); c.arc(x1, y, 28, 0, 7); c.stroke();
+        c.fillStyle = '#9a6a1f'; c.font = '500 21px Inter, sans-serif'; c.textAlign = 'center'; c.fillText(L.story.target, x1, y + 60);
+        const xg = X(E[Math.max(0, i - LAG)]); c.fillStyle = 'rgba(47,95,167,.28)'; c.beginPath(); c.arc(xg, y, 21, 0, 7); c.fill();
+        c.fillStyle = '#2f5fa7'; c.font = '500 19px Inter, sans-serif'; c.fillText('👁 ' + L.story.ghost, xg, y - 32);
+        const xh = X(E[i]); c.fillStyle = r.col; c.beginPath(); c.arc(xh, y, 23, 0, 7); c.fill(); c.fillStyle = '#fff'; c.font = '700 21px Inter, sans-serif'; c.fillText('✋', xh, y + 8);
+        c.fillStyle = r.col; c.font = '700 24px Inter, sans-serif'; c.textAlign = 'left'; c.fillText((k + 1) + '. ' + r.lab, 40, y - 64);
+        if (xh > x1 + 6) { c.fillStyle = '#b91c1c'; c.font = '800 26px Inter, sans-serif'; c.textAlign = 'right'; c.fillText('⚠ ' + L.story.over, W - 60, y - 64); }
+      });
+    };
+    const loop = () => { f += 2; draw(); if (LAG + f < sims[0].length - 1) timers.push(requestAnimationFrame(loop)); else timers.push(setTimeout(() => { f = 0; loop(); }, 1500)); };
+    loop();
+  }
+  // chapter 4: effective delay as a growing stacked bar
+  function deffAnim(cv) {
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height; const parts = L.story.deff_parts; const tot = parts.reduce((a, p) => a + p[1], 0);
+    const x0 = 60, x1 = W - 60, X = v => x0 + v / tot * (x1 - x0); let t0 = performance.now();
+    const draw = () => {
+      const p = Math.min(1, (performance.now() - t0) / 3200) * parts.length; c.clearRect(0, 0, W, H); c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+      let acc = 0; parts.forEach((q, k) => { const sh = Math.max(0, Math.min(1, p - k)); if (sh <= 0) return; const a = X(acc), w = (X(acc + q[1]) - a) * sh;
+        c.fillStyle = q[2]; c.fillRect(a, 70, w, 90); c.fillStyle = '#fff'; c.font = '700 26px Inter, sans-serif'; c.textAlign = 'center'; if (sh > .6) c.fillText((k + 1) + '', a + w / 2, 125);
+        c.fillStyle = '#111827'; c.font = '600 21px Inter, sans-serif'; if (sh > .9) { c.fillText(q[0], a + w / 2, 200); c.fillText(q[1] + ' ms', a + w / 2, 230); } acc += q[1]; });
+      c.fillStyle = '#111827'; c.font = '700 26px Inter, sans-serif'; c.textAlign = 'left'; c.fillText(L.story.deff_title, x0, 46);
+      if (p >= parts.length) { c.textAlign = 'right'; c.fillStyle = '#c2410c'; c.fillText('δ_eff = ' + tot + ' ms  →  k = (1/e) / ' + (tot / 1000).toFixed(3) + ' s = ' + (1 / Math.E / (tot / 1000)).toFixed(2) + ' 1/s', x1, 46); }
+      if (p < parts.length) timers.push(requestAnimationFrame(draw));
+    };
+    draw();
+  }
+  const pb = document.getElementById('btnPurpose');
+  if (pb) { const nb = pb.parentNode ? pb.cloneNode(true) : pb; if (pb.parentNode) pb.parentNode.replaceChild(nb, pb); nb.addEventListener('click', () => { st.classList.add('open'); showChap(0); }); }
+  window.__qwOpenStory = k => { st.classList.add('open'); showChap(k || 0); };
+  // build e(t) chart data now (needs dde)
+  if (L.charts.ett) L.charts.ett.series.forEach(s => { s.pts = dde(s.kd, 12); });
+  try { renderGhostModelBar(); renderCompareTable(); } catch (e) { }
 })();
 </script>
 </body>

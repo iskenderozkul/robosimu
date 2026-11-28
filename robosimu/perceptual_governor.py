@@ -78,8 +78,9 @@ class PerceptualGovernor:
             self.qd_m = self.qd_m + h * a
             self.q_m = self.q_m + h * self.qd_m
         self.ht.append(t); self.hq.append(self.q_m.copy()); self.hc.append(self.q_cmd.copy())
-        if len(self.ht) > 400:
-            self.ht = self.ht[-300:]; self.hq = self.hq[-300:]; self.hc = self.hc[-300:]
+        nmax = int(round(4.0 / self.T)); nkeep = int(round(3.0 / self.T))   # keep >= 3 s of history at any frame rate
+        if len(self.ht) > nmax:
+            self.ht = self.ht[-nkeep:]; self.hq = self.hq[-nkeep:]; self.hc = self.hc[-nkeep:]
 
     def step_blind(self, t):
         """No new frame: predict the retinal error from the efference copy (forward model)."""

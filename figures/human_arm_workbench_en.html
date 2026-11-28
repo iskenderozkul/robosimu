@@ -1511,12 +1511,126 @@
   .qw-float-hint { display: none; font-size: 11px; color: #6b6258; margin: 0 0 6px; }
   .qw-float .qw-float-hint { display: block; }
 </style>
+
+<style id="qwR5css">
+  /* header: owner + pulsing purpose */
+  .qw-hdr-row { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-top: 6px; }
+  .qw-owner { font-size: 12.5px; color: #374151; }
+  .qw-purpose { font: 700 15px/1.2 Inter, system-ui, sans-serif; color: #fff; border: 0; border-radius: 999px; padding: 9px 18px; cursor: pointer;
+                background: linear-gradient(135deg, #c2410c, #ea580c); box-shadow: 0 0 0 0 rgba(234,88,12,.55); animation: qwGlow 2.6s ease-in-out infinite; }
+  .qw-purpose:hover { filter: brightness(1.08); }
+  @keyframes qwGlow { 0% { box-shadow: 0 0 0 0 rgba(234,88,12,.55); transform: scale(1); }
+                      50% { box-shadow: 0 0 0 12px rgba(234,88,12,0); transform: scale(1.045); }
+                      100% { box-shadow: 0 0 0 0 rgba(234,88,12,0); transform: scale(1); } }
+  @media (prefers-reduced-motion: reduce) { .qw-purpose { animation: none; } }
+  .qw-float-head { background: #fff4ec !important; border: 1.5px solid #c2410c !important; color: #9a3412 !important; font-weight: 700 !important; }
+  #btnSceneDiagram { width: auto !important; padding: 0 7px !important; font-size: 11px !important; color: #9a3412 !important; font-weight: 700; }
+  /* wide control card */
+  #cardCtrlModel { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); column-gap: 16px; align-items: start; }
+  #cardCtrlModel > .card-title, #cardCtrlModel > .card-explain, #cardCtrlModel > .preset-bar { grid-column: 1 / -1; }
+  /* groups */
+  .cat-ref { color: #1e3a8a; border-color: #b9c8ee; background: #f1f5ff; }
+  .cat-old { color: #5b5470; border-color: #d3cfe0; background: #f7f6fa; border-style: dashed; }
+  tr.cat-ref td:first-child { border-left: 4px solid #2f4d78; }
+  tr.cat-old td:first-child { border-left: 4px dashed #8b84a3; }
+  .ghost-grp { cursor: help; text-decoration: underline dotted; text-underline-offset: 3px; }
+  .ghost-grp.cat-ref-t { color: #1e3a8a; } .ghost-grp.cat-old-t { color: #5b5470; }
+  .ghost-pill.old-pill { opacity: .85; border-style: dashed !important; }
+  .hud-info { margin-left: 4px; border: 1px solid #c2410c; color: #fff; background: #c2410c; border-radius: 50%; width: 20px; height: 20px; font: 700 12px/18px Inter, sans-serif; cursor: pointer; padding: 0; }
+  /* info popover */
+  #qwInfoPop { position: fixed; z-index: 10050; max-width: 380px; background: #fff; border: 1px solid #d6d3cc; border-radius: 8px; box-shadow: 0 12px 36px rgba(0,0,0,.25);
+               padding: 10px 12px 10px; font: 12.5px/1.5 Inter, system-ui, sans-serif; color: #1f2937; display: none; }
+  #qwInfoPop.open { display: block; }
+  #qwInfoPop h4 { margin: 0 0 2px; font-size: 14px; color: #111827; }
+  #qwInfoPop .sub { color: #6b7280; font-size: 11.5px; margin-bottom: 6px; }
+  #qwInfoPop .grp { display: inline-block; margin: 0 0 6px; }
+  #qwInfoPop b.h { display: block; margin-top: 5px; color: #374151; font-size: 11.5px; text-transform: uppercase; letter-spacing: .03em; }
+  #qwInfoPop .x { position: absolute; top: 4px; right: 8px; border: 0; background: none; font-size: 16px; cursor: pointer; color: #6b7280; }
+  /* purpose modal */
+  #qwPurpose { position: fixed; inset: 0; z-index: 10040; background: rgba(17,24,39,.6); display: none; align-items: flex-start; justify-content: center; overflow: auto; padding: 4vh 2vw; }
+  #qwPurpose.open { display: flex; }
+  #qwPurpose .box { background: #fffdf9; border-radius: 12px; max-width: 900px; width: 100%; padding: 18px 22px 20px; box-shadow: 0 24px 70px rgba(0,0,0,.4); font: 14px/1.55 Inter, system-ui, sans-serif; color: #1f2937; }
+  #qwPurpose h2 { margin: 0 0 6px; font-size: 22px; color: #9a3412; }
+  #qwPurpose .lead { font-size: 15.5px; margin: 0 0 10px; }
+  #qwPurpose canvas { width: 100%; height: auto; display: block; border: 1px solid #eadfd3; border-radius: 8px; background: #fff; }
+  #qwPurpose .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }
+  @media (max-width: 760px) { #qwPurpose .steps { grid-template-columns: repeat(2, 1fr); } }
+  #qwPurpose .step { border: 1px solid #eadfd3; border-radius: 10px; padding: 10px; background: #fff; transition: transform .35s, box-shadow .35s, border-color .35s; }
+  #qwPurpose .step .ic { font-size: 28px; display: block; }
+  #qwPurpose .step b { display: block; font-size: 15px; margin: 2px 0; }
+  #qwPurpose .step.on { border-color: #ea580c; box-shadow: 0 6px 18px rgba(234,88,12,.25); transform: translateY(-3px); }
+  #qwPurpose .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 760px) { #qwPurpose .cols { grid-template-columns: 1fr; } }
+  #qwPurpose h3 { font-size: 15px; margin: 6px 0 4px; color: #1b2a41; }
+  #qwPurpose ul { margin: 0; padding-left: 18px; }
+  #qwPurpose .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; flex-wrap: wrap; }
+  #qwPurpose .acts button { font: 600 13px Inter, sans-serif; border-radius: 8px; padding: 7px 14px; cursor: pointer; border: 1px solid #d6d3cc; background: #fff; }
+  #qwPurpose .acts .go { background: #c2410c; color: #fff; border-color: #c2410c; }
+</style>
+
+<style id="qwR6css">
+  #benchMethodCard, #benchSuiteCard { grid-column: 1 / -1; }
+  #cardPaperPlayer { grid-column: 1 / -1; }
+  .qwModal { position: fixed; inset: 0; z-index: 10060; background: rgba(17,24,39,.62); display: none; align-items: flex-start; justify-content: center; overflow: auto; padding: 3vh 2vw; }
+  .qwModal.open { display: flex; }
+  .qwModal .box { position: relative; background: #fffdf9; border-radius: 12px; max-width: 1060px; width: 100%; padding: 18px 24px 22px; box-shadow: 0 24px 70px rgba(0,0,0,.4); font: 14.5px/1.6 Inter, system-ui, sans-serif; color: #1f2937; }
+  .qwModal .qx { position: absolute; top: 8px; right: 12px; border: 0; background: none; font-size: 26px; cursor: pointer; color: #6b7280; }
+  .qwModal h2 { margin: 0 34px 8px 0; font-size: 22px; color: #9a3412; }
+  .qwModal h3 { font-size: 18px; color: #1b2a41; margin: 14px 0 6px; }
+  .qwModal h3 .src { font-size: 12px; font-weight: 400; color: #6b7280; margin-left: 6px; }
+  .qwModal .big { font-size: 16.5px; }
+  .qwModal .lead { font-size: 15px; }
+  .qwModal .note { background: #f7f4ee; border-left: 4px solid #c2410c; padding: 8px 12px; border-radius: 4px; }
+  .qwModal canvas { width: 100%; height: auto; display: block; border: 1px solid #eadfd3; border-radius: 8px; background: #fff; margin: 8px 0; }
+  .qwModal button { font: 600 13.5px Inter, sans-serif; border-radius: 8px; padding: 7px 14px; cursor: pointer; border: 1px solid #d6d3cc; background: #fff; margin: 3px 4px 3px 0; }
+  .qwModal button.go { background: #c2410c; color: #fff; border-color: #c2410c; }
+  .qwModal button:disabled { opacity: .45; cursor: default; }
+  .qw-leg { list-style: none; padding: 0; margin: 4px 0 10px; display: grid; gap: 4px; }
+  .qw-leg li { display: flex; align-items: center; gap: 8px; font-size: 13.5px; }
+  .qw-leg .n { display: inline-block; min-width: 24px; height: 24px; border-radius: 50%; color: #fff; font-weight: 700; text-align: center; line-height: 24px; }
+  .qw-leg .sw { display: inline-block; width: 38px; }
+  .qw-tw { overflow-x: auto; }
+  .qw-t { border-collapse: collapse; width: 100%; font-size: 13px; margin: 6px 0; }
+  .qw-t th { background: #eef4f4; text-align: left; padding: 6px 8px; border-bottom: 1px solid #c9d6d6; }
+  .qw-t td { padding: 5px 8px; border-bottom: 1px solid #ece7df; vertical-align: top; }
+  .qw-t tr.ours td { background: #fff4ec; font-weight: 600; }
+  .qw-read { background: #f1f5ff; border: 1px solid #d5def5; border-radius: 8px; padding: 8px 14px; margin: 6px 0; }
+  .qw-read ol, .qw-steps { margin: 4px 0; padding-left: 22px; }
+  .qw-steps li, .qw-read li { margin: 3px 0; }
+  .qw-exp { border-top: 1px solid #eadfd3; padding-top: 6px; margin-top: 10px; }
+  .qw-exp .read { margin: 6px 0; }
+  .qw-exp .py code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; }
+  .qw-toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
+  .qw-toc a { font-size: 12.5px; background: #f3efe8; border-radius: 999px; padding: 3px 10px; color: #1b2a41; text-decoration: none; }
+  .qw-run { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; }
+  .qwModal .hint { font-size: 12.5px; color: #6b7280; margin: 2px 0 8px; }
+  .qw-chaps { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 8px; }
+  .qw-chaps button { font-size: 12.5px !important; padding: 4px 10px !important; }
+  .qw-chaps button.on { background: #1b2a41; color: #fff; border-color: #1b2a41; }
+  .qw-nav { display: flex; justify-content: space-between; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .qw-grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 0; }
+  @media (max-width: 800px) { .qw-grid4 { grid-template-columns: repeat(2, 1fr); } .qw-cols { grid-template-columns: 1fr !important; } }
+  .qw-grid4 .step { border: 1px solid #eadfd3; border-radius: 10px; padding: 10px; background: #fff; transition: transform .35s, box-shadow .35s, border-color .35s; font-size: 13.5px; }
+  .qw-grid4 .step .ic { font-size: 28px; display: block; }
+  .qw-grid4 .step b { display: block; font-size: 15px; margin: 2px 0; }
+  .qw-grid4 .step.on { border-color: #ea580c; box-shadow: 0 6px 18px rgba(234,88,12,.25); transform: translateY(-3px); }
+  .qw-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .qw-cols h4 { margin: 4px 0; }
+  .qw-shot { margin: 8px 0; } .qw-shot img { width: 100%; border: 1px solid #d6d3cc; border-radius: 8px; } .qw-shot figcaption { font-size: 12.5px; color: #6b7280; }
+  #qwRunStrip { position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 10055; background: #1b2a41; color: #fff; border-radius: 0 0 10px 10px; padding: 6px 12px; display: none; align-items: center; gap: 8px; font: 600 13px Inter, sans-serif; box-shadow: 0 6px 20px rgba(0,0,0,.3); }
+  #qwRunStrip.on { display: flex; }
+  #qwRunStrip .bar { display: inline-block; width: 160px; height: 8px; background: rgba(255,255,255,.25); border-radius: 4px; overflow: hidden; }
+  #qwRunStrip .bar i { display: block; height: 100%; width: 0; background: #f97316; }
+  #qwRunStrip button { border: 0; border-radius: 6px; padding: 3px 9px; cursor: pointer; font: 600 12px Inter, sans-serif; }
+  #qwRunStrip .stop { background: #f97316; color: #fff; }
+</style>
 </head>
 <body>
 <header>
   <div class="title-block">
     <h1>Human-like Stereo Perspective (Looming) &amp; Singularity-Controlled Robot Laboratory</h1>
     <p>Workbench for Three Refutations (Encoder-Free Energy Pulse + Holding Brakes · Ordinal Perspective Cone Instead of Fixed XYZ · Intermittent S0–S6 Gaze + Bell-Curve HDA/HLSL)</p>
+    <div class="qw-hdr-row"><span class="qw-owner">Project owner: <b>İskender Özkul</b> · Mersin University, Department of Mechanical Engineering · © 2026</span><button type="button" class="qw-purpose" id="btnPurpose" title="What is this project trying to do? Click for a short animated explanation">🎯 Project purpose</button></div>
   </div>
   <div class="header-actions">
     <a class="btn" href="human_arm_workbench.html" title="Türkçe sürüm" style="text-decoration:none">TR</a>
@@ -1679,6 +1793,7 @@
         <div class="pw-controls">
           <button class="pw-btn" data-act="toggle" title="Collapse / Expand">&#8211;</button>
           <button class="pw-btn" data-act="close" title="Close">&#10005;</button>
+          <button class="pw-btn" id="btnSceneDiagram" title="Open the control-loop diagram next to this 3D scene">⇱ Diagram</button>
           <button class="pw-btn" id="btnSceneFS" title="Full Screen (two eyes + scene + basic settings)" aria-label="Tam Ekran">&#x26F6;</button>
         </div>
       </div>
@@ -1698,25 +1813,7 @@
           </div>
           <div class="hud hud-bl">
             <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#e8e6df;opacity:.85;margin-right:2px">Model</span>
-            <select id="selController" class="hud-select" title="Control model: this work, our earlier variants, or classic methods from the literature">
-              <optgroup label="This work (the paper’s controller)">
-                <option value="pg" selected>Perceptual 1/e Governor — İskender Governor, without privileged information (pixels + timestamps only)</option>
-              </optgroup>
-              <optgroup label="Our earlier variants (same 1/e delay law, with privileged information)">
-                <option value="governor">İskender Governor — 1/e speed limit with privileged information, k = 1/(e·δ)</option>
-                <option value="hlsl">HLSL — human-like stereo looming + bell-curve speed envelope</option>
-                <option value="hdap">Human-HDA — human-like dynamic approach (adaptive bell curve, triphasic sequencing)</option>
-                <option value="bio">Bio-Pulse — biomimetic pulse (duty-cycle) model</option>
-              </optgroup>
-              <optgroup label="Classic methods from the literature (baselines)">
-                <option value="pid">PID — proportional–integral–derivative controller (fixed gain)</option>
-                <option value="lqr">LQR — linear quadratic regulator (state feedback)</option>
-                <option value="fixed">Fixed gain P — proportional visual servo, v = k·e</option>
-              </optgroup>
-              <optgroup label="Deneme">
-                <option value="custom">Custom mathematical formula (from the code box below)</option>
-              </optgroup>
-            </select>
+            <select id="selController" class="hud-select"><optgroup label="★ This work — our active model (the paper’s controller)"><option value="pg" selected>★ İskender Governor (our model) — pixels + timestamps only</option></optgroup><optgroup label="Reference — same 1/e law, with privileged information"><option value="governor">Oracle 1/e governor (reference) — k = 1/(e·δ)</option></optgroup><optgroup label="Additional exploratory models of ours (not in the paper)"><option value="hlsl">HLSL — human-like stereo looming + bell-shaped speed envelope</option><option value="hdap">Human-HDA — human-like dynamic approach</option><option value="bio">Bio-Pulse — biomimetic pulse model</option></optgroup><optgroup label="Classical methods from the literature (baselines)"><option value="pid">PID — proportional–integral–derivative (fixed gains)</option><option value="lqr">LQR — linear quadratic regulator</option><option value="fixed">Fixed gain P — proportional visual servo, v = k·e</option></optgroup><optgroup label="Experiment"><option value="custom">Custom mathematical formula (from the code box below)</option></optgroup></select><button type="button" class="hud-info" id="btnModelInfo" title="What is the selected model? Click">i</button>
           </div>
           <div class="hud hud-telemetry" id="telemetryHud" title="Scene telemetry — to distinguish pulse/gaze boundaries in slow motion">
             <div class="tel-title">TELEMETRY <span id="telTimeScale" class="tel-badge">x1</span></div>
@@ -1881,15 +1978,10 @@
       <button class="btn" id="btnShowAllTabs" style="font-size:10.5px;padding:4px 9px;" title="Show all tab cards stacked on a single page">Open All Tabs</button>
     </div>
     <div class="tab-panels" id="tabPanels">
-    <div class="card fs-basic" data-tab="tab1">
+    <div class="card fs-basic" data-tab="tab1" id="cardCtrlModel">
       <div class="card-title">1. Human-like Control Model <span class="sub">PID / LQR Alternative</span></div>
-      <div class="card-explain">The paper’s controller is the <b>Perceptual 1/e Governor</b>: the form of the 1/e delay law, which we named the <b>İskender Governor</b>, that uses no privileged information. <b>HLSL</b> (<i>Human-Like Stereo Looming</i>, human-like stereo looming) and <b>HDA</b> (<i>Human-like Dynamic Approach</i>, human-like dynamic approach) are <b>our earlier variants</b> that add a bell-shaped speed envelope to the same law; they do not appear in the paper. Compare them with the classical methods from the literature: <b>PID</b> (proportional–integral–derivative), <b>LQR</b> (linear quadratic regulator) and <b>P</b> (proportional visual servo with fixed gain). All are explained in the <b>“Compared approaches and abbreviations”</b> card below. In this card you also select the speed class and the singularity protection.</div>
-    <div class="card concept-card-wide" data-tab="tab1" id="cardApproaches1">
-      <div class="card-title">Compared approaches and abbreviations <span class="sub">What are we comparing with what?</span></div>
-      <div class="card-explain">Each controller belongs to one of three groups: <span class="cat-chip cat-this">This work</span> is the paper’s contribution. <span class="cat-chip cat-ours">Our earlier variants</span> are based on the same 1/<var>e</var> law, but use the simulator’s privileged information. <span class="cat-chip cat-lit">Literature</span> methods are the classical, established robotics methods and are used as baselines. The comparisons in the paper pit this work against the İskender Governor and the literature methods.</div>
-      <div class="appr-wrap"><table class="appr-tab"><tr><th>Model</th><th>Expansion</th><th>Grup</th><th>Information given to the controller</th><th>Place in robotics</th></tr><tr class="cat-this"><td><b>Perceptual 1/e Governor</b></td><td><i>Perceptual 1/e Governor</i>; the form of the İskender Governor without privileged information</td><td><b>This work</b> (the paper’s contribution)</td><td>Only the hand and target pixel positions in the two cameras and the image timestamps. <var>Ĵ</var> and the servo delay <var>L</var> are learned by motor babbling (self-identification).</td><td>Combines uncalibrated visual servoing (learning the Jacobian by estimation) with the 1/<var>e</var> limit of a delayed loop. It uses no joint angle, metric distance or true delay.</td></tr><tr class="cat-ours"><td><b>İskender Governor</b></td><td>Speed governor limited by the 1/<var>e</var> delay, <var>k</var> = 1/(<var>e</var>·<var>δ</var><sub>eff</sub>)</td><td>Our earlier version (the comparison reference in the paper as the “governor with privileged information”)</td><td>Metric hand–target error, analytic Jacobian, true delay.</td><td>The same law, but with the privileged information provided by the simulator. An upper reference to measure the cost of the perceptual version giving up this information.</td></tr><tr class="cat-ours"><td><b>HLSL</b></td><td><i>Human-Like Stereo Looming</i>: human-like stereo looming + bell-curve speed envelope</td><td>Our earlier variant (not in the paper)</td><td>Metric back-projection from stereo and apparent size, true delay.</td><td>Places a smooth-onset, smooth-stop speed envelope <var>φ</var>(<var>t</var>) on top of the 1/<var>e</var> limit. Inspired by the bell-shaped speed profile of human reaching (Flash & Hogan, 1985).</td></tr><tr class="cat-ours"><td><b>Human-HDA</b></td><td><i>Human-like Dynamic Approach</i>: human-like dynamic approach</td><td>Our earlier variant (not in the paper)</td><td>Same as HLSL.</td><td>In addition to HLSL, a speed ceiling based on distance and urgency, signal-dependent motor noise (Harris & Wolpert, 1998) and sequential (triphasic) joint activation: shoulder → elbow → wrist.</td></tr><tr class="cat-ours"><td><b>Bio-Pulse</b></td><td>Biomimetic pulse (muscle contraction) model</td><td>Our earlier variant (not in the paper)</td><td>Same as HLSL.</td><td>Produces speed not with a continuous command but with a duty-cycle-adjusted pulse train. It is the precursor of the encoderless look–pulse–brake controller in the paper (§8.9).</td></tr><tr class="cat-lit"><td><b>PID</b></td><td>Proportional–integral–derivative controller</td><td>Literature (classical baseline)</td><td>Metric error (measured hand–target difference).</td><td>The most widespread feedback controller in industry. Its gains are tuned at one operating point; retuning is needed when the delay or the plant changes.</td></tr><tr class="cat-lit"><td><b>LQR</b></td><td>Linear quadratic regulator (<i>Linear Quadratic Regulator</i>)</td><td>Literature (classical baseline)</td><td>Metric error and speed (state vector).</td><td>An optimal state feedback computed from a plant model. A double-integrator model is used here; if the model does not include the delay, it is sensitive to delay.</td></tr><tr class="cat-lit"><td><b>Fixed gain P</b></td><td>Proportional visual servo, <var>v</var> = <var>k</var>·<var>e</var></td><td>Literature (classical baseline)</td><td>Metric error.</td><td>The classical exponential decay law of visual servoing (Chaumette & Hutchinson, 2006); it is the default law in visual servoing libraries. The gain is chosen for a single delay.</td></tr></table></div>
-      <details class="abbr-details"><summary>Abbreviations and terms</summary><table class="appr-tab abbr-tab"><tr><td>1/<var>e</var> law</td><td>The fastest gain for approaching the target without overshoot in a delayed loop: <var>k</var>·<var>δ</var> ≤ 1/<var>e</var> ≈ 0.368</td></tr><tr><td><var>δ</var><sub>eff</sub></td><td>Effective delay: measured visual delay + servo delay + averaging and sampling delay</td></tr><tr><td>Privileged information</td><td>Information the simulator gives the controller that a real robot could not know by itself: joint angle, metric distance, true delay, analytic Jacobian (<i>oracle / privileged information</i>)</td></tr><tr><td>Motor babbling (self-identification)</td><td>The arm moves each joint slightly in turn and watches how the image changes, building its own model (<i>motor babbling</i>)</td></tr><tr><td>Efferent kopya</td><td>The internally stored copy of the command sent by the controller; used to estimate where the hand is when there is no image</td></tr><tr><td><var>Ĵ</var>, <var>Ĵ</var><sup>+</sup></td><td>The learned image Jacobian and its damped inverse</td></tr><tr><td>SD (DOF)</td><td>Degrees of freedom (<i>DOF</i>); this arm has 6 DOF</td></tr><tr><td>DH</td><td>Denavit–Hartenberg: a convention that describes joint frames with four parameters (<var>θ</var>, <var>d</var>, <var>a</var>, <var>α</var>)</td></tr><tr><td>DK / TK (FK / IK)</td><td>Forward kinematics (hand position from angles) and inverse kinematics (angles from hand position)</td></tr><tr><td>DLS</td><td>Damped least squares (<i>DLS</i>): inverse kinematics near a singularity</td></tr><tr><td><var>w</var>(<var>q</var>)</td><td>Manipulability (Yoshikawa): if it approaches 0, the arm is at a singularity</td></tr><tr><td>SO(3), SE(3)</td><td>The set of 3D rotations, and 3D position + rotation (rigid-body motion)</td></tr><tr><td>IBVS</td><td>Image-based visual servoing (<i>IBVS</i>)</td></tr><tr><td><var>ρ</var><sub>s</sub></td><td>Ratio of the apparent sizes of the hand and the target; at 1 the hand is at the target’s depth</td></tr><tr><td>Sakkad</td><td>A fast jump of the eye between two gaze points; no image is acquired in between</td></tr><tr><td>Parallax</td><td>When the gaze point shifts, a near object moves more than a far one</td></tr><tr><td>MT, <var>T</var><sub>s</sub></td><td>Movement time and settling time</td></tr><tr><td>TP</td><td>Fitts throughput (bit/s), per ISO 9241-9</td></tr><tr><td><var>E</var><sub>init</sub>, %<var>T</var><sub>comp</sub></td><td>Error at the end of the first (ballistic) phase and the percentage of total time spent in the correction phase</td></tr><tr><td>Z1–Z4</td><td>Workspace shells: near, middle, boundary, unreachable</td></tr><tr><td>FOV, px, HUD</td><td>Field of view, pixels, on-scene indicator panel</td></tr></table></details>
-    </div>
+      <div class="card-explain"><b>Which model is ours?</b> The model we are actively developing and present in the paper is the <b>★ İskender Governor (our model)</b> (top of the selector). The <b>oracle 1/e governor</b> is the <b>reference</b>: it applies the 1/e delay bound known from the literature with the true delay and the true distance. <b>HLSL</b> (human-like stereo looming), <b>Human-HDA</b> (human-like dynamic approach) and <b>Bio-Pulse</b> are <b>exploratory models</b> of ours built on the same idea and are not evaluated in the paper. <b>PID</b> (proportional–integral–derivative), <b>LQR</b> (linear quadratic regulator) and <b>P</b> (fixed-gain visual servo) are the <b>baselines from the literature</b>. Click any model name for a short explanation.</div>
+    
     
       <div class="ctrl-group">
         <label>Singularity & Joint Coordination</label>
@@ -1965,6 +2057,12 @@
         <button class="preset-btn" data-preset="mononeck">5. One Eye + Slow Neck–Eye Sync</button>
         <button class="preset-btn" data-preset="waist_sync">6. Waist (Trunk) + Arm Synchronized Reaching</button>
       </div>
+    </div>
+    <div class="card concept-card-wide" data-tab="tab1" id="cardApproaches1">
+      <div class="card-title">Compared approaches and abbreviations <span class="sub">What are we comparing with what?</span></div>
+      <div class="card-explain">Every controller belongs to one of four groups: <span class="cat-chip cat-this">★ This work</span> is the contribution of the paper. The <span class="cat-chip cat-ref">reference</span> applies the same 1/<var>e</var> law with the simulator’s privileged information. <span class="cat-chip cat-old">Our exploratory models</span> are other forms of the same 1/<var>e</var> idea; they are not evaluated in the paper. <span class="cat-chip cat-lit">Literature</span> methods are the classical baselines of robot control. The comparisons in the paper are made against the reference and the literature methods.</div>
+      <div class="appr-wrap"><table class="appr-tab"><tr><th>Model</th><th>Expansion</th><th>Grup</th><th>Information given to the controller</th><th>Place in robotics</th></tr><tr class="cat-this"><td><b>★ İskender Governor</b> (our model)</td><td>Perceptual 1/e speed governor; the 1/e law computed from pixels and timestamps only</td><td><b>This work</b> (the paper’s contribution)</td><td>Only the hand and target pixel positions in the two cameras and the image timestamps. <var>Ĵ</var> and the servo delay <var>L</var> are learned by motor babbling (self-identification).</td><td>Combines uncalibrated visual servoing (learning the Jacobian by estimation) with the 1/<var>e</var> limit of a delayed loop. It uses no joint angle, metric distance or true delay.</td></tr><tr class="cat-ref"><td><b>Oracle 1/e governor (reference)</b></td><td>Speed governor limited by the 1/<var>e</var> delay, <var>k</var> = 1/(<var>e</var>·<var>δ</var><sub>eff</sub>)</td><td>Reference (the “oracle governor” of the paper)</td><td>Metric hand–target error, analytic Jacobian, true delay.</td><td>The same law, but with the privileged information provided by the simulator. An upper reference to measure the cost of the perceptual version giving up this information.</td></tr><tr class="cat-old"><td><b>HLSL</b></td><td><i>Human-Like Stereo Looming</i>: human-like stereo looming + bell-curve speed envelope</td><td>Exploratory model of ours (not in the paper)</td><td>Metric back-projection from stereo and apparent size, true delay.</td><td>Places a smooth-onset, smooth-stop speed envelope <var>φ</var>(<var>t</var>) on top of the 1/<var>e</var> limit. Inspired by the bell-shaped speed profile of human reaching (Flash & Hogan, 1985).</td></tr><tr class="cat-old"><td><b>Human-HDA</b></td><td><i>Human-like Dynamic Approach</i>: human-like dynamic approach</td><td>Exploratory model of ours (not in the paper)</td><td>Same as HLSL.</td><td>In addition to HLSL, a speed ceiling based on distance and urgency, signal-dependent motor noise (Harris & Wolpert, 1998) and sequential (triphasic) joint activation: shoulder → elbow → wrist.</td></tr><tr class="cat-old"><td><b>Bio-Pulse</b></td><td>Biomimetic pulse (muscle contraction) model</td><td>Exploratory model of ours (not in the paper)</td><td>Same as HLSL.</td><td>Produces speed not with a continuous command but with a duty-cycle-adjusted pulse train. It is the precursor of the encoderless look–pulse–brake controller in the paper (§8.9).</td></tr><tr class="cat-lit"><td><b>PID</b></td><td>Proportional–integral–derivative controller</td><td>Literature (classical baseline)</td><td>Metric error (measured hand–target difference).</td><td>The most widespread feedback controller in industry. Its gains are tuned at one operating point; retuning is needed when the delay or the plant changes.</td></tr><tr class="cat-lit"><td><b>LQR</b></td><td>Linear quadratic regulator (<i>Linear Quadratic Regulator</i>)</td><td>Literature (classical baseline)</td><td>Metric error and speed (state vector).</td><td>An optimal state feedback computed from a plant model. A double-integrator model is used here; if the model does not include the delay, it is sensitive to delay.</td></tr><tr class="cat-lit"><td><b>Fixed gain P</b></td><td>Proportional visual servo, <var>v</var> = <var>k</var>·<var>e</var></td><td>Literature (classical baseline)</td><td>Metric error.</td><td>The classical exponential decay law of visual servoing (Chaumette & Hutchinson, 2006); it is the default law in visual servoing libraries. The gain is chosen for a single delay.</td></tr></table></div>
+      <details class="abbr-details"><summary>Abbreviations and terms</summary><table class="appr-tab abbr-tab"><tr><td>1/<var>e</var> law</td><td>The fastest gain for approaching the target without overshoot in a delayed loop: <var>k</var>·<var>δ</var> ≤ 1/<var>e</var> ≈ 0.368</td></tr><tr><td><var>δ</var><sub>eff</sub></td><td>Effective delay: measured visual delay + servo delay + averaging and sampling delay</td></tr><tr><td>Privileged information</td><td>Information the simulator gives the controller that a real robot could not know by itself: joint angle, metric distance, true delay, analytic Jacobian (<i>oracle / privileged information</i>)</td></tr><tr><td>Motor babbling (self-identification)</td><td>The arm moves each joint slightly in turn and watches how the image changes, building its own model (<i>motor babbling</i>)</td></tr><tr><td>Efferent kopya</td><td>The internally stored copy of the command sent by the controller; used to estimate where the hand is when there is no image</td></tr><tr><td><var>Ĵ</var>, <var>Ĵ</var><sup>+</sup></td><td>The learned image Jacobian and its damped inverse</td></tr><tr><td>SD (DOF)</td><td>Degrees of freedom (<i>DOF</i>); this arm has 6 DOF</td></tr><tr><td>DH</td><td>Denavit–Hartenberg: a convention that describes joint frames with four parameters (<var>θ</var>, <var>d</var>, <var>a</var>, <var>α</var>)</td></tr><tr><td>DK / TK (FK / IK)</td><td>Forward kinematics (hand position from angles) and inverse kinematics (angles from hand position)</td></tr><tr><td>DLS</td><td>Damped least squares (<i>DLS</i>): inverse kinematics near a singularity</td></tr><tr><td><var>w</var>(<var>q</var>)</td><td>Manipulability (Yoshikawa): if it approaches 0, the arm is at a singularity</td></tr><tr><td>SO(3), SE(3)</td><td>The set of 3D rotations, and 3D position + rotation (rigid-body motion)</td></tr><tr><td>IBVS</td><td>Image-based visual servoing (<i>IBVS</i>)</td></tr><tr><td><var>ρ</var><sub>s</sub></td><td>Ratio of the apparent sizes of the hand and the target; at 1 the hand is at the target’s depth</td></tr><tr><td>Sakkad</td><td>A fast jump of the eye between two gaze points; no image is acquired in between</td></tr><tr><td>Parallax</td><td>When the gaze point shifts, a near object moves more than a far one</td></tr><tr><td>MT, <var>T</var><sub>s</sub></td><td>Movement time and settling time</td></tr><tr><td>TP</td><td>Fitts throughput (bit/s), per ISO 9241-9</td></tr><tr><td><var>E</var><sub>init</sub>, %<var>T</var><sub>comp</sub></td><td>Error at the end of the first (ballistic) phase and the percentage of total time spent in the correction phase</td></tr><tr><td>Z1–Z4</td><td>Workspace shells: near, middle, boundary, unreachable</td></tr><tr><td>FOV, px, HUD</td><td>Field of view, pixels, on-scene indicator panel</td></tr></table></details>
     </div>
     <div class="card concept-card-wide" data-tab="tab1" id="cardConceptGuide">
       <div class="card-title">Coordinate-Free Retinal Looming Control Loop, Mathematical Explanation &amp; Kinematic Diagram <span class="sub">Undergraduate-Level Walkthrough Adapted to the Scenario · Encoder=NONE · (X,Y,Z)=NONE</span></div>
@@ -2197,7 +2295,7 @@
 </table>
 </div>
 <div class="math-mini-card">
-<b class="mi-title">5. Perceptual 1/<var>e</var> law (İskender Governor, without privileged information): only pixels and timestamps — the main controller of the paper</b>
+<b class="mi-title">5. İskender Governor (our model): perceptual 1/<var>e</var> law: only pixels and timestamps — the main controller of the paper</b>
 <svg class="math-illu" viewBox="0 0 320 175" role="img" aria-label="The loop of the perceptual 1/e law"><defs><marker id="arrPg" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0, 7 3, 0 6" fill="#555b64"/></marker></defs><rect x="6" y="20" width="96" height="34" rx="5" fill="#e9eef5"/><g class="bd"><circle cx="19" cy="37.0" r="8"/><text x="19" y="40.6">1</text></g><text class="bx" x="32" y="41.0">Cameras</text><rect x="112" y="20" width="96" height="34" rx="5" fill="#e9eef5"/><g class="bd"><circle cx="125" cy="37.0" r="8"/><text x="125" y="40.6">2</text></g><text class="bx" x="138" y="41.0">Mean</text><rect x="218" y="20" width="96" height="34" rx="5" fill="#f6e9e4"/><g class="bd"><circle cx="231" cy="37.0" r="8"/><text x="231" y="40.6">3</text></g><text class="bx" x="244" y="41.0">Gain k</text><rect x="218" y="112" width="96" height="34" rx="5" fill="#f6e9e4"/><g class="bd"><circle cx="231" cy="129.0" r="8"/><text x="231" y="132.6">4</text></g><text class="bx" x="244" y="133.0">Command</text><rect x="6" y="112" width="96" height="34" rx="5" fill="#e7efe9"/><g class="bd"><circle cx="19" cy="129.0" r="8"/><text x="19" y="132.6">5</text></g><text class="bx" x="32" y="133.0">Kol</text><rect x="112" y="70" width="96" height="30" rx="5" fill="#f3f1ec"/><g class="bd"><circle cx="125" cy="85.0" r="8"/><text x="125" y="88.6">6</text></g><text class="bx" x="138" y="89.0">Self-identification</text><g stroke="#555b64" stroke-width="1.5" fill="none"><line x1="102" y1="37" x2="110" y2="37" marker-end="url(#arrPg)"/><line x1="208" y1="37" x2="216" y2="37" marker-end="url(#arrPg)"/><line x1="266" y1="54" x2="266" y2="110" marker-end="url(#arrPg)"/><polyline points="266,146 266,160 54,160 54,148" marker-end="url(#arrPg)"/><line x1="54" y1="112" x2="54" y2="56" marker-end="url(#arrPg)"/><line x1="208" y1="78" x2="226" y2="56" stroke-dasharray="3 2" marker-end="url(#arrPg)"/><line x1="208" y1="94" x2="226" y2="112" stroke-dasharray="3 2" marker-end="url(#arrPg)"/></g></svg>
 <ol class="mi-legend">
   <li><b>Cameras:</b> pixel positions of the hand and target in both eyes, the image capture time <var>t</var><sub>cap</sub> and the time of use <var>t</var><sub>now</sub>. This is all the controller receives.</li>
@@ -2625,14 +2723,14 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
     </div>
     <div class="card concept-card-wide tab-hidden" data-tab="tab5" id="cardApproaches5">
       <div class="card-title">Compared approaches and abbreviations <span class="sub">What are we comparing with what?</span></div>
-      <div class="card-explain">Each controller belongs to one of three groups: <span class="cat-chip cat-this">This work</span> is the paper’s contribution. <span class="cat-chip cat-ours">Our earlier variants</span> are based on the same 1/<var>e</var> law, but use the simulator’s privileged information. <span class="cat-chip cat-lit">Literature</span> methods are the classical, established robotics methods and are used as baselines. The comparisons in the paper pit this work against the İskender Governor and the literature methods.</div>
-      <div class="appr-wrap"><table class="appr-tab"><tr><th>Model</th><th>Expansion</th><th>Grup</th><th>Information given to the controller</th><th>Place in robotics</th></tr><tr class="cat-this"><td><b>Perceptual 1/e Governor</b></td><td><i>Perceptual 1/e Governor</i>; the form of the İskender Governor without privileged information</td><td><b>This work</b> (the paper’s contribution)</td><td>Only the hand and target pixel positions in the two cameras and the image timestamps. <var>Ĵ</var> and the servo delay <var>L</var> are learned by motor babbling (self-identification).</td><td>Combines uncalibrated visual servoing (learning the Jacobian by estimation) with the 1/<var>e</var> limit of a delayed loop. It uses no joint angle, metric distance or true delay.</td></tr><tr class="cat-ours"><td><b>İskender Governor</b></td><td>Speed governor limited by the 1/<var>e</var> delay, <var>k</var> = 1/(<var>e</var>·<var>δ</var><sub>eff</sub>)</td><td>Our earlier version (the comparison reference in the paper as the “governor with privileged information”)</td><td>Metric hand–target error, analytic Jacobian, true delay.</td><td>The same law, but with the privileged information provided by the simulator. An upper reference to measure the cost of the perceptual version giving up this information.</td></tr><tr class="cat-ours"><td><b>HLSL</b></td><td><i>Human-Like Stereo Looming</i>: human-like stereo looming + bell-curve speed envelope</td><td>Our earlier variant (not in the paper)</td><td>Metric back-projection from stereo and apparent size, true delay.</td><td>Places a smooth-onset, smooth-stop speed envelope <var>φ</var>(<var>t</var>) on top of the 1/<var>e</var> limit. Inspired by the bell-shaped speed profile of human reaching (Flash & Hogan, 1985).</td></tr><tr class="cat-ours"><td><b>Human-HDA</b></td><td><i>Human-like Dynamic Approach</i>: human-like dynamic approach</td><td>Our earlier variant (not in the paper)</td><td>Same as HLSL.</td><td>In addition to HLSL, a speed ceiling based on distance and urgency, signal-dependent motor noise (Harris & Wolpert, 1998) and sequential (triphasic) joint activation: shoulder → elbow → wrist.</td></tr><tr class="cat-ours"><td><b>Bio-Pulse</b></td><td>Biomimetic pulse (muscle contraction) model</td><td>Our earlier variant (not in the paper)</td><td>Same as HLSL.</td><td>Produces speed not with a continuous command but with a duty-cycle-adjusted pulse train. It is the precursor of the encoderless look–pulse–brake controller in the paper (§8.9).</td></tr><tr class="cat-lit"><td><b>PID</b></td><td>Proportional–integral–derivative controller</td><td>Literature (classical baseline)</td><td>Metric error (measured hand–target difference).</td><td>The most widespread feedback controller in industry. Its gains are tuned at one operating point; retuning is needed when the delay or the plant changes.</td></tr><tr class="cat-lit"><td><b>LQR</b></td><td>Linear quadratic regulator (<i>Linear Quadratic Regulator</i>)</td><td>Literature (classical baseline)</td><td>Metric error and speed (state vector).</td><td>An optimal state feedback computed from a plant model. A double-integrator model is used here; if the model does not include the delay, it is sensitive to delay.</td></tr><tr class="cat-lit"><td><b>Fixed gain P</b></td><td>Proportional visual servo, <var>v</var> = <var>k</var>·<var>e</var></td><td>Literature (classical baseline)</td><td>Metric error.</td><td>The classical exponential decay law of visual servoing (Chaumette & Hutchinson, 2006); it is the default law in visual servoing libraries. The gain is chosen for a single delay.</td></tr></table></div>
+      <div class="card-explain">Every controller belongs to one of four groups: <span class="cat-chip cat-this">★ This work</span> is the contribution of the paper. The <span class="cat-chip cat-ref">reference</span> applies the same 1/<var>e</var> law with the simulator’s privileged information. <span class="cat-chip cat-old">Our exploratory models</span> are other forms of the same 1/<var>e</var> idea; they are not evaluated in the paper. <span class="cat-chip cat-lit">Literature</span> methods are the classical baselines of robot control. The comparisons in the paper are made against the reference and the literature methods.</div>
+      <div class="appr-wrap"><table class="appr-tab"><tr><th>Model</th><th>Expansion</th><th>Grup</th><th>Information given to the controller</th><th>Place in robotics</th></tr><tr class="cat-this"><td><b>★ İskender Governor</b> (our model)</td><td>Perceptual 1/e speed governor; the 1/e law computed from pixels and timestamps only</td><td><b>This work</b> (the paper’s contribution)</td><td>Only the hand and target pixel positions in the two cameras and the image timestamps. <var>Ĵ</var> and the servo delay <var>L</var> are learned by motor babbling (self-identification).</td><td>Combines uncalibrated visual servoing (learning the Jacobian by estimation) with the 1/<var>e</var> limit of a delayed loop. It uses no joint angle, metric distance or true delay.</td></tr><tr class="cat-ref"><td><b>Oracle 1/e governor (reference)</b></td><td>Speed governor limited by the 1/<var>e</var> delay, <var>k</var> = 1/(<var>e</var>·<var>δ</var><sub>eff</sub>)</td><td>Reference (the “oracle governor” of the paper)</td><td>Metric hand–target error, analytic Jacobian, true delay.</td><td>The same law, but with the privileged information provided by the simulator. An upper reference to measure the cost of the perceptual version giving up this information.</td></tr><tr class="cat-old"><td><b>HLSL</b></td><td><i>Human-Like Stereo Looming</i>: human-like stereo looming + bell-curve speed envelope</td><td>Exploratory model of ours (not in the paper)</td><td>Metric back-projection from stereo and apparent size, true delay.</td><td>Places a smooth-onset, smooth-stop speed envelope <var>φ</var>(<var>t</var>) on top of the 1/<var>e</var> limit. Inspired by the bell-shaped speed profile of human reaching (Flash & Hogan, 1985).</td></tr><tr class="cat-old"><td><b>Human-HDA</b></td><td><i>Human-like Dynamic Approach</i>: human-like dynamic approach</td><td>Exploratory model of ours (not in the paper)</td><td>Same as HLSL.</td><td>In addition to HLSL, a speed ceiling based on distance and urgency, signal-dependent motor noise (Harris & Wolpert, 1998) and sequential (triphasic) joint activation: shoulder → elbow → wrist.</td></tr><tr class="cat-old"><td><b>Bio-Pulse</b></td><td>Biomimetic pulse (muscle contraction) model</td><td>Exploratory model of ours (not in the paper)</td><td>Same as HLSL.</td><td>Produces speed not with a continuous command but with a duty-cycle-adjusted pulse train. It is the precursor of the encoderless look–pulse–brake controller in the paper (§8.9).</td></tr><tr class="cat-lit"><td><b>PID</b></td><td>Proportional–integral–derivative controller</td><td>Literature (classical baseline)</td><td>Metric error (measured hand–target difference).</td><td>The most widespread feedback controller in industry. Its gains are tuned at one operating point; retuning is needed when the delay or the plant changes.</td></tr><tr class="cat-lit"><td><b>LQR</b></td><td>Linear quadratic regulator (<i>Linear Quadratic Regulator</i>)</td><td>Literature (classical baseline)</td><td>Metric error and speed (state vector).</td><td>An optimal state feedback computed from a plant model. A double-integrator model is used here; if the model does not include the delay, it is sensitive to delay.</td></tr><tr class="cat-lit"><td><b>Fixed gain P</b></td><td>Proportional visual servo, <var>v</var> = <var>k</var>·<var>e</var></td><td>Literature (classical baseline)</td><td>Metric error.</td><td>The classical exponential decay law of visual servoing (Chaumette & Hutchinson, 2006); it is the default law in visual servoing libraries. The gain is chosen for a single delay.</td></tr></table></div>
       <details class="abbr-details"><summary>Abbreviations and terms</summary><table class="appr-tab abbr-tab"><tr><td>1/<var>e</var> law</td><td>The fastest gain for approaching the target without overshoot in a delayed loop: <var>k</var>·<var>δ</var> ≤ 1/<var>e</var> ≈ 0.368</td></tr><tr><td><var>δ</var><sub>eff</sub></td><td>Effective delay: measured visual delay + servo delay + averaging and sampling delay</td></tr><tr><td>Privileged information</td><td>Information the simulator gives the controller that a real robot could not know by itself: joint angle, metric distance, true delay, analytic Jacobian (<i>oracle / privileged information</i>)</td></tr><tr><td>Motor babbling (self-identification)</td><td>The arm moves each joint slightly in turn and watches how the image changes, building its own model (<i>motor babbling</i>)</td></tr><tr><td>Efferent kopya</td><td>The internally stored copy of the command sent by the controller; used to estimate where the hand is when there is no image</td></tr><tr><td><var>Ĵ</var>, <var>Ĵ</var><sup>+</sup></td><td>The learned image Jacobian and its damped inverse</td></tr><tr><td>SD (DOF)</td><td>Degrees of freedom (<i>DOF</i>); this arm has 6 DOF</td></tr><tr><td>DH</td><td>Denavit–Hartenberg: a convention that describes joint frames with four parameters (<var>θ</var>, <var>d</var>, <var>a</var>, <var>α</var>)</td></tr><tr><td>DK / TK (FK / IK)</td><td>Forward kinematics (hand position from angles) and inverse kinematics (angles from hand position)</td></tr><tr><td>DLS</td><td>Damped least squares (<i>DLS</i>): inverse kinematics near a singularity</td></tr><tr><td><var>w</var>(<var>q</var>)</td><td>Manipulability (Yoshikawa): if it approaches 0, the arm is at a singularity</td></tr><tr><td>SO(3), SE(3)</td><td>The set of 3D rotations, and 3D position + rotation (rigid-body motion)</td></tr><tr><td>IBVS</td><td>Image-based visual servoing (<i>IBVS</i>)</td></tr><tr><td><var>ρ</var><sub>s</sub></td><td>Ratio of the apparent sizes of the hand and the target; at 1 the hand is at the target’s depth</td></tr><tr><td>Sakkad</td><td>A fast jump of the eye between two gaze points; no image is acquired in between</td></tr><tr><td>Parallax</td><td>When the gaze point shifts, a near object moves more than a far one</td></tr><tr><td>MT, <var>T</var><sub>s</sub></td><td>Movement time and settling time</td></tr><tr><td>TP</td><td>Fitts throughput (bit/s), per ISO 9241-9</td></tr><tr><td><var>E</var><sub>init</sub>, %<var>T</var><sub>comp</sub></td><td>Error at the end of the first (ballistic) phase and the percentage of total time spent in the correction phase</td></tr><tr><td>Z1–Z4</td><td>Workspace shells: near, middle, boundary, unreachable</td></tr><tr><td>FOV, px, HUD</td><td>Field of view, pixels, on-scene indicator panel</td></tr></table></details>
     </div>
     <div class="card fs-academic tab-hidden" data-tab="tab5" id="cardPaperPlayer">
       <div class="card-title">Watch the paper’s experiments: random workspace protocol <span class="sub">Paper §8.11 · Table 12 · same targets, same initial poses, same noise seeds</span></div>
       <div class="card-explain">
-        The volume the arm can reach is divided into <b>four shells</b> around the shoulder using a map derived from 20 000 random joint angles. In each reach the arm starts from one of <b>12 random initial poses</b> (the hand is visible in both cameras, the arm is away from singularity). The target is a random point inside the chosen shell. Each target is tried with <b>four controllers</b> (<span class="cat-chip cat-this">this work</span> perceptual 1/<var>e</var>, <span class="cat-chip cat-ours">our earlier version</span> İskender Governor, <span class="cat-chip cat-lit">literature</span> fixed gain P and PID) one after another with the same noise (paired design), position task only. <b>Success:</b> settling within 6 mm of the target within 5 s. <b>Unreachable shell Z4:</b> no controller can get there. What is measured is whether the arm stops before fully extending into a singularity (<var>w</var><sub>min</sub> ≥ 0.001).
+        The volume the arm can reach is divided into <b>four shells</b> around the shoulder using a map derived from 20 000 random joint angles. In each reach the arm starts from one of <b>12 random initial poses</b> (the hand is visible in both cameras, the arm is away from singularity). The target is a random point inside the chosen shell. Each target is tried with <b>four controllers</b> (<span class="cat-chip cat-this">this work</span> perceptual 1/<var>e</var>, <span class="cat-chip cat-ref">reference</span> oracle 1/e governor, <span class="cat-chip cat-lit">literature</span> fixed gain P and PID) one after another with the same noise (paired design), position task only. <b>Success:</b> settling within 6 mm of the target within 5 s. <b>Unreachable shell Z4:</b> no controller can get there. What is measured is whether the arm stops before fully extending into a singularity (<var>w</var><sub>min</sub> ≥ 0.001).
         The motion is watched in the <b>3D scene, eye windows and side/top views</b> at the top of the page. Results accumulate below next to the values in the paper.
       </div>
       <div class="pp-zones" id="ppZones"><span data-z="Z1">Z1 near · 0.25–0.45 m</span><span data-z="Z2">Z2 mid · 0.45–0.58 m</span><span data-z="Z3">Z3 boundary · 0.58–0.69 m</span><span data-z="Z4">Z4 unreachable · 0.75–0.95 m</span></div>
@@ -2640,6 +2738,7 @@ return [e[0]/r * vMag, e[1]/r * vMag, e[2]/r * vMag];</textarea>
         <label><input type="radio" name="ppMode" value="w60" checked> <b>Watchable set A</b>: two eyes, 60 ms. 4 zones × 3 targets × 4 controllers = <b>48 reaches</b>, animated (about 7 minutes at x1 speed).</label>
         <label><input type="radio" name="ppMode" value="w150m"> <b>Watchable set B</b>: single eye, 150 ms. 48 reaches, animated. The condition in which metric laws miss the target with a single eye.</label>
         <label><input type="radio" name="ppMode" value="full"> <b>Full protocol (paper Table 12)</b>: 3 seeds × 2 vision × 2 delays × 4 zones × 12 targets × 4 controllers = <b>2304 reaches</b>, fast computation without animation (a few minutes).</label>
+        <label><input type="radio" name="ppMode" value="delay"> <b>Delay sweep</b> (the browser-arm counterpart of Table 6 of the paper): two eyes, 30/60/100/150/200 ms × 6 targets × 4 controllers = <b>120 reaches</b>, animated.</label>
       </div>
       <div class="pp-ctl">
         <button class="btn btn-accent" id="ppStart">&#9654; Start</button>
@@ -5863,7 +5962,7 @@ function draw3DScene(idx) {
     const legX = 10;
     const legY = 44;
     const actMeta = GHOST_MODEL_MAP[state.controller];
-    const actLabel = `Active: ${actMeta ? actMeta.short : state.controller}` + ((typeof MODEL_CAT !== 'undefined' && MODEL_CAT[state.controller]) ? ' · ' + { this: 'THIS WORK', ours: 'our earlier version', lit: 'literature' }[MODEL_CAT[state.controller]] : '')
+    const actLabel = `Active: ${actMeta ? actMeta.short : state.controller}` + ((typeof MODEL_CAT !== 'undefined' && MODEL_CAT[state.controller]) ? ' · ' + (window.__modelTag ? window.__modelTag(state.controller) : '') : '')
       + ((!state.theoremMode && tr) ? ` · e=${(tr.err[idx] * 100).toFixed(1)} cm` : '');
     const legendRows = [{ kind: 'primary', color: '#3a3f47', accent: '#a9844d', text: actLabel }];
     activeGhostIds.forEach(gmId => {
@@ -7350,7 +7449,7 @@ function drawKin3D(idx) {
    'J_ω,i = ẑᵢ₋₁                  (angular Jacobian)',
    'w(q) = √det(J_v J_vᵀ) = ' + jm.w.toFixed(4),
    'q̇ = J_vᵀ(J_vJ_vᵀ+λ²I)⁻¹ v   (DLS, singularity)',
-   'Perceptual: q̇ = −k Ĵᵀ(ĴĴᵀ+λ²I)⁻¹ e_px',
+   'İskender Gov.: q̇ = −k Ĵᵀ(ĴĴᵀ+λ²I)⁻¹ e_px',
    '         k = (1/e)/δ_eff,  Ĵ: motor babbling'].forEach(t => { ctx.fillText(t, x0, y); y += 13; });
   }
   ctx.fillStyle = '#f3efe7'; ctx.font = '600 12px Inter, system-ui';
@@ -9547,7 +9646,7 @@ document.getElementById('rngScrub').addEventListener('input', e => {
 function bindSettingsStore() {
   const KEY = 'ikjal_ayarlar_v1';
   const WANTED = new Set(['range', 'number', 'text', 'checkbox', 'radio']);
-  const wanted = el => !!(el && el.id && !/^(rngScrub|brk_|arm_j|limb|jp)/.test(el.id))
+  const wanted = el => !!(el && el.id && !/^(rngScrub|brk_|arm_j|limb|jp|selController)/.test(el.id))
     && (el.tagName === 'SELECT' || el.tagName === 'TEXTAREA'
         || (el.tagName === 'INPUT' && WANTED.has(el.type)));
   const controls = () => Array.from(document.querySelectorAll('input, select, textarea')).filter(wanted);
@@ -10378,7 +10477,7 @@ const BENCHMARK_SCENARIOS_JS = [
   }
 ];
 const BENCHMARK_CTRL_LABELS = {
-  pg: 'Perceptual 1/e (this work)',
+  pg: 'İskender Governor (our model)',
   hdap: 'Human-HDA',
   hlsl: 'HLSL',
   governor: 'Governor',
@@ -10682,7 +10781,7 @@ function __runZoneBenchmarkFixed(targets, posts, opts) {
           Q0 = posts[i].slice(); state.target = tg.slice();
           const reachSeed = 100003 * (opts.seed || 0) + 7919 * (vm === 'binocular' ? 0 : 1) + 997 * Math.round(dl * 1000) + 101 * zi + i;
           const o = projectStereoAndLooming(tg, state.targetRealM, 0, 0, 0, 0.0);
-          const inView = o.uL >= 0 && o.uL <= state.imgW && o.vL >= 0 && o.vL <= state.imgH && o.zCam > 0.15;
+          const inView = window.__qwInView ? window.__qwInView(j) : (o.uL >= 0 && o.uL <= state.imgW && o.vL >= 0 && o.vL <= state.imgH && o.zCam > 0.15);
           (opts.ctrls || ['pg', 'governor', 'hlsl', 'fixed', 'pid']).forEach(c => {
             __rand = __seededRandom(reachSeed);   // same noise for every controller on this reach (paired design)
             const m = runSimulationForController(c, 'human_wdls', { isGhost: true, disableWaistSync: true }).metrics;
@@ -11438,7 +11537,7 @@ runAndAnimate();
   if (!$('cardPaperPlayer') || typeof ZONE_BENCH_PAPER === 'undefined') return;
   const ZN = { Z1: 'near', Z2: 'middle', Z3: 'limit', Z4: 'unreachable' };
   const CTRL = ['pg', 'governor', 'fixed', 'pid'];
-  const CL = { pg: 'Perceptual 1/e — this work', governor: 'İskender Governor, with privileged information — our earlier version', fixed: 'Fixed gain P — literature', pid: 'PID — literature' };
+  const CL = { pg: '① İskender Governor (our model)', governor: '② Oracle 1/e governor (reference)', fixed: '④ Fixed gain P (literature)', pid: '③ PID (literature)' };
   const PAPER = {
     'binocular|0.06': { pg: [88, 5.3, 2.50], governor: [100, 1.6, 0.84], fixed: [100, 11.5, 0.87], pid: [44, 10.8, 0.60] },
     'binocular|0.15': { pg: [97, 3.2, 2.02], governor: [100, 1.5, 1.08], fixed: [6, 66.3, null], pid: [3, 65.8, null] },
@@ -11452,6 +11551,7 @@ runAndAnimate();
     const add = (seed, vm, dl, nT) => zs.forEach((z, zi) => { for (let i = 0; i < nT; i++) CTRL.forEach(c => out.push({ seed, vm, dl, z, zi, i, c })); });
     if (mode === 'w60') add(0, 'binocular', 0.06, 3);
     else if (mode === 'w150m') add(0, 'mono_left', 0.15, 3);
+    else if (mode === 'delay') { const PICK = { Z1: [0, 1], Z2: [0, 1], Z3: [0, 2] }; [0.03, 0.06, 0.1, 0.15, 0.2].forEach(dl => ['Z1', 'Z2', 'Z3'].forEach((z, zi) => PICK[z].forEach(i => CTRL.forEach(c => out.push({ seed: 0, vm: 'binocular', dl, z, zi, i, c }))))); }
     else [0, 1, 2].forEach(sd => ['binocular', 'mono_left'].forEach(vm => [0.06, 0.15].forEach(dl => add(sd, vm, dl, 12))));
     return out;
   }
@@ -11493,7 +11593,7 @@ runAndAnimate();
       CTRL.forEach(c => {
         const R = rs.filter(r => r.c === c && r.z !== 'Z4' && r.inView), U = rs.filter(r => r.c === c && r.z === 'Z4');
         if (!R.length && !U.length) return;
-        const pp = (PAPER[k] || {})[c] || [null, null, null];
+        const pp = ((P.mode === 'delay' && window.__qwPaperDelay) ? window.__qwPaperDelay : PAPER)[k] ? (((P.mode === 'delay' && window.__qwPaperDelay) ? window.__qwPaperDelay : PAPER)[k][c] || [null, null, null]) : [null, null, null];
         const succ = R.length ? 100 * R.filter(r => r.ok).length / R.length : null;
         const mos = R.length ? Math.max(...R.map(r => r.overshootPct)) : null;
         const mt = med(R.filter(r => r.ok).map(r => r.mt));
@@ -11507,7 +11607,8 @@ runAndAnimate();
       });
       html += '</table>';
     });
-    if (html && P.mode !== 'full') html += '<div style="font-size:11px;color:#6b6258">Paper values come from the full protocol (n = 78 reachable reaches per cell, 3 seeds). The watchable set is a subset of it; numbers are close but may not be identical. Run "Full protocol" for an exact comparison.</div>';
+    if (html && P.mode === 'delay') html += (window.__qwDelayNote || '');
+    if (html && P.mode !== 'full' && P.mode !== 'delay') html += '<div style="font-size:11px;color:#6b6258">Paper values come from the full protocol (n = 78 reachable reaches per cell, 3 seeds). The watchable set is a subset of it; numbers are close but may not be identical. Run "Full protocol" for an exact comparison.</div>';
     $('ppTable').innerHTML = html;
   }
   function log(r) {
@@ -11638,22 +11739,22 @@ runAndAnimate();
 </script>
 
 <script>
-// ===== R3: model categories (this work / our earlier variants / literature) =====
+// ===== R3: model categories (this work / exploratory / literature) =====
 var MODEL_CAT = { pg: 'this', governor: 'ours', hlsl: 'ours', hdap: 'ours', bio: 'ours', pid: 'lit', lqr: 'lit', fixed: 'lit' };
-var MODEL_CAT_LABEL = { this: 'This work', ours: 'Our earlier variants', lit: 'Literature (baseline)' };
+var MODEL_CAT_LABEL = { this: 'This work', ours: 'Our exploratory models', lit: 'Literature (baseline)' };
 (function relabelModels() {
-  const L = { pid: ['PID', 'PID — proportional–integral–derivative (literature)'], hdap: ['Human-HDA', 'Human-HDA — human-like dynamic approach (our earlier variant)'],
-    hlsl: ['HLSL', 'HLSL — human-like stereo looming (our earlier variant)'], governor: ['İskender Governor', 'İskender Governor — 1/e with privileged information (our earlier version)'],
+  const L = { pid: ['PID', 'PID — proportional–integral–derivative (literature)'], hdap: ['Human-HDA', 'Human-HDA — human-like dynamic approach (exploratory model)'],
+    hlsl: ['HLSL', 'HLSL — human-like stereo looming (exploratory model)'], governor: ['1/e reference', 'Oracle 1/e governor (reference)'],
     lqr: ['LQR', 'LQR — linear quadratic regulator (literature)'], fixed: ['Fixed (P)', 'Fixed gain P — proportional visual servo (literature)'],
-    bio: ['Bio-Pulse', 'Bio-Pulse — biomimetic pulse (our earlier variant)'] };
+    bio: ['Bio-Pulse', 'Bio-Pulse — biomimetic pulse (exploratory model)'] };
   GHOST_MODELS.forEach(m => { if (L[m.id]) { m.short = L[m.id][0]; m.label = L[m.id][1]; } });
   if (!GHOST_MODEL_MAP.pg) {
-    const pg = { id: 'pg', short: 'Perceptual 1/e', label: 'Perceptual 1/e Governor — this work (paper)', color: '#c2410c', rgba: 'rgba(194, 65, 12, 0.55)', dash: [8, 3] };
+    const pg = { id: 'pg', short: 'İskender Gov. (ours)', label: 'İskender Governor — perceptual 1/e speed governor (our model)', color: '#c2410c', rgba: 'rgba(194, 65, 12, 0.55)', dash: [8, 3] };
     GHOST_MODELS.unshift(pg); GHOST_MODEL_MAP.pg = pg;
   }
   if (typeof BENCHMARK_CTRL_LABELS !== 'undefined') Object.assign(BENCHMARK_CTRL_LABELS, {
-    pg: 'Perceptual 1/e (this work)', governor: 'İskender Governor (our earlier version)', hdap: 'Human-HDA (our earlier variant)', hlsl: 'HLSL (our earlier variant)',
-    bio: 'Bio-Pulse (our earlier variant)', pid: 'PID (literature)', lqr: 'LQR (literature)', fixed: 'Fixed gain P (literature)' });
+    pg: 'İskender Governor (our model)', governor: 'Oracle 1/e governor (reference)', hdap: 'Human-HDA (exploratory model)', hlsl: 'HLSL (exploratory model)',
+    bio: 'Bio-Pulse (exploratory model)', pid: 'PID (literature)', lqr: 'LQR (literature)', fixed: 'Fixed gain P (literature)' });
   if (state.ghostModels && state.ghostModels.indexOf('pg') < 0 && state.controller !== 'pg') state.ghostModels.unshift('pg');
   if (state.controller === 'pg') state.ghostModels = ['governor', 'pid'];
 })();
@@ -11809,7 +11910,7 @@ try { renderGhostModelBar(); } catch (e) { }
     if (window.ResizeObserver) new ResizeObserver(() => save()).observe(card);
     // shortcut in the page header, next to the other header buttons
     const bar = document.querySelector('.header-actions'); let hb = null;
-    if (bar) { hb = document.createElement('button'); hb.type = 'button'; hb.className = 'btn'; hb.textContent = L.head; hb.title = L.hint;
+    if (bar) { hb = document.createElement('button'); hb.type = 'button'; hb.className = 'btn qw-float-head'; hb.id = 'btnFloatDiagram'; hb.textContent = L.head; hb.title = L.hint;
       hb.addEventListener('click', () => floating ? dock() : pop()); bar.insertBefore(hb, bar.firstChild); }
   } catch (e) { if (window.console) console.warn('floatConcept', e); }
 })();
@@ -11831,9 +11932,400 @@ try { renderGhostModelBar(); } catch (e) { }
     runAndAnimate = function () {
       const blind = (state.controller === 'pg') && !handInView();
       orig.apply(this, arguments);
-      if (blind && typeof setModeBanner === 'function') setTimeout(() => setModeBanner('', 'OUR MODEL CANNOT SEE THE HAND — the Perceptual 1/e Governor uses only what the cameras see, and at the start the hand is outside the image. Choose a start posture with the hand in view (e.g. Desk-ready posture).'), 60);
+      if (blind && typeof setModeBanner === 'function') setTimeout(() => setModeBanner('', 'OUR MODEL CANNOT SEE THE HAND — İskender Governor (our model) uses only what the cameras see, and at the start the hand is outside the image. Choose a start posture with the hand in view (e.g. Desk-ready posture).'), 60);
     };
   } catch (e) { if (window.console) console.warn('visibleStart', e); }
+})();
+</script>
+
+<script>
+// ===== R5: model groups with explanations, purpose modal, scene diagram button =====
+(function R5() {
+  const T = {"owner": "Project owner: <b>İskender Özkul</b> · Mersin University, Department of Mechanical Engineering · © 2026", "purpose_btn": "🎯 Project purpose", "purpose_tip": "What is this project trying to do? Click for a short animated explanation", "diag_scene": "⇱ Diagram", "diag_scene_tip": "Open the control-loop diagram next to this 3D scene", "model_info_tip": "What is the selected model? Click", "groups": {"this": "★ This work: İskender Governor (our model)", "ref": "Reference: same law, privileged information", "old": "Additional exploratory models of ours (not in the paper)", "lit": "Literature (baselines)"}, "groups_short": {"this": "OUR MODEL", "ref": "reference", "old": "exploratory", "lit": "literature", "ours": "exploratory"}, "group_info": {"this": "This is the model we are actively developing and present in the paper. It uses only what the cameras see and the timestamps of the images.", "ref": "The same 1/e speed law in a version that “peeks” at the simulator: it is given the true distance, the true delay and the exact arm geometry. It is kept as a reference to measure what our model pays for giving this information up.", "old": "Exploratory models built on other forms of the same 1/e idea. They use privileged information and are not evaluated in the paper; they stay in the simulator for comparison.", "lit": "Classical methods widely used in robot control. They are compared with our model under the same conditions, as baselines."}, "ghost_label": "Twin models (click for an explanation):", "all_on": "All", "all_off": "Only our model + reference + PID", "info": {"pg": ["★ İskender Governor (our model)", "Perceptual 1/e speed governor; uses only pixels and timestamps", "Uses only the pixel positions of hand and target in two cameras and the timestamps of the images. It measures the delay itself, learns how the arm moves from a 2.6 s motor-babbling routine and sets its speed with k = (1/e) / δ<sub>eff</sub>.", "Approaches without overshooting; no joint angles, metric distance or true delay are needed. The price: it is slower.", "The main controller of the paper. Note: it must see the hand; if the hand is out of view it cannot reach."], "governor": ["② Oracle 1/e governor (reference)", "k = 1 / (e·δ); the 1/e delay bound is known from the literature, applied here with the true delay and distance", "Applies the same 1/e speed law with the true distance, true delay and analytic Jacobian given by the simulator.", "Answers “what if we got this information for free?”. It is faster, but a real robot does not have this information ready.", "Upper reference in the paper (“oracle governor”)."], "hlsl": ["HLSL", "Human-Like Stereo Looming", "Adds a bell-shaped speed envelope with soft start and stop to the 1/e law; computes distance metrically from stereo and apparent size.", "Tries to imitate the bell-shaped speed profile of human reaching.", "Exploratory model of ours; not evaluated in the paper."], "hdap": ["Human-HDA", "Human-like Dynamic Approach", "On top of HLSL: a speed cap that depends on distance and urgency, signal-dependent noise like human muscle, and shoulder → elbow → wrist sequencing.", "Aims to look even more like human movement.", "Exploratory model of ours; not evaluated in the paper."], "bio": ["Bio-Pulse", "Biomimetic pulse (muscle twitch) model", "Produces speed with short pulses (a duty cycle), like muscle twitches, instead of a continuous command.", "Uses the same pulse idea as the encoderless look–pulse–brake controller of the paper.", "Exploratory model of ours; not evaluated in the paper."], "pid": ["PID", "Proportional–integral–derivative controller", "Builds the command from the error, its accumulation and its rate of change. Gains were tuned at 30 ms delay and then frozen.", "The most widely used controller in industry. As the delay grows it overshoots and needs retuning.", "Classical baseline from the literature."], "lqr": ["LQR", "Linear Quadratic Regulator", "Optimal state feedback (error and velocity) computed from a simple mathematical model of the arm.", "Works well when the model is right; here the model does not include the delay, so it is sensitive to delay.", "Classical baseline from the literature (simulator only)."], "fixed": ["Fixed gain P", "Proportional visual servo, v = k · e", "Speed = constant × error. The classical visual-servoing law and the default of visual-servoing software.", "The gain is chosen for one delay; it loses its safety when the delay or the robot changes.", "Classical baseline from the literature."]}, "info_heads": ["What it does", "Why it is here", "Role in the paper"], "card1_explain": "<b>Which model is ours?</b> The model we are actively developing and present in the paper is the <b>★ İskender Governor (our model)</b> (top of the selector). The <b>oracle 1/e governor</b> is the <b>reference</b>: it applies the 1/e delay bound known from the literature with the true delay and the true distance. <b>HLSL</b> (human-like stereo looming), <b>Human-HDA</b> (human-like dynamic approach) and <b>Bio-Pulse</b> are <b>exploratory models</b> of ours built on the same idea and are not evaluated in the paper. <b>PID</b> (proportional–integral–derivative), <b>LQR</b> (linear quadratic regulator) and <b>P</b> (fixed-gain visual servo) are the <b>baselines from the literature</b>. Click any model name for a short explanation.", "appr_explain": "Every controller belongs to one of four groups: <span class=\"cat-chip cat-this\">★ This work</span> is the contribution of the paper. The <span class=\"cat-chip cat-ref\">reference</span> applies the same 1/<var>e</var> law with the simulator’s privileged information. <span class=\"cat-chip cat-old\">Our exploratory models</span> are other forms of the same 1/<var>e</var> idea; they are not evaluated in the paper. <span class=\"cat-chip cat-lit\">Literature</span> methods are the classical baselines of robot control. The comparisons in the paper are made against the reference and the literature methods.", "old_phrase": ["Our earlier variant (not in the paper)", "Exploratory model of ours (not in the paper)"], "sel_groups": ["★ This work — our active model (the paper’s controller)", "Reference — same 1/e law, with privileged information", "Additional exploratory models of ours (not in the paper)", "Classical methods from the literature (baselines)", "Experiment"], "sel_opts": {"pg": "★ İskender Governor (our model) — pixels + timestamps only", "governor": "Oracle 1/e governor (reference) — k = 1/(e·δ)", "hlsl": "HLSL — human-like stereo looming + bell-shaped speed envelope", "hdap": "Human-HDA — human-like dynamic approach", "bio": "Bio-Pulse — biomimetic pulse model", "pid": "PID — proportional–integral–derivative (fixed gains)", "lqr": "LQR — linear quadratic regulator", "fixed": "Fixed gain P — proportional visual servo, v = k·e", "custom": "Custom mathematical formula (from the code box below)"}, "modal": {"title": "The purpose of this project", "lead": "To move a robot arm to a target <b>using only what two cameras see</b> — and, although the camera image always arrives late, <b>never to overshoot the target</b>.", "lane_a": "Classical controller: ignores the delay (k·δ = 1.2) → overshoots and oscillates", "lane_b": "★ Our model: k·δ = 1/e ≈ 0.37 → the fastest approach that never overshoots", "ghost": "what the camera sees (delayed)", "target": "target", "over": "TARGET OVERSHOT", "steps": [["👀", "Sees", "Only the pixel positions of hand and target in two cameras. No joint angles, no ruler."], ["⏱️", "Measures", "Measures the delay itself from the image timestamps."], ["🧮", "Computes", "Sets its speed with k = (1/e) / delay: twice the delay ⇒ half the speed."], ["🎯", "Approaches", "Arrives without overshooting, and re-tunes itself when the robot or the delay changes."]], "why_t": "Why does it matter?", "why": ["Low-cost robots may have no joint sensors (encoders), or their calibration may drift.", "Every camera system has a delay, and it changes over time.", "Overshooting means knocking over a cup or hitting a part or a person."], "now_t": "Where does it stand today?", "now": "In simulation, at 30–200 ms delay, it settled within 5 mm on 118 of 120 reaches and overshot by at most 3.5 %. The price is speed: movements take 1.9–3.1 times longer. It has not yet been tested on a real robot.", "try_btn": "▶ Try our model now", "close": "Close", "replay": "↻ Replay the animation"}};
+  try {
+    MODEL_CAT = { pg: 'this', governor: 'ref', hlsl: 'old', hdap: 'old', bio: 'old', pid: 'lit', lqr: 'lit', fixed: 'lit' };
+    MODEL_CAT_LABEL = T.groups;
+    window.__modelTag = id => T.groups_short[MODEL_CAT[id]] || '';
+  } catch (e) { }
+  // ---------- popover ----------
+  const pop = document.createElement('div'); pop.id = 'qwInfoPop'; document.body.appendChild(pop);
+  let popFor = null;
+  function closePop() { pop.classList.remove('open'); popFor = null; }
+  function showPop(anchor, html) {
+    pop.innerHTML = '<button class="x" aria-label="close">×</button>' + html; pop.classList.add('open'); popFor = anchor;
+    pop.querySelector('.x').onclick = closePop;
+    const r = anchor.getBoundingClientRect(), w = Math.min(380, innerWidth - 16);
+    let left = Math.min(innerWidth - w - 8, Math.max(8, r.left)), top = r.bottom + 8;
+    pop.style.left = left + 'px'; pop.style.top = top + 'px';
+    const ph = pop.getBoundingClientRect().height; if (top + ph > innerHeight - 8) pop.style.top = Math.max(8, r.top - ph - 8) + 'px';
+  }
+  document.addEventListener('mousedown', e => { if (popFor && !pop.contains(e.target) && !popFor.contains(e.target)) closePop(); }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePop(); });
+  function modelHtml(id) {
+    const I = T.info[id]; if (!I) return '';
+    const cat = MODEL_CAT[id] || 'lit';
+    return '<h4>' + I[0] + '</h4><div class="sub">' + I[1] + '</div><span class="cat-chip cat-' + cat + ' grp">' + T.groups[cat] + '</span>'
+      + '<b class="h">' + T.info_heads[0] + '</b>' + I[2] + '<b class="h">' + T.info_heads[1] + '</b>' + I[3] + '<b class="h">' + T.info_heads[2] + '</b>' + I[4];
+  }
+  window.__showModelInfo = (anchor, id) => showPop(anchor, modelHtml(id));
+  // ---------- ghost bar with four groups ----------
+  renderGhostModelBar = function () {
+    const bar = document.getElementById('ghostModelBar'); if (!bar) return;
+    bar.classList.toggle('hidden', !state.showGhost); bar.innerHTML = '';
+    const lbl = document.createElement('span'); lbl.className = 'ghost-bar-lbl'; lbl.textContent = T.ghost_label; bar.appendChild(lbl);
+    const others = GHOST_MODELS.map(m => m.id).filter(id => id !== state.controller);
+    const refresh = () => { renderGhostModelBar(); if (state.traj) { syncGhostTrajs(); updateKPIs(); renderCompareTable(); updateUIFrame(state.frameIdx); } else { renderSetupPreview(); } };
+    ['this', 'ref', 'old', 'lit'].forEach(cat => {
+      const g = document.createElement('span'); g.className = 'ghost-grp cat-' + cat + '-t'; g.textContent = T.groups[cat] + ':'; g.title = T.group_info[cat];
+      g.addEventListener('click', () => showPop(g, '<h4>' + T.groups[cat] + '</h4>' + T.group_info[cat])); bar.appendChild(g);
+      GHOST_MODELS.filter(m => (MODEL_CAT[m.id] || 'lit') === cat).forEach(m => {
+        const isOn = state.ghostModels.includes(m.id), isPrimary = (m.id === state.controller);
+        const btn = document.createElement('button'); btn.type = 'button';
+        btn.className = 'ghost-pill' + (isOn ? ' active' : '') + (isPrimary ? ' is-primary-ctrl' : '') + (m.id === 'pg' ? ' ours-pill' : '') + (cat === 'old' ? ' old-pill' : '');
+        btn.dataset.ghostModel = m.id; btn.style.color = (isOn || isPrimary) ? m.color : '#555b64';
+        const I = T.info[m.id]; btn.title = I ? (I[0] + ' — ' + I[1]) : m.label;
+        const sw = document.createElement('span'); sw.className = 'ghost-swatch'; sw.style.background = 'repeating-linear-gradient(to right, ' + m.color + ' 0 4px, transparent 4px 6px)';
+        const tx = document.createElement('span'); tx.textContent = (m.id === 'pg' ? '★ ' : '') + m.short + (isPrimary ? ' ●' : '');
+        btn.appendChild(sw); btn.appendChild(tx);
+        btn.addEventListener('click', () => {
+          if (!isPrimary) { const i = state.ghostModels.indexOf(m.id); if (i >= 0) state.ghostModels.splice(i, 1); else state.ghostModels.push(m.id); refresh(); }
+          const nb = bar.querySelector('[data-ghost-model="' + m.id + '"]') || btn; showPop(nb, modelHtml(m.id));
+        });
+        bar.appendChild(btn);
+      });
+    });
+    const allActive = others.length > 0 && others.every(id => state.ghostModels.includes(id));
+    const b = document.createElement('button'); b.type = 'button'; b.id = 'btnGhostAll'; b.className = 'ghost-pill' + (allActive ? ' active' : '');
+    b.style.color = allActive ? '#1b2a41' : '#555b64'; b.textContent = allActive ? T.all_off : T.all_on;
+    b.addEventListener('click', () => { state.ghostModels = allActive ? ['pg', 'governor', 'pid'].filter(x => x !== state.controller) : others.slice(); refresh(); });
+    bar.appendChild(b);
+  };
+  renderCompareTable = function () {
+    const tbody = document.getElementById('tbodyCompare'); if (!tbody) return;
+    const order = ['pg', 'governor', 'hlsl', 'hdap', 'bio', 'pid', 'lqr', 'fixed'];
+    const keys = order.filter(k => state.compareResults[k]); if (!keys.length) return;
+    tbody.innerHTML = keys.map(k => {
+      const m = state.compareResults[k], meta = GHOST_MODEL_MAP[k] || { short: k }, cat = MODEL_CAT[k] || 'lit';
+      return '<tr class="cat-' + cat + (k === state.controller ? ' active-row' : '') + '"><td>' + (k === 'pg' ? '★ ' : '') + meta.short + ' <span class="cat-chip cat-' + cat + '">' + T.groups_short[cat] + '</span></td>'
+        + '<td>' + m.mt.toFixed(2) + '</td><td>' + m.overshootPct.toFixed(1) + '%</td><td>' + (m.onsetAcc || 0).toFixed(1) + ' m/s²</td>'
+        + '<td>' + m.minW.toFixed(3) + '</td><td>' + m.peakTau.toFixed(1) + '</td><td>' + (m.eInitMm || 0).toFixed(1) + '</td>'
+        + '<td>' + (m.tCompPct || 0).toFixed(0) + '</td><td>' + (m.visualLoadHz || 100).toFixed(1) + '</td><td>' + (m.pulseEffPct || 0).toFixed(0) + '%</td></tr>';
+    }).join('');
+  };
+  try { renderGhostModelBar(); renderCompareTable(); } catch (e) { }
+  // info button next to the model selector
+  const ib = document.getElementById('btnModelInfo'), selC = document.getElementById('selController');
+  if (ib && selC) ib.addEventListener('click', e => { e.stopPropagation(); showPop(ib, modelHtml(selC.value) || ('<h4>' + selC.options[selC.selectedIndex].text + '</h4>')); });
+  // diagram button on the 3D scene
+  const sb = document.getElementById('btnSceneDiagram');
+  if (sb) sb.addEventListener('click', e => { e.stopPropagation(); const h = document.getElementById('btnFloatDiagram'); if (h) h.click(); });
+
+  // ---------- purpose modal with animation ----------
+  const MD = T.modal;
+  const ov = document.createElement('div'); ov.id = 'qwPurpose'; ov.setAttribute('role', 'dialog');
+  ov.innerHTML = '<div class="box"><h2>🎯 ' + MD.title + '</h2><p class="lead">' + MD.lead + '</p>'
+    + '<canvas id="qwPurposeCv" width="1720" height="600"></canvas>'
+    + '<div class="steps">' + MD.steps.map((s, i) => '<div class="step" data-i="' + i + '"><span class="ic">' + s[0] + '</span><b>' + (i + 1) + '. ' + s[1] + '</b>' + s[2] + '</div>').join('') + '</div>'
+    + '<div class="cols"><div><h3>' + MD.why_t + '</h3><ul>' + MD.why.map(w => '<li>' + w + '</li>').join('') + '</ul></div><div><h3>' + MD.now_t + '</h3><p style="margin:0">' + MD.now + '</p></div></div>'
+    + '<div class="acts"><button class="rp">' + MD.replay + '</button><button class="go">' + MD.try_btn + '</button><button class="cl">' + MD.close + '</button></div></div>';
+  document.body.appendChild(ov);
+  const cv = ov.querySelector('canvas') || document.getElementById('qwPurposeCv'); if (!cv || !cv.getContext) return; const ctx = cv.getContext('2d');
+  // e'(t) = -k e(t - d), d = 1 (time in units of the delay); history e = 1
+  function sim(kd) { const h = 1 / 120, lag = 120, n = 9 * 120, e = new Array(n + lag).fill(1);
+    for (let i = lag; i < n + lag - 1; i++) e[i + 1] = e[i] - h * kd * e[i - lag]; return e; }
+  const EA = sim(1.2), EB = sim(1 / Math.E), LAG = 120;
+  let f = 0, raf = null, stepT = null;
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function lane(y, E, label, col, i) {
+    const W = cv.width, x0 = 150, x1 = Math.round(W * 0.58), X = e => Math.min(W - 60, x0 + (1 - e) * (x1 - x0));
+    ctx.fillStyle = '#1f2937'; ctx.font = '600 30px Inter, system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.fillText(label, 40, y - 78);
+    ctx.strokeStyle = '#e5e1da'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(W - 70, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(220,38,38,.08)'; ctx.fillRect(x1, y - 46, W - 70 - x1, 92);
+    ctx.strokeStyle = '#e0a04a'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(x1, y, 30, 0, 7); ctx.stroke();
+    ctx.fillStyle = '#9a6a1f'; ctx.font = '500 22px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.fillText(MD.target, x1, y + 62);
+    // trail
+    ctx.strokeStyle = col; ctx.globalAlpha = .35; ctx.lineWidth = 5; ctx.beginPath();
+    for (let j = Math.max(LAG, i - 160); j <= i; j += 2) { const xx = X(E[j]); if (j === Math.max(LAG, i - 160)) ctx.moveTo(xx, y); else ctx.lineTo(xx, y); } ctx.stroke(); ctx.globalAlpha = 1;
+    // delayed view (what the camera reports)
+    const xg = X(E[Math.max(0, i - LAG)]);
+    ctx.fillStyle = 'rgba(47,95,167,.28)'; ctx.beginPath(); ctx.arc(xg, y, 22, 0, 7); ctx.fill();
+    ctx.fillStyle = '#2f5fa7'; ctx.font = '500 20px Inter, sans-serif'; ctx.fillText('👁 ' + MD.ghost, xg, y - 34);
+    const xh = X(E[i]); ctx.fillStyle = col; ctx.beginPath(); ctx.arc(xh, y, 24, 0, 7); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '700 22px Inter, sans-serif'; ctx.fillText('✋', xh, y + 8);
+    if (xh > x1 + 6) { ctx.fillStyle = '#b91c1c'; ctx.font = '800 28px Inter, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('⚠ ' + MD.over, W - 70, y - 78); ctx.textAlign = 'center'; }
+  }
+  function draw() {
+    const i = Math.min(EA.length - 1, LAG + f);
+    ctx.clearRect(0, 0, cv.width, cv.height); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cv.width, cv.height);
+    lane(170, EA, MD.lane_a, '#8f2d2d', i); lane(450, EB, MD.lane_b, '#c2410c', i);
+    ctx.fillStyle = '#e5e1da'; ctx.fillRect(40, cv.height - 22, cv.width - 80, 8);
+    ctx.fillStyle = '#c2410c'; ctx.fillRect(40, cv.height - 22, (cv.width - 80) * (i - LAG) / (EA.length - 1 - LAG), 8);
+  }
+  function loop() { f += 2; draw(); if (LAG + f >= EA.length - 1) { raf = setTimeout(() => { f = 0; loop(); }, 1600); return; } raf = requestAnimationFrame(loop); }
+  function startAnim() { stopAnim(); f = reduce ? EA.length : 0; if (reduce) { draw(); } else loop();
+    const steps = ov.querySelectorAll('.step'); let k = 0; if (!steps.length) return; steps.forEach(s => s.classList.remove('on')); steps[0].classList.add('on');
+    stepT = setInterval(() => { steps.forEach(s => s.classList.remove('on')); k = (k + 1) % steps.length; steps[k].classList.add('on'); }, 1800); }
+  function stopAnim() { if (raf) { cancelAnimationFrame(raf); clearTimeout(raf); raf = null; } if (stepT) { clearInterval(stepT); stepT = null; } }
+  function openP() { ov.classList.add('open'); startAnim(); }
+  function closeP() { ov.classList.remove('open'); stopAnim(); }
+  ov.addEventListener('click', e => { if (e.target === ov) closeP(); });
+  ov.querySelector('.cl').onclick = closeP; ov.querySelector('.rp').onclick = startAnim;
+  ov.querySelector('.go').onclick = () => {
+    closeP();
+    const s = document.getElementById('selController'); if (s) { s.value = 'pg'; s.dispatchEvent(new Event('change', { bubbles: true })); s.dispatchEvent(new Event('input', { bubbles: true })); }
+    state.controller = 'pg';
+    try { renderGhostModelBar(); } catch (e) { }
+    const run = document.getElementById('btnRunReach'); if (run) run.click();
+    const sc = document.getElementById('pwScene'); if (sc) sc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && ov.classList.contains('open')) closeP(); });
+  const pb = document.getElementById('btnPurpose'); if (pb) pb.addEventListener('click', openP);
+})();
+</script>
+
+<script>
+// ===== R6: naming, paper-experiment hub, delay sweep, correct in-view flags, animated project story =====
+(function R6() {
+  const L = {"groups": {"this": "★ This work: İskender Governor (our model)", "ref": "Reference: same 1/e bound, privileged information", "old": "Additional exploratory models of ours (not in the paper)", "lit": "Literature (baselines)"}, "short_tag": {"this": "OUR MODEL", "ref": "reference", "old": "exploratory", "lit": "literature"}, "names": {"pg": ["İskender Gov. (ours)", "İskender Governor — perceptual 1/e speed governor (our model)"], "governor": ["1/e reference", "Oracle 1/e governor (reference)"], "hlsl": ["HLSL", "HLSL — human-like stereo looming (exploratory model)"], "hdap": ["Human-HDA", "Human-HDA — human-like dynamic approach (exploratory model)"], "bio": ["Bio-Pulse", "Bio-Pulse — biomimetic pulse (exploratory model)"], "pid": ["PID", "PID — proportional–integral–derivative (literature)"], "lqr": ["LQR", "LQR — linear quadratic regulator (literature)"], "fixed": ["Fixed (P)", "Fixed gain P — proportional visual servo (literature)"]}, "colors": ["#c2410c", "#1e3a8a", "#6b7280", "#0f766e", "#7c3aed"], "delay_note": "<div style=\"font-size:11.5px;color:#6b6258\">This sweep runs on the human-like arm in the browser. The grey “paper” values come from Table 6 of the paper, i.e. the Python experiment on the <b>six-axis arm</b>: the arms differ, so the numbers are not expected to match; compare the <b>trend</b> (who overshoots and who stays safe as the delay grows).</div>", "strip": {"show": "Show card", "stop": "■ Stop", "next": "next:", "label": {"delay": "Delay sweep", "w60": "Workspace, set A", "w150m": "Workspace, set B", "full": "Workspace, full protocol"}}, "charts": {"ett": {"xlab": "Time in units of the delay (t/δ)", "ylab": "Remaining gap e(t)/e₀", "xticks": [0, 2, 4, 6, 8, 10, 12], "yticks": [-0.8, -0.4, 0, 0.4, 0.8, 1], "ymin": -0.85, "ymax": 1.05, "zero": true, "xmin": 0, "xmax": 12, "series": [{"kd": 0.2, "color": "#0f766e", "tag": "kδ = 0.2", "label": "kδ = 0.2 — small gain: never overshoots but approaches very slowly", "pts": [], "lx": 6.0, "dy": -26}, {"kd": 0.36787944117144233, "color": "#c2410c", "tag": "kδ = 1/e", "label": "kδ = 1/e ≈ 0.37 — the fastest approach that never overshoots (İskender Governor picks this value)", "pts": [], "w": 7, "lx": 2.4, "dy": -24}, {"kd": 0.6, "color": "#2f5fa7", "tag": "kδ = 0.6", "label": "kδ = 0.6 — a little above the bound: the hand overshoots slightly, then comes back", "pts": [], "dash": [14, 8], "dy": 26, "lx": 3.0}, {"kd": 1.2, "color": "#6b7280", "tag": "kδ = 1.2", "label": "kδ = 1.2 — three times the bound: the hand overshoots and oscillates", "pts": [], "lx": 1.8, "dy": 30}]}, "os_delay": {"xlab": "Visual delay (ms)", "ylab": "Maximum overshoot (%), log scale", "logy": true, "ymin": 0.4, "ymax": 400, "yticks": [0.5, 1, 2, 5, 10, 20, 50, 100, 200], "xticks": [30, 60, 100, 150, 200], "markers": true, "xmin": 30, "xmax": 200, "series": [{"label": "① İskender Governor (our model)", "tag": "", "color": "#c2410c", "pts": [[30, 3.5], [60, 2.8], [100, 2.0], [150, 0.9], [200, 0.6]], "dy": 0, "w": 7}, {"label": "② Oracle 1/e governor (reference)", "tag": "", "color": "#1e3a8a", "pts": [[30, 18.6], [60, 9.9], [100, 5.3], [150, 3.7], [200, 3.0]], "dy": 0}, {"label": "③ PID tuned at 30 ms (literature)", "tag": "", "color": "#6b7280", "pts": [[30, 29.7], [60, 53.3], [100, 134.8], [150, 211.1], [200, 250.7]], "dy": -14}, {"label": "④ Fixed gain P tuned at 30 ms (literature)", "tag": "", "color": "#0f766e", "pts": [[30, 29.7], [60, 53.7], [100, 135.0], [150, 212.5], [200, 251.1]], "dy": 18, "dash": [14, 8]}, {"label": "⑤ Fixed gain P retuned for this arm, k = 1.5 (literature)", "tag": "", "color": "#7c3aed", "pts": [[30, 4.6], [60, 4.9], [100, 5.2], [150, 5.6], [200, 6.0]], "dy": -10, "dash": [6, 6]}]}, "succ_delay": {"xlab": "Visual delay (ms)", "ylab": "Success (%)", "ymin": 0, "ymax": 105, "yticks": [0, 20, 40, 60, 80, 100], "xticks": [30, 60, 100, 150, 200], "markers": true, "xmin": 30, "xmax": 200, "series": [{"label": "① İskender Governor (our model)", "tag": "", "color": "#c2410c", "pts": [[30, 100], [60, 100], [100, 100], [150, 100], [200, 92]], "dy": 0, "w": 7}, {"label": "② Oracle 1/e governor (reference)", "tag": "", "color": "#1e3a8a", "pts": [[30, 92], [60, 100], [100, 100], [150, 100], [200, 100]], "dy": -14}, {"label": "③ PID tuned at 30 ms (literature)", "tag": "", "color": "#6b7280", "pts": [[30, 83], [60, 58], [100, 17], [150, 0], [200, 0]], "dy": -12}, {"label": "④ Fixed gain P tuned at 30 ms (literature)", "tag": "", "color": "#0f766e", "pts": [[30, 83], [60, 67], [100, 17], [150, 0], [200, 0]], "dy": 16, "dash": [14, 8]}, {"label": "⑤ Fixed gain P retuned for this arm, k = 1.5 (literature)", "tag": "", "color": "#7c3aed", "pts": [[30, 100], [60, 100], [100, 100], [150, 100], [200, 100]], "dy": 20, "dash": [6, 6]}]}, "fps_os": {"xlab": "Camera frame rate (frames per second, fps)", "ylab": "Maximum overshoot (%)", "ymin": 0, "ymax": 36, "yticks": [0, 5, 10, 15, 20, 25, 30, 35], "xticks": [0, 1, 2, 3, 4], "xtl": ["15", "30", "60", "100", "200"], "markers": true, "xmin": 0, "xmax": 4, "series": [{"label": "İskender Governor (our model), 60 ms visual delay", "tag": "60 ms", "color": "#c2410c", "pts": [[0, 31.9], [1, 6.6], [2, 7.0], [3, 2.6], [4, 3.6]], "dy": 0, "w": 7}, {"label": "İskender Governor (our model), 150 ms visual delay", "tag": "150 ms", "color": "#1e3a8a", "pts": [[0, 34.0], [1, 6.1], [2, 6.6], [3, 0.8], [4, 2.6]], "dy": 18, "dash": [14, 8]}]}, "fps_succ": {"xlab": "Camera frame rate (frames per second, fps)", "ylab": "Success (%)", "ymin": 0, "ymax": 105, "yticks": [0, 20, 40, 60, 80, 100], "xticks": [0, 1, 2, 3, 4], "xtl": ["15", "30", "60", "100", "200"], "markers": true, "xmin": 0, "xmax": 4, "series": [{"label": "İskender Governor (our model), 60 ms visual delay", "tag": "60 ms", "color": "#c2410c", "pts": [[0, 79], [1, 100], [2, 100], [3, 100], [4, 100]], "dy": 0, "w": 7}, {"label": "İskender Governor (our model), 150 ms visual delay", "tag": "150 ms", "color": "#1e3a8a", "pts": [[0, 50], [1, 100], [2, 100], [3, 96], [4, 100]], "dy": 18, "dash": [14, 8]}]}, "fps_k": {"xlab": "Camera frame rate (frames per second, fps)", "ylab": "Chosen gain k (1/s)", "ymin": 0, "ymax": 3.2, "yticks": [0, 0.5, 1, 1.5, 2, 2.5, 3], "xticks": [0, 1, 2, 3, 4], "xtl": ["15", "30", "60", "100", "200"], "markers": true, "xmin": 0, "xmax": 4, "series": [{"label": "İskender Governor (our model), 60 ms visual delay", "tag": "60 ms", "color": "#c2410c", "pts": [[0, 1.13], [1, 1.81], [2, 2.43], [3, 2.45], [4, 2.83]], "dy": 0, "w": 7}, {"label": "İskender Governor (our model), 150 ms visual delay", "tag": "150 ms", "color": "#1e3a8a", "pts": [[0, 0.88], [1, 1.25], [2, 1.52], [3, 1.53], [4, 1.67]], "dy": 18, "dash": [14, 8]}]}, "pred_obs": {"xlab": "Experiment (Table 8)", "ylab": "Maximum overshoot (%)", "ymin": 0, "ymax": 50, "yticks": [0, 10, 20, 30, 40, 50], "xticks": [0, 1, 2, 3, 4, 5, 6], "xtl": ["ND 60", "ND 150", "H 30", "H 60", "H 100", "H 150", "H 200"], "xmin": -0.5, "xmax": 6.5, "series": [{"label": "Predicted by the theory (no number fitted to the simulator)", "tag": "predicted", "color": "#1e3a8a", "pts": [[0, 12.2], [1, 46.7], [2, 0.5], [3, 1.9], [4, 4.1], [5, 6.5], [6, 8.5]], "dy": 0, "noline": true, "dx": -9}, {"label": "Measured in the simulator", "tag": "measured", "color": "#c2410c", "pts": [[0, 11.6], [1, 41.9], [2, 3.9], [3, 3.7], [4, 3.3], [5, 3.0], [6, 2.5]], "dy": 22, "noline": true, "dx": 9}]}}, "hub": {"title": "📊 The paper’s experiments — all in one place", "lead": "Below are <b>all the comparisons</b> reported in the paper. Each one shows what is tested, the results table, a chart with numbered lines and how to read it. The <b>number</b> of a line is the number in the table: ① is always <b>İskender Governor (our model)</b>. Experiments that run in the browser have a <b>▶</b> button; the arm really moves in the 3D scene and the results build up next to the paper’s values. The others use the Python simulation of the six-axis arm; the command that produces them is given.", "run_all": "▶ Run every browser experiment in turn", "run_delay": "▶ Delay sweep (120 reaches)", "run_a": "▶ Workspace, set A (48)", "run_b": "▶ Workspace, set B — one eye (48)", "run_full": "▶ Full protocol (1728 + 576, no animation)", "run_hint": "While running, an orange progress strip appears at the top of the page; you can stop there or jump to the results card.", "read": "How to read it:", "run_this": "Run this experiment in the browser", "python": "This experiment uses the Python simulation. Command or raw data:", "btn_tip": "Open all the paper’s experiments: tables, numbered charts and batch runs in the browser", "header_btn": "📊 Paper experiments"}, "exps": [{"id": "D1", "title": "Main comparison: who stays safe as the delay grows?", "src": "Paper Table 6 · six-axis arm · 12 targets × 2 seeds", "what": "The same 12 targets are tried at five delays (30–200 ms) with five controllers. Cell: success / maximum overshoot / median movement time. ① İskender Governor (our model); ② Oracle 1/e governor (reference); ③ PID tuned at 30 ms (literature); ④ Fixed gain P tuned at 30 ms (literature); ⑤ Fixed gain P retuned for this arm, k = 1.5 (literature)", "chart": "os_delay", "table": {"h": ["Delay", "①", "②", "③", "④", "⑤"], "r": [{"c": ["30 ms", "100 % / 3.5 % / 1.06 s", "92 % / 18.6 % / 3.71 s", "83 % / 29.7 % / 4.50 s", "83 % / 29.7 % / 4.50 s", "100 % / 4.6 % / 1.53 s"]}, {"c": ["60 ms", "100 % / 2.8 % / 1.30 s", "100 % / 9.9 % / 0.42 s", "58 % / 53.3 % / 4.84 s", "67 % / 53.7 % / 4.81 s", "100 % / 4.9 % / 1.50 s"]}, {"c": ["100 ms", "100 % / 2.0 % / 1.67 s", "100 % / 5.3 % / 0.61 s", "17 % / 134.8 % / —", "17 % / 135.0 % / —", "100 % / 5.2 % / 1.40 s"]}, {"c": ["150 ms", "100 % / 0.9 % / 2.12 s", "100 % / 3.7 % / 0.96 s", "0 % / 211 % / —", "0 % / 213 % / —", "100 % / 5.6 % / 1.31 s"]}, {"c": ["200 ms", "92 % / 0.6 % / 2.40 s", "100 % / 3.0 % / 1.27 s", "0 % / 251 % / —", "0 % / 251 % / —", "100 % / 6.0 % / 1.12 s"]}]}, "read": "Look first at ①, the thick orange line: below 4 % at every delay. ③ grey and ④ green dashed (classical laws tuned at 30 ms and frozen) climb to 135–251 % beyond 100 ms; the table shows that they hardly ever settle there. ② navy (same 1/e bound, but given the true delay) overshoots 18.6 % at 30 ms because it ignores the servo lag and the averaging. ⑤ purple dashed is the fixed gain retuned for this arm: equally reliable and, beyond 60 ms, faster. The price of ① is time: at 60–200 ms it takes 1.9–3.1 times longer than ②.", "run": "delay", "cmd": "python scripts/run_v5.py"}, {"id": "D2", "title": "What carries the safety? (ablation)", "src": "Paper Table 7 · 12 targets", "what": "Parts of İskender Governor are removed one at a time. Cell: maximum overshoot / median time / success.", "table": {"h": ["Variant", "60 ms", "150 ms"], "r": [{"ours": true, "c": ["① Full law (our model)", "2.8 % / 1.30 s / 100 %", "0.9 % / 2.12 s / 100 %"]}, {"c": ["No averaging (n = 1)", "5.6 % / 1.24 s / 100 %", "5.0 % / 1.99 s / 100 %"]}, {"c": ["Update the Jacobian during the reach (Broyden)", "33.8 % / 0.84 s / 100 %", "9.5 % / 1.39 s / 92 %"]}, {"c": ["Delay term removed", "11.5 % / 0.88 s / 100 %", "41.9 % / 0.80 s / 100 %"]}, {"c": ["Nominal 200 ms instead of the identified lag", "0.2 % / 2.77 s / 83 %", "0.0 % / 3.24 s / 75 %"]}]}, "read": "Removing the delay term raises overshoot to 42 %: that term carries the safety. Updating the Jacobian on the way speeds things up but breaks safety. Over-estimating the lag never overshoots but leaves a quarter of the reaches unfinished.", "cmd": "python scripts/run_v5.py"}, {"id": "D3", "title": "Does the theory predict the result?", "src": "Paper Table 8", "what": "The gain multiplier of each removed part follows from the formula, and the overshoot it implies is compared with the measured one. ND: no delay term; H: delay reported at half; number: delay (ms).", "chart": "pred_obs", "table": {"h": ["Experiment", "Gain ×", "Predicted", "Measured"], "r": [{"c": ["No delay term, 60 ms", "1.65", "12.2 %", "11.6 %"]}, {"c": ["No delay term, 150 ms", "2.64", "46.7 %", "41.9 %"]}, {"c": ["Half-reported delay, 30 ms", "1.14", "0.5 %", "3.9 %"]}, {"c": ["Half-reported delay, 60 ms", "1.25", "1.9 %", "3.7 %"]}, {"c": ["Half-reported delay, 100 ms", "1.36", "4.1 %", "3.3 %"]}, {"c": ["Half-reported delay, 150 ms", "1.45", "6.5 %", "3.0 %"]}, {"c": ["Half-reported delay, 200 ms", "1.53", "8.5 %", "2.5 %"]}]}, "read": "Blue dots (1) are the theory, orange dots (2) the simulator. In the first two experiments the dots almost coincide: the theory said 12 % and 47 %, the measurement gave 12 % and 42 %. With a half-reported delay the measured overshoot stays at 2.5–3.9 %, because the delay is only one of the four parts of the effective delay.", "cmd": "python scripts/verify_margin_theory.py"}, {"id": "D4", "title": "What if the robot changes?", "src": "Paper Table 9 · 8 targets", "what": "The joint servo is slowed (10 → 5 rad/s) or sped up (30 rad/s); the fixed gain is not retuned. Cell: success / maximum overshoot / median time.", "table": {"h": ["Servo, delay", "① our model", "⑤ k = 1.5"], "r": [{"c": ["5 rad/s, 60 ms", "100 % / 6.4 % / 1.84 s", "88 % / 11.5 % / 1.95 s"]}, {"c": ["5 rad/s, 150 ms", "100 % / 3.8 % / 2.62 s", "75 % / 14.4 % / 3.21 s"]}, {"c": ["10 rad/s, 60 ms", "100 % / 1.8 % / 1.67 s", "100 % / 4.9 % / 1.42 s"]}, {"c": ["10 rad/s, 150 ms", "100 % / 0.7 % / 2.43 s", "100 % / 5.6 % / 1.25 s"]}, {"c": ["30 rad/s, 60 ms", "100 % / 2.7 % / 1.10 s", "100 % / 1.9 % / 1.42 s"]}, {"c": ["30 rad/s, 150 ms", "100 % / 1.7 % / 1.78 s", "100 % / 2.4 % / 1.25 s"]}]}, "read": "When the servo slows, the tuned fixed gain fails on a quarter of the reaches and overshoots up to 14 %. İskender Governor repeats its 2.6 s self-identification, learns the new servo lag (75 ms) and succeeds on all. Its advantage is not speed but staying safe without retuning.", "cmd": "python scripts/run_v5_robustness.py"}, {"id": "D5", "title": "A second arm: the human-like arm", "src": "Paper Table 10 · 48 reaches", "what": "Human-like arm with trunk, shoulder, elbow and wrist joints; cameras above and behind the shoulder.", "table": {"h": ["Controller", "Success (95 % CI)", "Max / mean overshoot", "Median time"], "r": [{"ours": true, "c": ["① İskender Governor (our model)", "44/48 (80–97 %)", "2.7 % / 0.8 %", "1.37 s"]}, {"c": ["② Oracle 1/e governor (reference)", "48/48 (93–100 %)", "21.8 % / 5.6 %", "0.69 s"]}, {"c": ["⑤ Fixed k = 1.5 (tuned on the first arm)", "48/48 (93–100 %)", "3.6 % / 1.7 %", "1.36 s"]}]}, "read": "① again overshoots least. All four failures are slow approaches ending 6–7.5 mm short; in two of them the elbow hit its joint limit.", "cmd": "python scripts/run_v5_robustness.py"}, {"id": "D6", "title": "When the eye does not look continuously (intermittent gaze)", "src": "Paper Table 11 · 24 reaches", "what": "The cameras are blind for 0.34 s of every 0.62 s (like the saccades of a human eye).", "table": {"h": ["Controller", "60 ms", "150 ms"], "r": [{"ours": true, "c": ["① İskender Governor + forward model (our model)", "92 % / 3.1 % / 2.57 s", "75 % / 0.9 % / 2.85 s"]}, {"c": ["İskender Governor, hold only", "96 % / 32.1 % / 2.11 s", "92 % / 9.1 % / 2.59 s"]}, {"c": ["② Oracle 1/e governor (reference)", "100 % / 68.9 % / 5.85 s", "100 % / 20.4 % / 1.90 s"]}, {"c": ["⑤ Fixed k = 1.5", "75 % / 20.5 % / 4.97 s", "79 % / 20.3 % / 5.16 s"]}]}, "read": "With gaps in vision ② overshoots up to 69 %. ① predicts where the hand goes from its own commands while blind (forward model) and stays below 3.1 %. The price is 75 % success at 150 ms.", "cmd": "python scripts/run_v5_robustness.py"}, {"id": "D7", "title": "One eye", "src": "Paper §8.7 · 12 targets, 60 ms", "what": "With one camera depth is read from the apparent size ratio of hand and target (r₀).", "table": {"h": ["Error in r₀", "Success", "Median final error", "Max overshoot"], "r": [{"ours": true, "c": ["0 %", "100 %", "0.4 mm", "2.1 %"]}, {"c": ["5 %", "0 %", "46 mm", "79 %"]}, {"c": ["10 %", "0 %", "88 mm", "151 %"]}, {"c": ["28 %", "0 %", "211 mm", "358 %"]}]}, "read": "With the right size ratio one eye is enough. If it is 5 % wrong the model goes safely, but to the wrong depth: the 1/e law protects against overshoot caused by delay, not against a biased sensor.", "cmd": "reports/v6_mono_size_prior.jsonl"}, {"id": "D8", "title": "If the delay is mis-measured", "src": "Paper §8.8 · 24 reaches", "what": "The timestamps report half the true delay.", "table": {"h": ["Delay", "Success", "Max overshoot", "Median time"], "r": [{"c": ["30 ms", "100 %", "3.9 %", "0.94 s"]}, {"c": ["60 ms", "100 %", "3.7 %", "1.02 s"]}, {"c": ["100 ms", "100 %", "3.3 %", "1.17 s"]}, {"c": ["150 ms", "100 %", "3.0 %", "1.36 s"]}, {"c": ["200 ms", "100 %", "2.5 %", "1.52 s"]}]}, "read": "Even with half the delay reported no reach fails and overshoot stays below 4 %, because the gain rises only 1.14–1.53 times, not 2 times.", "cmd": "python scripts/run_v5.py"}, {"id": "D9", "title": "No joint sensor: look, pulse, brake", "src": "Paper Table 12 · 12 targets", "what": "The motor only gets a speed command, no joint angle is read; a brake holds when stopped. Cell: share of reaches ending within 5 mm / maximum overshoot.", "table": {"h": ["Drive, delay", "Look–pulse–brake (our model)", "Without drift learning", "Continuous law"], "r": [{"c": ["Stiff drive, 60 ms", "83 % / 9.2 %", "0 % / 32.9 %", "0 % / 60.7 %"]}, {"c": ["Stiff drive, 150 ms", "92 % / 7.6 %", "0 % / 33.2 %", "0 % / 112.7 %"]}, {"c": ["Weak drive, 60 ms", "58 % / 42.6 %", "0 % / 103.3 %", "0 % / 211.3 %"]}, {"c": ["Weak drive, 150 ms", "58 % / 42.9 %", "0 % / 103.1 %", "0 % / 365.4 %"]}]}, "read": "With a stiff drive 83–92 % of reaches end within 5 mm without any joint sensor. Learning the drift is essential; with a weak drive success falls to 58 %.", "cmd": "python scripts/run_v6_encoderless.py"}, {"id": "D10", "title": "Randomised workspace (independent test)", "src": "Paper Table 13 · human-like arm in the browser · 1728 + 576 reaches", "what": "The reachable volume is split into four shells (Z1 near, Z2 middle, Z3 boundary, Z4 unreachable). Each target is tried with four controllers and the same noise. Cell: success / maximum overshoot / median time.", "table": {"h": ["Condition", "①", "②", "④", "③"], "r": [{"c": ["Two eyes, 60 ms", "88 % / 5.3 % / 2.50 s", "100 % / 1.6 % / 0.81 s", "100 % / 11.5 % / 0.80 s", "44 % / 10.8 % / 0.59 s"]}, {"c": ["Two eyes, 150 ms", "97 % / 3.2 % / 2.02 s", "100 % / 1.5 % / 1.06 s", "6 % / 66.3 % / —", "3 % / 65.8 % / —"]}, {"c": ["One eye, 60 ms", "91 % / 8.4 % / 2.37 s", "99 % / 97.0 % / 0.92 s", "99 % / 83.9 % / 0.85 s", "31 % / 81.6 % / 0.76 s"]}, {"c": ["One eye, 150 ms", "99 % / 3.7 % / 2.02 s", "100 % / 114.3 % / 1.21 s", "0 % / 125.9 % / —", "0 % / 124.9 % / —"]}]}, "read": "With two eyes ② is faster and more reliable. With one eye the metric laws overshoot 84–126 % while ① stays below 8.4 %. On unreachable targets ① stops before stretching the arm into a singularity (94–100 % of reaches); the others never stop.", "run": "w60", "cmd": ""}, {"id": "D11", "title": "Does reaching get better with a faster camera (fps)?", "src": "New experiment · reports/v8_framerate.md · 480 reaches", "what": "Six-axis arm, 12 targets × 2 seeds; camera and control rate 15, 30, 60, 100, 200 fps; visual delay 60 and 150 ms. Self-identification is repeated at every rate.", "chart": "fps_os", "table": {"h": ["fps", "Identified servo lag L", "k (1/s), 60 / 150 ms", "Success, 60 / 150 ms", "Max overshoot, 60 / 150 ms", "Median time, 60 / 150 ms"], "r": [{"c": ["15", "0 ms", "1.13 / 0.88", "79 % / 50 %", "31.9 % / 34.0 %", "2.73 / 2.13 s"]}, {"c": ["30", "10 ms", "1.81 / 1.25", "100 % / 100 %", "6.6 % / 6.1 %", "1.00 / 1.32 s"]}, {"c": ["60", "25 ms", "2.43 / 1.52", "100 % / 100 %", "7.0 % / 6.6 %", "0.88 / 0.97 s"]}, {"c": ["100", "50 ms", "2.45 / 1.53", "100 % / 96 %", "2.6 % / 0.8 %", "1.38 / 2.18 s"]}, {"c": ["200", "50 ms", "2.83 / 1.67", "100 % / 100 %", "3.6 % / 2.6 %", "0.72 / 1.04 s"]}]}, "read": "Yes, but only up to a point. At 15 fps one frame lasts 67 ms; the robot cannot see its own 50 ms servo lag, picks too high a gain and overshoots 32–34 %. From 30 fps on every reach succeeds. The lowest overshoot comes at 100–200 fps, where the servo lag is identified correctly. Going from 100 to 200 fps changes little, because most of the effective delay is image delay and servo lag, which do not shrink with the frame rate.", "cmd": "python scripts/run_v8_framerate.py"}], "story": {"title": "The purpose of this project — in 8 short chapters", "prev": "Back", "next": "Next", "replay": "Replay the animation", "try_btn": "Try our model in the simulator", "fog_a": "A driver who drives fast although the view is late", "fog_b": "A driver who slows down according to the delay (1/e rule)", "obstacle": "obstacle", "seen": "what the driver sees (late)", "crash": "CRASH", "lane_a": "A controller that ignores the delay (kδ = 1.2)", "lane_b": "İskender Governor (our model), kδ = 1/e", "target": "target", "ghost": "what the camera sees (delayed)", "over": "TARGET OVERSHOT", "deff_title": "Effective delay: four parts add up (60 ms visual delay)", "deff_parts": [["image delay δ_obs", 60, "#2f5fa7"], ["servo lag L", 50, "#0f766e"], ["8-frame average", 35, "#7c3aed"], ["half a frame", 5, "#c2410c"]], "ch": [{"short": "Problem", "title": "The problem: the robot sees the world a little late", "html": "<p class=\"big\">We want to move a robot arm to a target <b>using only what two cameras see</b>. The difficulty: the camera image always reaches the robot <b>a little late</b> (0.03–0.2 s).</p><p><b>The foggy-road analogy.</b> Imagine you can only see the road as it was a few seconds ago. You learn <b>late</b> how close you are to the obstacle. In the animation two drivers start together. The pale blue car is where the driver currently sees himself (late).</p><canvas class=\"fog\" width=\"1500\" height=\"420\"></canvas><ol class=\"qw-steps\"><li><b>Driver 1</b> ignores the delay. In the late picture the obstacle is still far, so he drives fast; when the picture catches up he is already on it: <b>crash</b>.</li><li><b>Driver 2</b> approaches more slowly the more delayed his view is. He arrives without hitting it, in the shortest possible time.</li></ol><p>For a robot arm, “crashing” means moving the hand <b>past the target</b>: knocking over a cup, hitting a part or a person. The aim of this project is to give the robot the behaviour of driver 2 <b>with an exact number</b>.</p>"}, {"short": "The 1/e rule", "title": "The rule: gain × delay = 1/e", "html": "<p class=\"big\">Every second we close a fixed share of the remaining gap. That share is the <b>gain k</b>. The rule: <b>k = (1/e) / δ</b>, where δ is the delay and e = 2.718… (Euler’s number), 1/e ≈ 0.37.</p><p>Twice the delay means half the gain: the robot approaches at half the speed. Example: for δ = 0.15 s, k = 0.37 / 0.15 ≈ 2.45; the hand moves at about 2.45 times the remaining gap per second, and slows down as the gap shrinks.</p><canvas class=\"qw-cv\" width=\"1500\" height=\"560\" data-chart=\"ett\"></canvas><div class=\"leg\" data-leg=\"ett\"></div><div class=\"qw-read\"><b>How to read the chart, step by step</b><ol><li>The horizontal axis is time in units of the delay: “2” means two delays.</li><li>The vertical axis is the remaining gap: 1 at the start, 0 at the target. <b>A line below 0 means the hand has passed the target.</b></li><li><b>Line 1, green</b> (kδ = 0.2) never goes below 0 but has not arrived even after 12 delays: safe but very slow.</li><li><b>Line 2, thick orange</b> (kδ = 1/e) is <b>the fastest</b> of the lines that never go below 0. İskender Governor uses exactly this value.</li><li><b>Line 3, blue dashed</b> (kδ = 0.6) is a little above the bound: near 2 it dips slightly below 0 (small overshoot), then comes back.</li><li><b>Line 4, grey</b> (kδ = 1.2) is three times the bound: it drops to −0.7 and swings up and down. The hand passes the target again and again.</li></ol></div><p class=\"note\">This bound has been known since the 1950s. What is new is that the robot computes it from what it measures itself, and that in the real loop, sampled 100 times per second, it stays within 1.2 % of the exact bound.</p>"}, {"short": "Our model", "title": "İskender Governor (our model): uses only what it sees", "html": "<p class=\"big\">Robots are usually given four things “for free” by the simulator: joint angles, the exact arm geometry, the distance in centimetres and the true delay. <b>İskender Governor uses none of them.</b></p><div class=\"qw-grid4\"><div class=\"step\"><span class=\"ic\">👀</span><b>1. Sees</b>Only the pixel positions of hand and target in two cameras. No joint angles, no ruler.</div><div class=\"step\"><span class=\"ic\">🤚</span><b>2. Learns its body</b>Once, for 2.6 s, it moves each joint a little and watches the image (self-identification). It learns which joint moves the hand which way, and how late its own motor responds.</div><div class=\"step\"><span class=\"ic\">⏱️</span><b>3. Measures the delay</b>From the timestamp of every image it computes how old the image is.</div><div class=\"step\"><span class=\"ic\">🎯</span><b>4. Approaches</b>It sets its speed with k = (1/e) / δ<sub>eff</sub> and arrives without overshooting.</div></div><p>In the animation a controller that ignores the delay (1, top) and İskender Governor (2, bottom) reach for the same target. The pale blue disc is the delayed hand position the camera currently reports.</p><canvas class=\"lanes\" width=\"1500\" height=\"460\"></canvas>"}, {"short": "Effective delay", "title": "Why a delay with four parts?", "html": "<p class=\"big\">The arm’s “lateness” has more than one source. If all four parts are not added, the gain comes out too large and the hand overshoots.</p><canvas class=\"deff\" width=\"1500\" height=\"260\"></canvas><ol class=\"qw-steps\"><li><b>1. Image delay δ<sub>obs</sub></b>: time between capturing the image and its arrival; measured from the timestamp.</li><li><b>2. Servo lag L</b>: time between commanding the motor and the arm really moving; learned during self-identification.</li><li><b>3. Averaging delay</b>: the last 8 images are averaged to reduce jitter; the average is as old as the middle image.</li><li><b>4. Half a frame</b>: at 100 frames per second a frame lasts 10 ms; on average the controller is half of that late.</li></ol><p class=\"note\">A governor that uses only part 1 (the oracle reference in the paper) therefore overshoots by 18.6 % at 30 ms; İskender Governor, which adds all four, stays below 3.5 %.</p>"}, {"short": "Other methods", "title": "Comparison with known methods", "html": "<div class=\"qw-tw\"><table class=\"qw-t\"><tr><th>No</th><th>Method</th><th>What it knows</th><th>Place in robotics</th></tr><tr class=\"ours\"><td>①</td><td><b>İskender Governor (our model)</b></td><td>Only pixels and timestamps</td><td>The contribution of this work</td></tr><tr><td>②</td><td>Oracle 1/e governor (reference)</td><td>True delay, true distance, exact arm geometry</td><td>Applies the same 1/e bound in the known way; answers “what if we got this for free?”</td></tr><tr><td>③</td><td>PID (literature)</td><td>True distance; gains tuned at 30 ms and frozen</td><td>The most widely used industrial controller</td></tr><tr><td>④</td><td>Fixed gain P (literature)</td><td>True distance; one gain tuned at 30 ms</td><td>The classical visual-servoing law</td></tr><tr><td>⑤</td><td>Fixed gain P, retuned (literature)</td><td>True distance; best gain for this arm, k = 1.5</td><td>An expert-tuned classical law: the strongest baseline</td></tr></table></div><canvas class=\"qw-cv\" width=\"1500\" height=\"560\" data-chart=\"os_delay\"></canvas><div class=\"leg\" data-leg=\"os_delay\"></div><div class=\"qw-read\"><b>The chart step by step</b><ol><li>The horizontal axis is the visual delay, the vertical axis the maximum overshoot (log scale: each grid step is about 2–2.5 times).</li><li>① thick orange is the lowest line at every delay: 0.6–3.5 %.</li><li>③ and ④ (grey and green dashed) almost coincide; beyond 100 ms they shoot up to 135–251 %.</li><li>② navy improves as the delay grows but is above ① at every point.</li><li>⑤ purple dashed stays flat at about 5–6 %.</li></ol></div><canvas class=\"qw-cv\" width=\"1500\" height=\"560\" data-chart=\"succ_delay\"></canvas><div class=\"leg\" data-leg=\"succ_delay\"></div><p class=\"note\">The second chart shows success (settling within 5 mm of the target): ③ and ④ fall to 17 % at 100 ms and to 0 % at 150 ms.</p>"}, {"short": "Status", "title": "Does it really work?", "html": "<p class=\"big\"><b>Short answer:</b> in simulation, yes; but it is not the best at everything and it has not been tested on a real robot yet.</p><div class=\"qw-cols\"><div><h4>✅ Where it wins</h4><ul><li>At 30–200 ms delay it settled within 5 mm on 118 of 120 reaches and overshot by at most 3.5 %.</li><li>When the robot’s motor changed it re-tuned itself; the tuned classical law missed a quarter of the reaches.</li><li>With intermittent vision it stayed below 3.1 %; the reference overshot by 69 %.</li><li>On an unreachable target it stopped without forcing the arm into a singularity.</li><li>The theory predicted how much it overshoots when parts are removed (12 % and 47 % predicted, 12 % and 42 % measured).</li></ul></div><div><h4>⚠️ Where it loses</h4><ul><li><b>Slow:</b> 1.9–3.1 times longer at 60–200 ms. The main cause is depth perception (6.5 cm between the cameras).</li><li>An expert-retuned classical law is equally reliable and faster as long as the robot does not change.</li><li>With one eye a 5 % wrong size ratio sends it to the wrong depth.</li><li>Its learned model breaks when a joint hits its limit.</li><li>All results are simulations.</li></ul></div></div><p><button class=\"go\" data-hub=\"1\">📊 See all the paper’s experiments and run them in the browser</button></p>"}, {"short": "Frame rate", "title": "Question: does reaching improve with a faster camera (higher fps)?", "html": "<p class=\"big\"><b>Answer: yes, but only up to a point.</b> To measure it we ran a new 480-reach experiment: 15, 30, 60, 100 and 200 fps; 60 and 150 ms visual delay.</p><canvas class=\"qw-cv\" width=\"1500\" height=\"560\" data-chart=\"fps_os\"></canvas><div class=\"leg\" data-leg=\"fps_os\"></div><div class=\"qw-read\"><b>The chart step by step</b><ol><li>The horizontal axis is the camera rate (frames per second), the vertical axis the maximum overshoot.</li><li><b>15 fps:</b> both lines sit at 32–34 %. A frame lasts 67 ms; the robot cannot see its own 50 ms motor lag, picks too high a gain and overshoots.</li><li><b>30–60 fps:</b> overshoot falls to 6–7 % and every reach succeeds. The motor lag is still learned too small (10–25 ms).</li><li><b>100–200 fps:</b> the motor lag is learned correctly (50 ms) and overshoot falls to 0.8–3.6 %.</li><li><b>100 → 200 fps</b> changes little: 85–95 % of the effective delay is image delay and motor lag, which do not shrink with the frame rate.</li></ol></div><canvas class=\"qw-cv\" width=\"1500\" height=\"560\" data-chart=\"fps_succ\"></canvas><div class=\"leg\" data-leg=\"fps_succ\"></div><p class=\"note\"><b>Practical rule:</b> the camera should be fast enough to see the motor lag over at least two frames (≥ 40 fps for 50 ms; 100 fps is comfortable). Beyond that, faster image transfer and processing help more than a faster camera. Movement time does not change steadily with the frame rate (0.7–2.2 s), because depth perception is the real limit.</p>"}, {"short": "Simulator", "title": "What is this page for, and how do I use it?", "html": "<p class=\"big\">This page is a robot laboratory that runs in the browser without installation. You see the arm, the two cameras and the models side by side.</p><figure class=\"qw-shot\"><img src=\"shots/sim_overview.png\" alt=\"The page at a glance\" loading=\"lazy\" onerror=\"this.parentNode.style.display='none'\"><figcaption>The page at a glance</figcaption></figure><figure class=\"qw-shot\"><img src=\"shots/sim_eyes_scene.png\" alt=\"Eye windows and the 3D scene\" loading=\"lazy\" onerror=\"this.parentNode.style.display='none'\"><figcaption>Eye windows and the 3D scene</figcaption></figure><figure class=\"qw-shot\"><img src=\"shots/sim_hub.png\" alt=\"The paper-experiments window\" loading=\"lazy\" onerror=\"this.parentNode.style.display='none'\"><figcaption>The paper-experiments window</figcaption></figure><ol class=\"qw-steps\"><li><b>Eye windows:</b> what the two cameras see. The pixels of hand and target are here; İskender Governor uses only these.</li><li><b>3D scene:</b> arm, target, cameras. The dashed coloured arms are the other models reaching for the same target (ghost twins).</li><li><b>Twin-model bar:</b> ★ İskender Governor (our model) is always selected. Click a model name for a short explanation.</li><li><b>▶ Start simulation:</b> the arm reaches for the target. Raise the delay in tab 4 and try again: our model slows down but does not overshoot.</li><li><b>📊 Paper experiments:</b> tables, numbered charts and batch runs of every experiment in the paper.</li><li><b>⇱ Control-loop diagram:</b> shows the model’s internal computation steps live, next to the 3D scene.</li></ol>"}]}};
+  const NUM = ['①', '②', '③', '④', '⑤', '⑥'];
+  // ---------- 1. names and groups ----------
+  try {
+    MODEL_CAT = { pg: 'this', governor: 'ref', hlsl: 'old', hdap: 'old', bio: 'old', pid: 'lit', lqr: 'lit', fixed: 'lit' };
+    MODEL_CAT_LABEL = L.groups;
+    GHOST_MODELS.forEach(m => { const n = L.names[m.id]; if (n) { m.short = n[0]; m.label = n[1]; } });
+    if (typeof BENCHMARK_CTRL_LABELS !== 'undefined') Object.keys(L.names).forEach(k => { BENCHMARK_CTRL_LABELS[k] = L.names[k][1]; });
+    window.__modelTag = id => L.short_tag[MODEL_CAT[id]] || '';
+  } catch (e) { }
+  // ---------- 2. correct in-view flags of the randomised-workspace benchmark (from reports/v6_zone_benchmark.csv) ----------
+  const IN_VIEW = { Z1: [1,1,1,0,1,1,0,1,1,0,1,1], Z2: [1,1,1,1,1,0,1,1,0,0,1,1], Z3: [1,0,1,1,0,1,1,0,1,0,1,1], Z4: [0,0,0,1,0,0,0,1,1,1,1,1] };
+  window.__qwInView = j => !!(IN_VIEW[j.z] && IN_VIEW[j.z][j.i]);
+  // six-axis paper values (Table 6) for the delay sweep
+  window.__qwPaperDelay = {
+    'binocular|0.03': { pg: [100, 3.5, 1.06], governor: [92, 18.6, 3.71], pid: [83, 29.7, 4.50], fixed: [83, 29.7, 4.50] },
+    'binocular|0.06': { pg: [100, 2.8, 1.30], governor: [100, 9.9, 0.42], pid: [58, 53.3, 4.84], fixed: [67, 53.7, 4.81] },
+    'binocular|0.1':  { pg: [100, 2.0, 1.67], governor: [100, 5.3, 0.61], pid: [17, 134.8, null], fixed: [17, 135.0, null] },
+    'binocular|0.15': { pg: [100, 0.9, 2.12], governor: [100, 3.7, 0.96], pid: [0, 211.1, null], fixed: [0, 212.5, null] },
+    'binocular|0.2':  { pg: [92, 0.6, 2.40], governor: [100, 3.0, 1.27], pid: [0, 250.7, null], fixed: [0, 251.1, null] } };
+  window.__qwDelayNote = L.delay_note;
+
+  // ---------- 3. modal helper ----------
+  function modal(id, title) {
+    let ov = document.getElementById(id); if (ov) return ov;
+    ov = document.createElement('div'); ov.id = id; ov.className = 'qwModal'; ov.setAttribute('role', 'dialog');
+    ov.innerHTML = '<div class="box"><button class="qx" aria-label="close">×</button><h2>' + title + '</h2><div class="body"></div></div>';
+    document.body.appendChild(ov);
+    const close = () => { ov.classList.remove('open'); if (ov.__onclose) ov.__onclose(); };
+    ov.addEventListener('click', e => { if (e.target === ov) close(); });
+    ov.querySelector('.qx').onclick = close; ov.__close = close;
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && ov.classList.contains('open')) close(); });
+    return ov;
+  }
+  // ---------- 4. small chart library (numbered series) ----------
+  function lineChart(cv, o, prog) {
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height, m = { l: 92, r: 150, t: 36, b: 70 };
+    c.clearRect(0, 0, W, H); c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+    const xs = o.series.flatMap(s => s.pts.map(p => p[0])), ys = o.series.flatMap(s => s.pts.map(p => p[1])).filter(v => v !== null);
+    const x0 = o.xmin !== undefined ? o.xmin : Math.min(...xs), x1 = o.xmax !== undefined ? o.xmax : Math.max(...xs);
+    const tf = v => o.logy ? Math.log10(Math.max(v, o.ymin)) : v;
+    const y0 = tf(o.ymin !== undefined ? o.ymin : Math.min(...ys)), y1 = tf(o.ymax !== undefined ? o.ymax : Math.max(...ys));
+    const X = v => m.l + (v - x0) / (x1 - x0) * (W - m.l - m.r), Y = v => H - m.b - (tf(v) - y0) / (y1 - y0) * (H - m.t - m.b);
+    c.strokeStyle = '#e5e1da'; c.lineWidth = 1.5; c.font = '22px Inter, system-ui, sans-serif'; c.fillStyle = '#374151'; c.textAlign = 'right';
+    (o.yticks || []).forEach(v => { const y = Y(v); c.beginPath(); c.moveTo(m.l, y); c.lineTo(W - m.r, y); c.stroke(); c.fillText(String(v), m.l - 10, y + 7); });
+    c.textAlign = 'center'; (o.xticks || []).forEach((v, i) => { const x = X(v); c.fillText(o.xtl ? o.xtl[i] : String(v), x, H - m.b + 30); });
+    if (o.zero) { c.strokeStyle = '#9ca3af'; c.lineWidth = 2; c.beginPath(); c.moveTo(m.l, Y(0)); c.lineTo(W - m.r, Y(0)); c.stroke(); }
+    c.strokeStyle = '#374151'; c.lineWidth = 2; c.beginPath(); c.moveTo(m.l, m.t); c.lineTo(m.l, H - m.b); c.lineTo(W - m.r, H - m.b); c.stroke();
+    c.fillStyle = '#111827'; c.font = '600 23px Inter, sans-serif'; c.fillText(o.xlab, (m.l + W - m.r) / 2, H - 14);
+    c.save(); c.translate(26, (m.t + H - m.b) / 2); c.rotate(-Math.PI / 2); c.fillText(o.ylab, 0, 0); c.restore();
+    const pr = prog === undefined ? 1 : prog;
+    o.series.forEach((s, si) => {
+      const pts = s.pts.filter(p => p[1] !== null), n = Math.max(1, Math.round(pts.length * pr));
+      c.strokeStyle = s.color; c.lineWidth = s.w || 5; c.setLineDash(s.dash || []); c.beginPath();
+      pts.slice(0, n).forEach((p, i) => { if (i) c.lineTo(X(p[0]), Y(p[1])); else c.moveTo(X(p[0]), Y(p[1])); }); if (!s.noline) c.stroke(); c.setLineDash([]);
+      if (o.markers || s.noline) pts.slice(0, n).forEach(p => { c.fillStyle = s.color; c.beginPath(); c.arc(X(p[0]) + (s.dx || 0), Y(p[1]), s.noline ? 11 : 7, 0, 7); c.fill(); });
+      let lp = pts[n - 1]; if (!lp) return;
+      if (s.lx !== undefined) { const cand = pts.slice(0, n).reduce((b, p) => Math.abs(p[0] - s.lx) < Math.abs(b[0] - s.lx) ? p : b, pts[0]); if (Math.abs(cand[0] - s.lx) < 0.6) lp = cand; else return; }
+      const lx = X(lp[0]) + 14, ly = Y(lp[1]) + (s.dy || 0);
+      c.fillStyle = s.color; c.beginPath(); c.arc(lx + 14, ly, 16, 0, 7); c.fill();
+      c.fillStyle = '#fff'; c.font = '700 20px Inter, sans-serif'; c.textAlign = 'center'; c.fillText(String(si + 1), lx + 14, ly + 7);
+      c.fillStyle = s.color; c.textAlign = 'left'; c.font = '600 20px Inter, sans-serif'; c.fillText(s.tag || '', lx + 36, ly + 7);
+    });
+  }
+  function legend(series) {
+    return '<ol class="qw-leg">' + series.map((s, i) => '<li><span class="n" style="background:' + s.color + '">' + (i + 1) + '</span><span class="sw" style="border-top:5px ' + (s.dash ? 'dashed' : 'solid') + ' ' + s.color + '"></span>' + s.label + '</li>').join('') + '</ol>';
+  }
+  function animate(cv, o, ms) {
+    if (cv.__raf) cancelAnimationFrame(cv.__raf);
+    const t0 = performance.now();
+    const f = () => { const p = Math.min(1, (performance.now() - t0) / ms); lineChart(cv, o, p); if (p < 1) cv.__raf = requestAnimationFrame(f); };
+    f();
+  }
+  // delayed loop e' = -k e(t - 1), time in units of the delay
+  function dde(kd, tmax) { const h = 1 / 50, lag = 50, n = Math.round(tmax * 50), e = new Array(n + lag + 1).fill(1);
+    for (let i = lag; i < n + lag; i++) e[i + 1] = e[i] - h * kd * e[i - lag];
+    const pts = []; for (let i = lag; i <= n + lag; i += 2) pts.push([(i - lag) / 50, e[i]]); return pts; }
+
+  // ---------- 5. paper-experiment hub ----------
+  const C = L.colors;
+  function tableHtml(t) {
+    return '<div class="qw-tw"><table class="qw-t"><tr>' + t.h.map(x => '<th>' + x + '</th>').join('') + '</tr>'
+      + t.r.map(r => '<tr' + (r.ours ? ' class="ours"' : '') + '>' + r.c.map(x => '<td>' + x + '</td>').join('') + '</tr>').join('') + '</table></div>';
+  }
+  const hub = modal('qwHub', L.hub.title);
+  function buildHub() {
+    const b = hub.querySelector('.body');
+    b.innerHTML = '<p class="lead">' + L.hub.lead + '</p>'
+      + '<div class="qw-run"><button class="go" data-run="queue">' + L.hub.run_all + '</button><button data-run="delay">' + L.hub.run_delay + '</button><button data-run="w60">' + L.hub.run_a + '</button><button data-run="w150m">' + L.hub.run_b + '</button><button data-run="full">' + L.hub.run_full + '</button></div>'
+      + '<p class="hint">' + L.hub.run_hint + '</p>'
+      + '<nav class="qw-toc">' + L.exps.map((x, i) => '<a href="#qwE' + i + '">' + x.id + ' ' + x.title + '</a>').join('') + '</nav>'
+      + L.exps.map((x, i) => '<section class="qw-exp" id="qwE' + i + '"><h3>' + x.id + ' · ' + x.title + ' <span class="src">' + x.src + '</span></h3>'
+        + '<p>' + x.what + '</p>' + (x.chart ? '<canvas class="qw-cv" width="1500" height="560" data-chart="' + x.chart + '"></canvas><div class="leg" data-leg="' + x.chart + '"></div>' : '')
+        + tableHtml(x.table) + '<p class="read"><b>' + L.hub.read + '</b> ' + x.read + '</p>'
+        + (x.run ? '<div class="qw-run"><button class="go" data-run="' + x.run + '">▶ ' + L.hub.run_this + '</button></div>' : '<p class="py">' + L.hub.python + ' <code>' + x.cmd + '</code></p>') + '</section>').join('');
+    b.querySelectorAll('[data-run]').forEach(el => el.addEventListener('click', () => runModes(el.dataset.run === 'queue' ? ['delay', 'w60', 'w150m'] : [el.dataset.run])));
+    b.querySelectorAll('canvas[data-chart]').forEach(cv => { const o = L.charts[cv.dataset.chart]; if (!o) return; const lg = b.querySelector('[data-leg="' + cv.dataset.chart + '"]'); if (lg) lg.innerHTML = legend(o.series); lineChart(cv, o, 1); });
+    b.querySelectorAll('.qw-toc a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); const t = b.querySelector(a.getAttribute('href')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+  }
+  let queue = [];
+  function runModes(modes) {
+    hub.__close(); queue = modes.slice(); startNext();
+  }
+  function startNext() {
+    const P = window.__qwPaperPlayer; if (!P || P.running || !queue.length) return;
+    const mode = queue.shift();
+    const r = document.querySelector('input[name=ppMode][value="' + mode + '"]'); if (r) r.checked = true;
+    const tb = document.querySelector('.tab-btn[data-tab="tab5"]'); if (tb) tb.click();
+    const sp = document.getElementById('ppSpeed'); if (sp && mode === 'delay' && sp.value === '1') sp.value = '2';
+    setTimeout(() => { const st = document.getElementById('ppStart'); if (st) st.click(); const sc = document.getElementById('pwScene'); if (sc) sc.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 200);
+  }
+  // progress strip + queue runner
+  const strip = document.createElement('div'); strip.id = 'qwRunStrip';
+  strip.innerHTML = '<b>📊</b> <span class="t"></span> <i class="bar"><i></i></i> <button class="show">' + L.strip.show + '</button><button class="stop">' + L.strip.stop + '</button>';
+  document.body.appendChild(strip);
+  strip.querySelector('.show').onclick = () => { const c = document.getElementById('cardPaperPlayer'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  strip.querySelector('.stop').onclick = () => { queue = []; const s = document.getElementById('ppStop'); if (s) s.click(); };
+  let wasRunning = false;
+  setInterval(() => {
+    const P = window.__qwPaperPlayer; if (!P) return;
+    if (P.running) {
+      strip.classList.add('on'); const n = P.jobs.length || 1;
+      strip.querySelector('.t').textContent = L.strip.label[P.mode] + ' · ' + Math.min(P.i + 1, n) + ' / ' + n + (queue.length ? ' · ' + L.strip.next + ' ' + queue.map(q => L.strip.label[q]).join(', ') : '');
+      strip.querySelector('.bar i').style.width = (100 * P.i / n).toFixed(1) + '%';
+    } else strip.classList.remove('on');
+    if (wasRunning && !P.running && queue.length) setTimeout(startNext, 900);
+    wasRunning = P.running;
+  }, 400);
+  const bb = document.getElementById('btnOpenBenchmark');
+  if (bb) {
+    const nb = bb.parentNode ? bb.cloneNode(true) : bb; if (bb.parentNode) bb.parentNode.replaceChild(nb, bb);   // drop the old handlers
+    nb.title = L.hub.btn_tip;
+    nb.addEventListener('click', () => { buildHub(); hub.classList.add('open'); });
+  }
+  const hb = document.createElement('button'); hb.type = 'button'; hb.className = 'btn qw-float-head'; hb.textContent = L.hub.header_btn; hb.title = L.hub.btn_tip;
+  hb.addEventListener('click', () => { buildHub(); hub.classList.add('open'); });
+  const ha = document.querySelector('.header-actions'); if (ha) ha.insertBefore(hb, ha.firstChild);
+  window.__qwOpenHub = () => { buildHub(); hub.classList.add('open'); };
+
+  // ---------- 6. project story (purpose) ----------
+  const st = modal('qwStory', '🎯 ' + L.story.title);
+  let chap = 0, timers = [];
+  function clearT() { timers.forEach(t => { clearInterval(t); clearTimeout(t); cancelAnimationFrame(t); }); timers = []; }
+  st.__onclose = clearT;
+  function showChap(i) {
+    clearT(); chap = Math.max(0, Math.min(L.story.ch.length - 1, i));
+    const ch = L.story.ch[chap], b = st.querySelector('.body');
+    b.innerHTML = '<nav class="qw-chaps">' + L.story.ch.map((c, k) => '<button class="' + (k === chap ? 'on' : '') + '" data-k="' + k + '">' + (k + 1) + '. ' + c.short + '</button>').join('') + '</nav>'
+      + '<h3>' + (chap + 1) + '. ' + ch.title + '</h3>' + ch.html
+      + '<div class="qw-nav"><button class="pv"' + (chap ? '' : ' disabled') + '>‹ ' + L.story.prev + '</button><button class="rp">↻ ' + L.story.replay + '</button>'
+      + (chap < L.story.ch.length - 1 ? '<button class="go nx">' + L.story.next + ' ›</button>' : '<button class="go try">▶ ' + L.story.try_btn + '</button>') + '</div>';
+    b.querySelectorAll('.qw-chaps button').forEach(x => x.onclick = () => showChap(+x.dataset.k));
+    b.querySelector('.pv').onclick = () => showChap(chap - 1); b.querySelector('.rp').onclick = () => showChap(chap);
+    const nx = b.querySelector('.nx'); if (nx) nx.onclick = () => showChap(chap + 1);
+    const tr = b.querySelector('.try'); if (tr) tr.onclick = tryOurs;
+    b.querySelectorAll('[data-hub]').forEach(x => x.onclick = () => { st.__close(); window.__qwOpenHub(); });
+    // animations
+    b.querySelectorAll('canvas[data-chart]').forEach(cv => { const o = L.charts[cv.dataset.chart]; if (!o) return; const lg = b.querySelector('[data-leg="' + cv.dataset.chart + '"]'); if (lg) lg.innerHTML = legend(o.series); animate(cv, o, 2600); });
+    const fog = b.querySelector('canvas.fog'); if (fog) fogAnim(fog);
+    const lanes = b.querySelector('canvas.lanes'); if (lanes) lanesAnim(lanes);
+    const bar = b.querySelector('canvas.deff'); if (bar) deffAnim(bar);
+    const steps = b.querySelectorAll('.step'); if (steps.length) { let k = 0; steps[0].classList.add('on'); timers.push(setInterval(() => { steps.forEach(s => s.classList.remove('on')); k = (k + 1) % steps.length; steps[k].classList.add('on'); }, 1700)); }
+    b.scrollTop = 0; st.querySelector('.box').scrollTop = 0;
+  }
+  function tryOurs() {
+    st.__close();
+    const s = document.getElementById('selController'); if (s) { s.value = 'pg'; s.dispatchEvent(new Event('change', { bubbles: true })); }
+    state.controller = 'pg'; try { renderGhostModelBar(); } catch (e) { }
+    const run = document.getElementById('btnRunReach'); if (run) run.click();
+    const sc = document.getElementById('pwScene'); if (sc) sc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  // chapter 1: fog road — the driver sees the obstacle late
+  function fogAnim(cv) {
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height, LAG = 45; let f = 0;
+    const runs = [{ kd: 1.3, y: H * 0.3, col: '#8f2d2d', lab: L.story.fog_a }, { kd: 1 / Math.E, y: H * 0.74, col: '#c2410c', lab: L.story.fog_b }];
+    const sims = runs.map(r => { const h = 1 / LAG, n = 9 * LAG, e = new Array(n + LAG).fill(1); for (let i = LAG; i < n + LAG - 1; i++) e[i + 1] = e[i] - h * r.kd * e[i - LAG]; return e; });
+    const x0 = 120, x1 = W * 0.7, X = e => x0 + (1 - e) * (x1 - x0);
+    const draw = () => {
+      c.clearRect(0, 0, W, H); c.fillStyle = '#f3f4f6'; c.fillRect(0, 0, W, H);
+      runs.forEach((r, k) => {
+        const E = sims[k], i = Math.min(E.length - 1, LAG + f), y = r.y;
+        c.fillStyle = '#4b5563'; c.fillRect(40, y - 40, W - 80, 80); c.strokeStyle = '#fff'; c.setLineDash([30, 24]); c.lineWidth = 4; c.beginPath(); c.moveTo(40, y); c.lineTo(W - 40, y); c.stroke(); c.setLineDash([]);
+        c.fillStyle = '#b45309'; c.fillRect(x1 + 30, y - 46, 26, 92); c.fillStyle = '#111827'; c.font = '600 22px Inter, sans-serif'; c.textAlign = 'center'; c.fillText(L.story.obstacle, x1 + 43, y + 72);
+        const xg = X(E[Math.max(0, i - LAG)]); c.globalAlpha = .35; car(c, xg, y, '#2f5fa7'); c.globalAlpha = 1;
+        c.fillStyle = '#2f5fa7'; c.font = '500 19px Inter, sans-serif'; c.fillText(L.story.seen, xg, y - 50);
+        const xh = X(E[i]); car(c, xh, y, r.col);
+        const g = c.createLinearGradient(xh + 30, 0, W, 0); g.addColorStop(0, 'rgba(243,244,246,0)'); g.addColorStop(.25, 'rgba(229,231,235,.85)'); c.fillStyle = g; c.fillRect(xh + 30, y - 44, W - xh, 88);
+        c.fillStyle = r.col; c.font = '700 24px Inter, sans-serif'; c.textAlign = 'left'; c.fillText((k + 1) + '. ' + r.lab, 40, y - 54);
+        if (xh + 40 > x1 + 30) { c.fillStyle = '#b91c1c'; c.font = '800 26px Inter, sans-serif'; c.textAlign = 'right'; c.fillText('⚠ ' + L.story.crash, W - 50, y - 54); }
+      });
+    };
+    const loop = () => { f += 1; draw(); if (LAG + f < sims[0].length - 1) timers.push(requestAnimationFrame(loop)); else timers.push(setTimeout(() => { f = 0; loop(); }, 1500)); };
+    loop();
+  }
+  function car(c, x, y, col) { c.fillStyle = col; c.beginPath(); c.roundRect ? c.roundRect(x - 34, y - 20, 68, 40, 10) : c.rect(x - 34, y - 20, 68, 40); c.fill(); c.fillStyle = '#111'; c.beginPath(); c.arc(x - 18, y + 22, 8, 0, 7); c.arc(x + 18, y + 22, 8, 0, 7); c.fill(); }
+  // chapter 3: robot hand lanes
+  function lanesAnim(cv) {
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height, LAG = 60; let f = 0;
+    const runs = [{ kd: 1.2, y: H * 0.3, col: '#6b7280', lab: L.story.lane_a }, { kd: 1 / Math.E, y: H * 0.74, col: '#c2410c', lab: L.story.lane_b }];
+    const sims = runs.map(r => { const h = 1 / LAG, n = 9 * LAG, e = new Array(n + LAG).fill(1); for (let i = LAG; i < n + LAG - 1; i++) e[i + 1] = e[i] - h * r.kd * e[i - LAG]; return e; });
+    const x0 = 140, x1 = W * 0.6, X = e => Math.min(W - 60, x0 + (1 - e) * (x1 - x0));
+    const draw = () => {
+      c.clearRect(0, 0, W, H); c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+      runs.forEach((r, k) => {
+        const E = sims[k], i = Math.min(E.length - 1, LAG + f), y = r.y;
+        c.strokeStyle = '#e5e1da'; c.lineWidth = 6; c.beginPath(); c.moveTo(x0, y); c.lineTo(W - 60, y); c.stroke();
+        c.fillStyle = 'rgba(220,38,38,.08)'; c.fillRect(x1, y - 44, W - 60 - x1, 88);
+        c.strokeStyle = '#e0a04a'; c.lineWidth = 7; c.beginPath(); c.arc(x1, y, 28, 0, 7); c.stroke();
+        c.fillStyle = '#9a6a1f'; c.font = '500 21px Inter, sans-serif'; c.textAlign = 'center'; c.fillText(L.story.target, x1, y + 60);
+        const xg = X(E[Math.max(0, i - LAG)]); c.fillStyle = 'rgba(47,95,167,.28)'; c.beginPath(); c.arc(xg, y, 21, 0, 7); c.fill();
+        c.fillStyle = '#2f5fa7'; c.font = '500 19px Inter, sans-serif'; c.fillText('👁 ' + L.story.ghost, xg, y - 32);
+        const xh = X(E[i]); c.fillStyle = r.col; c.beginPath(); c.arc(xh, y, 23, 0, 7); c.fill(); c.fillStyle = '#fff'; c.font = '700 21px Inter, sans-serif'; c.fillText('✋', xh, y + 8);
+        c.fillStyle = r.col; c.font = '700 24px Inter, sans-serif'; c.textAlign = 'left'; c.fillText((k + 1) + '. ' + r.lab, 40, y - 64);
+        if (xh > x1 + 6) { c.fillStyle = '#b91c1c'; c.font = '800 26px Inter, sans-serif'; c.textAlign = 'right'; c.fillText('⚠ ' + L.story.over, W - 60, y - 64); }
+      });
+    };
+    const loop = () => { f += 2; draw(); if (LAG + f < sims[0].length - 1) timers.push(requestAnimationFrame(loop)); else timers.push(setTimeout(() => { f = 0; loop(); }, 1500)); };
+    loop();
+  }
+  // chapter 4: effective delay as a growing stacked bar
+  function deffAnim(cv) {
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height; const parts = L.story.deff_parts; const tot = parts.reduce((a, p) => a + p[1], 0);
+    const x0 = 60, x1 = W - 60, X = v => x0 + v / tot * (x1 - x0); let t0 = performance.now();
+    const draw = () => {
+      const p = Math.min(1, (performance.now() - t0) / 3200) * parts.length; c.clearRect(0, 0, W, H); c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+      let acc = 0; parts.forEach((q, k) => { const sh = Math.max(0, Math.min(1, p - k)); if (sh <= 0) return; const a = X(acc), w = (X(acc + q[1]) - a) * sh;
+        c.fillStyle = q[2]; c.fillRect(a, 70, w, 90); c.fillStyle = '#fff'; c.font = '700 26px Inter, sans-serif'; c.textAlign = 'center'; if (sh > .6) c.fillText((k + 1) + '', a + w / 2, 125);
+        c.fillStyle = '#111827'; c.font = '600 21px Inter, sans-serif'; if (sh > .9) { c.fillText(q[0], a + w / 2, 200); c.fillText(q[1] + ' ms', a + w / 2, 230); } acc += q[1]; });
+      c.fillStyle = '#111827'; c.font = '700 26px Inter, sans-serif'; c.textAlign = 'left'; c.fillText(L.story.deff_title, x0, 46);
+      if (p >= parts.length) { c.textAlign = 'right'; c.fillStyle = '#c2410c'; c.fillText('δ_eff = ' + tot + ' ms  →  k = (1/e) / ' + (tot / 1000).toFixed(3) + ' s = ' + (1 / Math.E / (tot / 1000)).toFixed(2) + ' 1/s', x1, 46); }
+      if (p < parts.length) timers.push(requestAnimationFrame(draw));
+    };
+    draw();
+  }
+  const pb = document.getElementById('btnPurpose');
+  if (pb) { const nb = pb.parentNode ? pb.cloneNode(true) : pb; if (pb.parentNode) pb.parentNode.replaceChild(nb, pb); nb.addEventListener('click', () => { st.classList.add('open'); showChap(0); }); }
+  window.__qwOpenStory = k => { st.classList.add('open'); showChap(k || 0); };
+  // build e(t) chart data now (needs dde)
+  if (L.charts.ett) L.charts.ett.series.forEach(s => { s.pts = dde(s.kd, 12); });
+  try { renderGhostModelBar(); renderCompareTable(); } catch (e) { }
 })();
 </script>
 </body>
